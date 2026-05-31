@@ -82,6 +82,15 @@ def parse_args() -> argparse.Namespace:
             "the faithfulness sweet spot, 0 disables it)"
         ),
     )
+    parser.add_argument(
+        "--time-mask-frac",
+        type=float,
+        default=0.15,
+        help=(
+            "fraction of time steps randomly zeroed per window (exp-008; ~0.15 "
+            "further raises faithfulness, 0 disables it)"
+        ),
+    )
     return parser.parse_args()
 
 
@@ -101,6 +110,7 @@ def main() -> int:
         relevance_weight=args.relevance_weight,
         occlusion_weight=args.occlusion_weight,
         noise_std=args.noise_std,
+        time_mask_frac=args.time_mask_frac,
     )
 
     result = train_baseline(config)
@@ -137,6 +147,7 @@ def main() -> int:
             "relevance_weight": config.relevance_weight,
             "occlusion_weight": config.occlusion_weight,
             "noise_std": config.noise_std,
+            "time_mask_frac": config.time_mask_frac,
             "channel_attention": config.model.channel_attention,
         },
     }

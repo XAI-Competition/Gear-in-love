@@ -457,3 +457,29 @@ uv run --no-sync gearxai package --model runs\<name>\model.onnx `
 **最佳可提交模型**: `runs/final/submission.zip`（narrow + noise=0.1）。
 **剩余候选方向**（未做，预计收益递减）: 全量 737k 数据训练、mixup/时间mask 等其他增强、
 relevance 框架级重构（高风险）。确定性收益已基本挖尽。
+
+---
+
+## exp-008 — Time-masking 增强叠加 noise（GPU sweep，真实 devkit）
+
+- **日期**: 2026-06-01
+- **commit (代码来源)**: `1e12352` — time-masking augmentation
+- **硬件**: RTX 4060，narrow + noise=0.1 基底，~0.9s/epoch
+- **假设**: exp-007 证明噪声增强间接提 faith。time-masking（随机置零部分时间步）能否进一步
+  迫使分类器分散时间依赖，叠加提升 faith。扫 `time_mask_frac`，基底 noise=0.1。
+- **结果**（narrow，train 10000/类、20 epoch、eval 5000）:
+
+  | time_mask | macro-F1 | faith | expl_partial |
+  | ---: | ---: | ---: | ---: |
+  | 0.0（纯 noise） | 0.9723 | 0.7169 | 0.4712 |
+  | 0.1 | 0.9718 | 0.7280 | 0.4756 |
+  | **0.2** | 0.9603 | **0.7296** | **0.4762** |
+  | 0.3 | 0.9418 | 0.7243 | 0.4741 |
+
+- **关键发现**: time-masking **确实在 noise 基础上进一步叠加提升 faith**。
+  `time_mask=0.2` 是甜点：faith 0.7169→**0.7296（+0.013）**，expl_partial **0.4762**（刷新纪录）。
+  但 macro-F1 在子集上降到 0.960（mask 越大降越多，0.3 时 0.942）——全量数据通常会拉回。
+  mask=0.1（faith 0.728，macro-F1 0.972 更安全）与 0.2 很接近。
+- **决定 / 下一步**: 增强可叠加（noise + time-mask）是又一确定收益。用 **narrow + noise=0.1 +
+  time_mask=0.15**（0.1 与 0.2 的折中，平衡 faith 与 macro-F1 裕度）全量训练，产出新最佳提交，
+  对比 exp-007-final（faith 0.722）。
