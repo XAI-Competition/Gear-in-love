@@ -38,7 +38,8 @@ uv sync --python 3.12          # create/sync .venv from pyproject + uv.lock
 **Heads up:** the installed `.venv` has `torch==2.12.0+cpu`, but `pyproject.toml` pins
 `torch>=2.7,<2.8` from the cu126 index. Because of that mismatch, plain `uv run …` tries to
 re-resolve and download torch on every call. Use **`uv run --no-sync …`** to run against the
-existing venv without re-syncing (and note training is **CPU-only** — no CUDA).
+existing venv without re-syncing. With this CPU torch, training runs **on CPU** even though a
+GPU is present — see *Compute resources* below before scaling up.
 
 ```powershell
 uv run pytest                            # run the test suite (testpaths = tests/)
@@ -128,6 +129,31 @@ Two scoring facts to keep in mind when changing the model:
 Export uses the **legacy** TorchScript exporter (`torch.onnx.export(..., dynamo=False)`): the
 installed torch 2.12 defaults to the dynamo path, which needs `onnxscript` (not installed).
 
+## Compute resources
+
+Training is **not** locked to CPU — it only runs on CPU today because the installed `.venv` has
+`torch==2.12.0+cpu`. Hardware available:
+
+- **Local:** NVIDIA **RTX 4060 Laptop, 8 GB VRAM** (driver 566.07). Good for fast iteration on
+  the small baseline; 8 GB is the constraint — keep batch/model modest. The current baseline
+  (~150k params, windows `[8,100]`) is tiny, so even large batches fit easily.
+- **Remote (on request):** the user can provision **multiple H20 GPUs** — ample capacity. **Ask
+  the user** when a run genuinely needs more than the 4060 (full 737k-window training, large
+  sweeps, bigger models, multi-seed studies). Don't assume it silently; request it.
+
+To actually use a GPU you must first install a **CUDA build of torch** (the venv is CPU-only
+right now). `pyproject.toml` already pins the `pytorch-cu126` index, so a CUDA wheel is the
+intended target — installing it then makes `torch.cuda.is_available()` true. After that:
+
+- move the model and tensors to `cuda` in `train.py` (the loop is currently CPU/`from_numpy`),
+- **export ONNX from the CPU copy** (`model.cpu()`), and keep the submission **CPU-only** — the
+  evaluator runs ONNX Runtime on `CPUExecutionProvider`, so the deliverable must not require CUDA.
+- after switching torch, plain `uv run` re-sync behavior may differ; keep using `--no-sync` and
+  verify `torch.cuda.is_available()` before a long run.
+
+Rule of thumb: prototype on the 4060; **request H20s for any heavy/long run** and log which
+hardware each experiment used in `progress.md`.
+
 ## Experiment log & git discipline (REQUIRED)
 
 Every experiment must be reproducible from a commit. Follow this loop for any run that
@@ -140,6 +166,7 @@ produces a model, metrics, or a notable result:
    - the **git commit hash** (`git rev-parse --short HEAD`) the run was produced from,
    - date, goal/hypothesis, and the exact command(s) run,
    - the config that matters (subset sizes, epochs, batch size, seed, arch changes),
+   - the **hardware** used (CPU / RTX 4060 / H20×N) and rough wall-clock time,
    - the **devkit metrics** (macro-F1, faith, simplicity; mechanical is `null` locally),
    - artifact paths (e.g. `runs/<name>/submission.zip`) and a one-line takeaway / next step.
 3. **Commit again after logging**, so `progress.md` and any kept artifacts land in history. Use a
