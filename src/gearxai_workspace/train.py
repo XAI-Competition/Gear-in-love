@@ -48,6 +48,10 @@ class TrainConfig:
     # (time masking). Tests whether forcing the classifier to spread its reliance
     # across time further improves faithfulness. 0 disables it.
     time_mask_frac: float = 0.0
+    # exp-009: per-window probability of zeroing each input channel during
+    # training (channel dropout). Tests whether forcing the classifier off any
+    # single channel further improves faithfulness (orthogonal to time masking).
+    channel_drop_prob: float = 0.0
     model: ModelConfig = field(default_factory=ModelConfig)
 
 
@@ -231,6 +235,13 @@ def train_baseline(config: TrainConfig) -> dict:
                     >= config.time_mask_frac
                 ).float()
                 xb = xb * keep
+            if config.channel_drop_prob > 0:
+                # Zero each channel independently per window (channel dropout).
+                keep_ch = (
+                    torch.rand(xb.shape[0], xb.shape[1], 1, device=xb.device)
+                    >= config.channel_drop_prob
+                ).float()
+                xb = xb * keep_ch
             optimizer.zero_grad(set_to_none=True)
             use_relevance = config.relevance_weight > 0 or config.occlusion_weight > 0
             if use_relevance:
