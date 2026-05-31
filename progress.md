@@ -411,3 +411,49 @@ uv run --no-sync gearxai package --model runs\<name>\model.onnx `
   faith 天花板（让 relevance 标注的高 |x| cell 对预测更因果）。noise_std=0.2 开始伤分类，过头。
 - **决定 / 下一步**: 噪声增强是**真实、可测、确定**的 faith 收益，且与 narrow 的 simplicity 收益
   **正交可叠加**。用 **narrow + noise_std=0.1** 全量训练产出新最佳提交，替代 exp-005-final。
+
+---
+
+## exp-007-final — 最终最佳提交：narrow + noise=0.1（叠加两个确定收益）
+
+- **日期**: 2026-06-01
+- **commit (代码来源)**: `0283705`
+- **硬件**: RTX 4060，全量 360k 训练窗口，40 epoch，~3s/epoch
+- **命令**:
+  ```powershell
+  uv run --no-sync python scripts\train_baseline.py --train-per-class 40000 `
+    --val-per-class 4000 --epochs 40 --batch-size 768 --device cuda --noise-std 0.1 `
+    --out runs\final\model.onnx
+  uv run --no-sync gearxai package --model runs\final\model.onnx `
+    --data-dir data\prepared --split validation --out runs\final\submission.zip
+  ```
+- **最终指标（完整公开验证集 83,790 样本）**:
+
+  | 指标 | **final (narrow+noise)** | narrow | exp-001 baseline |
+  | --- | ---: | ---: | ---: |
+  | macro-F1 | **0.9926** | 0.9914 | 0.9968 |
+  | faithfulness | **0.7219** | 0.7022 | 0.7077 |
+  | simplicity | **0.9220** | 0.9220 | 0.8363 |
+  | expl_partial (0.4·f+0.2·s) | **0.4732** | 0.4653 | 0.4504 |
+
+- **产物**: `runs/final/submission.zip`（valid + eligible；model_sha256 `7a8c011a…`，
+  39,689 参数、41 算子）、`runs/final/model.onnx`、`model.pt`、`train_summary.json`。
+- **结论（本轮探索最终交付）**: **两个正交的确定收益成功叠加**——simplicity（narrow，+0.086）
+  + faithfulness（噪声增强，+0.014）。最终 expl_partial **0.4732，比 exp-001 baseline 高 +0.023
+  （+5.1%）**，macro-F1 仍 0.993 远超 0.80 门槛。这是本轮 7 方向系统探索收敛得到的最佳可提交模型。
+
+## 本轮长程探索总结（最终，截至 0283705）
+
+| 方向 | 实验 | 结论 | 收益 |
+| --- | --- | --- | --- |
+| GPU 训练基础设施 | env-001 | torch cu126，~18× 加速 | 使能 |
+| 机械对齐（40%） | exp-002 | 本地不可靠（窗口<1转/变速/私有频带）；通道先验净负 | 否决 |
+| faith 通道遮挡蒸馏 | exp-003 | 大模型微弱正、小模型负 | 否决（小模型） |
+| **simplicity（20%）** | exp-004/005 | **narrow (32,64,128) 甜点** | **+0.086 simplicity** |
+| faith 时间维公式 | exp-006 | 固定分类器下 \|x\| 已最优（仅排序重要） | 已最优 |
+| **faith 训练增强** | exp-007 | **噪声增强间接提 faith，std=0.1 甜点** | **+0.014 faith** |
+| **最终叠加** | exp-007-final | narrow+noise=0.1 | **expl_partial 0.4504→0.4732（+0.023）** |
+
+**最佳可提交模型**: `runs/final/submission.zip`（narrow + noise=0.1）。
+**剩余候选方向**（未做，预计收益递减）: 全量 737k 数据训练、mixup/时间mask 等其他增强、
+relevance 框架级重构（高风险）。确定性收益已基本挖尽。

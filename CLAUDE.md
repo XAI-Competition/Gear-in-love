@@ -120,18 +120,21 @@ pool, `softmax`) plus a forward Grad-CAM relevance head (`relevance = softplus(c
 upsampled to length 100 by `F.interpolate`) — nonnegative, deterministic, exportable without
 autograd.
 
-**Current best submittable model** is `narrow` (`ModelConfig.widths=(32,64,128)`, the default):
-on the full public validation split macro-F1 **0.991**, faithfulness **0.702**, simplicity
-**0.922** (`runs/narrow/submission.zip`). It beats the original `(64,128,256)` baseline on the
-locally-measurable explainability (`0.4·faith + 0.2·simplicity`) by +0.015 — all from simplicity,
-since simplicity is 20% of the score and the conv layers held ~96% of the params.
+**Current best submittable model** is `narrow` (`ModelConfig.widths=(32,64,128)`, the default)
+trained with **input-noise augmentation `--noise-std 0.1`** (also the default): on the full
+public validation split macro-F1 **0.993**, faithfulness **0.722**, simplicity **0.922**
+(`runs/final/submission.zip`). It beats the original `(64,128,256)` baseline on the
+locally-measurable explainability (`0.4·faith + 0.2·simplicity`) by **+0.023** — stacking two
+orthogonal, certain gains: narrow lifts simplicity (+0.086; conv layers held ~96% of the params,
+and simplicity is 20% of the score) and noise augmentation lifts faithfulness (+0.014; see below).
 
 Hard-won scoring facts from the experiment sweep (don't re-litigate without reading progress.md):
 - **Faithfulness** (40%) is deletion/insertion AUC against an **all-zero** baseline; the devkit's
-  `topk_mask` only uses relevance *ranking*, so monotonic transforms of relevance don't change it.
-  `|x|` for the time axis is already optimal; faith is converged at ~0.70 in this framework
-  (exp-006). Occlusion-distilling the channel gate helps the big model slightly but **hurts** the
-  narrow one (exp-003/005).
+  `topk_mask` only uses relevance *ranking*, so monotonic transforms of relevance don't change it
+  and `|x|` for the time axis is already optimal *for a fixed classifier* (exp-006). The lever that
+  works is **changing the classifier**: input-noise augmentation (`--noise-std 0.1`) makes it rely
+  on robust cells and raises faith 0.706→0.722 (exp-007). Occlusion-distilling the channel gate
+  helps the big model slightly but **hurts** the narrow one (exp-003/005) — leave it off.
 - **Mechanical alignment** (40%) needs a private STFT band config the devkit doesn't ship, so
   `gearxai package` reports `mechanical_score: null` locally. It is also **time-degenerate** on
   100-sample windows (STFT → 1 frame) and the channel-prior lever tested net-negative against
