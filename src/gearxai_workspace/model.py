@@ -21,6 +21,13 @@ Design choices, tied to how the devkit scores submissions:
   the highest-relevance cells against a **zero** baseline, so marking
   large-magnitude cells at class-relevant times is exactly what it rewards.
   ``softplus`` keeps the map strictly nonnegative and finite.
+
+* **Channel attention** (optional) — a tiny class-conditioned per-channel gate
+  multiplies the relevance. The devkit's mechanical-alignment metric is time-
+  degenerate on length-100 windows (its STFT has a single frame), so the only
+  lever is how much relevance mass each channel receives; this gate lets each
+  predicted class shift mass toward the channels carrying its fault-band energy.
+  Zero-initialized so it starts as the identity (|x|-only relevance).
 """
 
 from __future__ import annotations
@@ -33,6 +40,10 @@ from torch.nn import functional as F
 
 from gearxai_workspace.data import NUM_CHANNELS, NUM_CLASSES, WINDOW_LENGTH
 
+# softplus(_SOFTPLUS_INV_1) == 1.0, so a zero-initialized channel gate starts at
+# unit (identity) weighting and the relevance equals the |x|-only baseline.
+_SOFTPLUS_INV_1 = 0.5413248538970947
+
 
 @dataclass(frozen=True)
 class ModelConfig:
@@ -42,6 +53,13 @@ class ModelConfig:
     kernel_sizes: tuple[int, ...] = (7, 5, 3)
     pool: int = 2
     dropout: float = 0.1
+    # Class-conditioned channel attention on the relevance head. The devkit's
+    # mechanical-alignment metric is time-degenerate on length-100 windows (its
+    # STFT yields a single frame), so the only lever is *how much relevance mass
+    # each channel gets*. This adds a tiny [num_classes, in_channels] gate that
+    # lets each predicted class emphasize the channels carrying its fault-band
+    # energy — without touching the time profile that drives faithfulness.
+    channel_attention: bool = True
 
 
 class ConvBlock(nn.Module):
@@ -83,6 +101,17 @@ class GearXAINet(nn.Module):
         # Head consumes concatenated [mean-pool, max-pool] features.
         self.head = nn.Linear(2 * in_ch, cfg.num_classes)
 
+        # Class-conditioned channel attention: maps class probabilities to a
+        # per-channel gate. Tiny (num_classes x in_channels), so simplicity is
+        # barely affected. Initialized to ~uniform so training starts from the
+        # |x|-only relevance and learns channel emphasis from there.
+        if cfg.channel_attention:
+            self.channel_gate = nn.Linear(cfg.num_classes, cfg.in_channels)
+            nn.init.zeros_(self.channel_gate.weight)
+            nn.init.zeros_(self.channel_gate.bias)
+        else:
+            self.channel_gate = None
+
     def _features(self, windows: torch.Tensor) -> torch.Tensor:
         return self.features(self.input_norm(windows))  # [N, C, T']
 
@@ -113,6 +142,13 @@ class GearXAINet(nn.Module):
         )  # [N, 1, 100]
         gate = F.softplus(cam_up)  # [N, 1, 100] >= 0
         relevance = gate * windows.abs()  # [N, 8, 100], nonnegative
+
+        if self.channel_gate is not None:
+            # Per-channel multiplicative gate, class-conditioned. softplus keeps
+            # it positive; centered at 1.0 since channel_gate starts at zero, so
+            # the model departs from the |x|-only relevance only as it learns.
+            ch_gate = F.softplus(self.channel_gate(probabilities) + _SOFTPLUS_INV_1)
+            relevance = relevance * ch_gate.unsqueeze(2)  # [N, 8, 1] broadcast
 
         return probabilities, relevance
 

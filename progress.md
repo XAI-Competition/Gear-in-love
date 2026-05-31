@@ -57,3 +57,45 @@ uv run --no-sync gearxai package --model runs\<name>\model.onnx `
   分类与忠实度均有竞争力。最大盲区是机械对齐（占 40%，本地不可测）——
   下一步给可解释头加 STFT 故障特征频带先验，是性价比最高的方向；
   忠实度可通过把 input×gradient 归因蒸馏进可解释头继续提升。
+
+---
+
+## env-001 — 启用 GPU 训练（RTX 4060 / cu126）
+
+- **日期**: 2026-06-01
+- **commit**: `14054d6` — feat: enable GPU training, keep ONNX export CPU-only
+- **变更**: 用户预装 CUDA 版 torch（`torch==2.10.0+cu126`，pyproject/uv.lock 指向本地 wheel）。
+  `TrainConfig.device`（auto/cuda/cpu）+ `resolve_device()`；CLI `--device`；
+  整个均衡子集常驻显存训练，`randperm` 放到 device 上；训练结束把最优模型搬回 CPU
+  再导出 ONNX，保证提交件 CPU-only。
+- **硬件**: RTX 4060 Laptop, 8 GB。
+- **验证**: GPU 冒烟训练 `device: cuda`，每 epoch ~0.1–0.2s（CPU 时约 21s，**~100× 加速**）；
+  导出 CPU ONNX 通过 devkit `valid: true`，与 torch 输出差异 ~1e-7。ruff/pytest 通过。
+- **结论**: 后续实验默认走 GPU，迭代速度大幅提升。
+
+---
+
+## exp-002a — 机械对齐机制分析（无训练，纯探索）
+
+- **日期**: 2026-06-01
+- **commit (代码来源)**: `14054d6`
+- **目标**: 机械对齐占 40% 但本地不可测。先逆向 devkit 的 `metrics.single_mechanical_alignment`，
+  搞清楚到底什么能提分，再决定 relevance 头怎么改。
+- **方法**: 复刻 devkit 的 STFT 配置（fs=5120, n_fft=256, hop=64），对验证集做
+  逐类频谱分析 + 通道-频带贡献分析（脚本在 `.tmp/`，未入库）。
+- **关键发现**:
+  1. **时间维退化**：窗口仅 100 点，devkit STFT `nperseg=min(256,100)=100`、`hop=64`
+     → **只有 1 个时间帧**。因此 `frame_relevance` 把每个通道的 relevance **在整窗求和**成一个标量，
+     **relevance 的时间分布完全不影响机械对齐**——只有「每通道 relevance 总量」起作用。
+  2. **机械对齐 = Σ_ch (该通道 relevance 总量) × (该通道能量落在故障频带的比例)**。
+     所以**唯一杠杆是通道选择性**：把 relevance 总量分给「频谱能量正好落在该类故障频带」的通道。
+  3. 代理指标（用从数据估计的频带配置）验证：单通道集中 |x| (0.354) > 全通道 |x| (0.339)
+     > 均匀 (0.322)，证明通道加权确实能提分。
+  4. **逐类判别频带**（相对 HEA 的频谱偏离）：CTF/MTF→高频 1480–1740 Hz；RCF→460–620 Hz；
+     IRF→840–1024 Hz；CWF→强直流 0 Hz；SWF/BWF/ORF→低频 0–160 Hz。
+  5. **逐类主导通道**（判别频带内能量占比 top）：RCF/IRF→`torque`；CTF/MTF→`pgb_y/pgb_x`；
+     CWF/ORF→`motor`；符合物理直觉（行星齿轮箱故障在 PGB/扭矩通道更明显）。
+- **结论 / 下一步**: 当前 relevance（`softplus(cam)·|x|`）对 8 通道的加权是隐式且均匀偏向高 |x| 的。
+  exp-002b 将给 relevance 头加**显式通道注意力**（让模型学每类该信任哪些通道），
+  期望在不损失 faithfulness/simplicity 的前提下提升机械对齐。
+  ⚠️ 注意：私有频带配置未知，本地仍只能用代理指标参考，不能过拟合到我估计的频带。
