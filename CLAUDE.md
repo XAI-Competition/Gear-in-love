@@ -112,21 +112,30 @@ Other dirs: `notebooks/` (exploration), `docs/` (the competition brief).
 
 ## Baseline model
 
-A working baseline lives in `src/gearxai_workspace/` (`data.py`, `model.py`, `train.py`,
-`export.py`) with the CLI `scripts/train_baseline.py`; see [docs/baseline.md](docs/baseline.md)
-for the design rationale tied to the scoring metrics. `GearXAINet` is one `nn.Module` emitting
-**both** outputs: a 1D-CNN classifier (3 pooled conv blocks, mean+max global pool, `softmax`)
-plus a forward Grad-CAM relevance head (`relevance = softplus(cam) · |x|`, with `cam` upsampled
-to length 100 by a constant matmul) — nonnegative, deterministic, exportable without autograd.
-It's deliberately small (~150k params, 34 ONNX ops) because **simplicity** is 20% of the score.
-On the full public validation split it scores macro-F1 **0.997**, faithfulness **0.708**,
-simplicity **0.836** (see `runs/baseline/submission.zip`).
+The model lives in `src/gearxai_workspace/` (`data.py`, `model.py`, `train.py`, `export.py`,
+`evaluate.py`) with the CLI `scripts/train_baseline.py`; see [docs/baseline.md](docs/baseline.md)
+for the rationale and [progress.md](progress.md) for the experiment history. `GearXAINet` is one
+`nn.Module` emitting **both** outputs: a 1D-CNN classifier (3 pooled conv blocks, mean+max global
+pool, `softmax`) plus a forward Grad-CAM relevance head (`relevance = softplus(cam) · |x|`, `cam`
+upsampled to length 100 by `F.interpolate`) — nonnegative, deterministic, exportable without
+autograd.
 
-Two scoring facts to keep in mind when changing the model:
-- **Faithfulness** (40%) is deletion/insertion AUC against an **all-zero** baseline (data is
-  pre-standardized), so relevance should mark high-`|x|` cells at class-relevant times.
+**Current best submittable model** is `narrow` (`ModelConfig.widths=(32,64,128)`, the default):
+on the full public validation split macro-F1 **0.991**, faithfulness **0.702**, simplicity
+**0.922** (`runs/narrow/submission.zip`). It beats the original `(64,128,256)` baseline on the
+locally-measurable explainability (`0.4·faith + 0.2·simplicity`) by +0.015 — all from simplicity,
+since simplicity is 20% of the score and the conv layers held ~96% of the params.
+
+Hard-won scoring facts from the experiment sweep (don't re-litigate without reading progress.md):
+- **Faithfulness** (40%) is deletion/insertion AUC against an **all-zero** baseline; the devkit's
+  `topk_mask` only uses relevance *ranking*, so monotonic transforms of relevance don't change it.
+  `|x|` for the time axis is already optimal; faith is converged at ~0.70 in this framework
+  (exp-006). Occlusion-distilling the channel gate helps the big model slightly but **hurts** the
+  narrow one (exp-003/005).
 - **Mechanical alignment** (40%) needs a private STFT band config the devkit doesn't ship, so
-  `gearxai package` reports `mechanical_score: null` locally — it can't be measured here.
+  `gearxai package` reports `mechanical_score: null` locally. It is also **time-degenerate** on
+  100-sample windows (STFT → 1 frame) and the channel-prior lever tested net-negative against
+  faithfulness (exp-002). Treat it as not locally optimizable.
 
 Export uses the **legacy** TorchScript exporter (`torch.onnx.export(..., dynamo=False)`): the
 installed torch 2.12 defaults to the dynamo path, which needs `onnxscript` (not installed).
