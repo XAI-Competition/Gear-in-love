@@ -227,3 +227,34 @@ uv run --no-sync gearxai package --model runs\<name>\model.onnx `
   与通道注意力门控输出同形 → **用 occ_ch 作监督目标蒸馏通道门控**，让推理时单次前向就近似出
   高 faith 的通道权重。这把 exp-002 留下的"零成本通道注意力结构"用到了**正确的目标
   （faithfulness 而非机械对齐）**上，且完全本地可测。
+
+---
+
+## exp-003b — Occlusion 蒸馏通道门控（GPU sweep，真实 devkit faith）
+
+- **日期**: 2026-06-01
+- **commit (代码来源)**: `c5fd83d` — occlusion distillation
+- **硬件**: RTX 4060；含蒸馏时每 epoch ~2.8s（8× 遮挡前向），无蒸馏 ~1.0s
+- **设计**: 用因果遮挡通道重要性 `occ_ch[N,8]`（置零某通道→预测类置信掉多少）作监督目标，
+  蒸馏 class-conditioned 通道门控（`channel_gate_distill_loss`）。扫 occlusion_weight ∈
+  {0, 0.5, 1.0, 2.0}，每个用 evaluate 模块在 4000 验证样本上测**真实 devkit faith**。
+- **结果**:
+
+  | occ_weight | macro-F1 | faith | deletion↓ | insertion↑ |
+  | ---: | ---: | ---: | ---: | ---: |
+  | 0（基线） | 0.9884 | 0.7062 | 0.225 | 0.637 |
+  | 0.5 | 0.9719 | 0.7122 | 0.178 | 0.602 |
+  | 1.0 | 0.9714 | 0.7140 | 0.178 | 0.605 |
+  | 2.0 | 0.9683 | **0.7177** | 0.172 | 0.608 |
+
+- **结论**: occlusion 蒸馏**有效但收益有限**。faith 单调升（0.706→0.718，**+0.012**，
+  ×0.4 权重 = +0.0048 解释性分），机制正确：**deletion 大幅改善**（0.225→0.172，门控确实学会
+  "哪些通道一删就掉预测"），但 **insertion 同步下降**（0.637→0.608）部分抵消，且 macro-F1
+  随权重下滑（0.988→0.968，仍远超 0.80 门槛）。
+- **瓶颈分析**: 探针里 per-sample occ_ch 能到 faith 0.81，但这里只到 0.718——差距源于门控是
+  **class-conditioned**（输入 `probs[N,9]`，同类样本同权重），只学到类平均通道重要性，
+  捕捉不到样本级差异。
+- **决定 / 下一步**: 这是**确定的正收益**（不像 exp-002 机械对齐），保留为可选。occ_weight=1.0
+  是较好折中（faith +0.008，macro-F1 仅降到 0.971）。exp-003c 候选：给门控加 **per-sample
+  通道能量输入** `[N,8]`，逼近 per-sample occ_ch（探针上限 0.81），但要权衡 simplicity。
+  先去做 exp-004（simplicity，确定可测），再回头评估 exp-003c。
