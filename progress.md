@@ -195,3 +195,35 @@ uv run --no-sync gearxai package --model runs\<name>\model.onnx `
   默认 `relevance_weight=0`。exp-002 系列到此收敛：最佳可提交模型仍是 exp-001 路线
   （faithfulness 0.708）。下一步把方向转回**确定性收益**：faithfulness 的 deletion/insertion
   辅助蒸馏，以及 simplicity 的小幅精简。
+
+---
+
+## exp-003a — Faithfulness 多角度探针（固定分类器，无重训）
+
+- **日期**: 2026-06-01
+- **commit (代码来源)**: `8933e37`（+ evaluate 模块）
+- **硬件**: RTX 4060（探针 + 一个 quick proxy 分类器）
+- **目标**: faithfulness（40%，本地**可测**）是确定性收益方向。在固定分类器上复刻 devkit
+  deletion/insertion AUC，对比多种 relevance 公式，找最优杠杆。
+- **方法**: 复刻 `deletion_insertion_auc`，对同一训练好的分类器测多种 relevance 数组
+  （脚本 `.tmp/faith_probe*.py`，未入库）。
+- **结果**（800 验证样本）:
+
+  | relevance 策略 | faith | 说明 |
+  | --- | ---: | --- |
+  | uniform | 0.537 | 下限 |
+  | `\|x\|`（当前 baseline 风格） | 0.699–0.707 | 现状 |
+  | occ_time × `\|x\|` | 0.667 | **时间维用遮挡反而更差** |
+  | gradxinput_ch × `\|x\|` | 0.721 | 梯度近似，有限 |
+  | **occ_ch × `\|x\|`（通道因果遮挡 × 输入幅值）** | **0.762–0.812** | **金钥匙** |
+
+- **关键发现**:
+  1. **时间维用 `\|x\|` 最好，通道维用因果遮挡重要性最好**：把某通道整段置零、看预测类
+     置信掉多少（occ_ch），作为通道权重，再乘时间维的 `\|x\|`，faith 从 0.70→0.76~0.81
+     （**+0.06~0.10**，本地实测、收益确定）。
+  2. occ_time × `\|x\|`（0.667）比 `\|x\|` 还差 → **不要用遮挡做时间维**。
+  3. gradient×input 只能部分逼近 occ_ch（per-sample Spearman 仅 0.66，faith 0.721）→ 梯度近似不够。
+- **结论 / 下一步（exp-003b）**: occ_ch 需要 8 次前向，无法塞进单次 ONNX。但它是个 `[N,8]` 量，
+  与通道注意力门控输出同形 → **用 occ_ch 作监督目标蒸馏通道门控**，让推理时单次前向就近似出
+  高 faith 的通道权重。这把 exp-002 留下的"零成本通道注意力结构"用到了**正确的目标
+  （faithfulness 而非机械对齐）**上，且完全本地可测。
