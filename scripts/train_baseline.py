@@ -73,6 +73,15 @@ def parse_args() -> argparse.Namespace:
             "gate to predict causal channel importance (exp-003b; 0 disables it)"
         ),
     )
+    parser.add_argument(
+        "--noise-std",
+        type=float,
+        default=0.1,
+        help=(
+            "std of additive Gaussian input-noise augmentation (exp-007; 0.1 is "
+            "the faithfulness sweet spot, 0 disables it)"
+        ),
+    )
     return parser.parse_args()
 
 
@@ -91,6 +100,7 @@ def main() -> int:
         device=args.device,
         relevance_weight=args.relevance_weight,
         occlusion_weight=args.occlusion_weight,
+        noise_std=args.noise_std,
     )
 
     result = train_baseline(config)
@@ -126,6 +136,7 @@ def main() -> int:
             "device": config.device,
             "relevance_weight": config.relevance_weight,
             "occlusion_weight": config.occlusion_weight,
+            "noise_std": config.noise_std,
             "channel_attention": config.model.channel_attention,
         },
     }
