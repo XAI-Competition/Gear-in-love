@@ -124,12 +124,23 @@ class GearXAINet(nn.Module):
 
         return self._logits_from_features(self._features(windows))
 
-    def forward(self, windows: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
-        """Return ``(probabilities[N, 9], relevance[N, 8, 100])``."""
+    def forward_train(self, windows: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+        """Return ``(logits[N, 9], relevance[N, 8, 100])`` in one forward pass.
 
-        feat = self._features(windows)  # [N, C, T']
-        logits = self._logits_from_features(feat)  # [N, 9]
-        probabilities = torch.softmax(logits, dim=1)
+        Training uses this so the classifier loss sees raw logits (numerically
+        stable cross-entropy) while the relevance regularizer can train the
+        channel-attention gate — without recomputing the conv features.
+        """
+
+        feat = self._features(windows)
+        logits = self._logits_from_features(feat)
+        relevance = self._relevance_from(feat, torch.softmax(logits, dim=1), windows)
+        return logits, relevance
+
+    def _relevance_from(
+        self, feat: torch.Tensor, probabilities: torch.Tensor, windows: torch.Tensor
+    ) -> torch.Tensor:
+        """Build the relevance map from features, class probs, and the input."""
 
         # Forward Grad-CAM using the mean-pool half of the head weights
         # (the part that corresponds to global-average-pooled features).
@@ -150,6 +161,14 @@ class GearXAINet(nn.Module):
             ch_gate = F.softplus(self.channel_gate(probabilities) + _SOFTPLUS_INV_1)
             relevance = relevance * ch_gate.unsqueeze(2)  # [N, 8, 1] broadcast
 
+        return relevance
+
+    def forward(self, windows: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+        """Return ``(probabilities[N, 9], relevance[N, 8, 100])``."""
+
+        feat = self._features(windows)  # [N, C, T']
+        probabilities = torch.softmax(self._logits_from_features(feat), dim=1)
+        relevance = self._relevance_from(feat, probabilities, windows)
         return probabilities, relevance
 
 

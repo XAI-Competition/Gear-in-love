@@ -55,6 +55,12 @@ def parse_args() -> argparse.Namespace:
         choices=["auto", "cuda", "cpu"],
         help="training device; 'auto' uses cuda when available (default: auto)",
     )
+    parser.add_argument(
+        "--relevance-weight",
+        type=float,
+        default=0.1,
+        help="weight of the channel-energy relevance regularizer (0 disables it)",
+    )
     return parser.parse_args()
 
 
@@ -71,6 +77,7 @@ def main() -> int:
         seed=args.seed,
         num_threads=args.num_threads,
         device=args.device,
+        relevance_weight=args.relevance_weight,
     )
 
     result = train_baseline(config)
@@ -104,6 +111,8 @@ def main() -> int:
             "lr": config.lr,
             "seed": config.seed,
             "device": config.device,
+            "relevance_weight": config.relevance_weight,
+            "channel_attention": config.model.channel_attention,
         },
     }
     summary_path = onnx_path.parent / "train_summary.json"

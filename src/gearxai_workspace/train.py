@@ -31,6 +31,9 @@ class TrainConfig:
     seed: int = 42
     num_threads: int | None = None
     device: str = "auto"  # "auto" | "cuda" | "cpu"
+    # Weight of the relevance regularizer that trains the channel-attention gate
+    # (the classifier path alone never touches it). 0 disables it.
+    relevance_weight: float = 0.1
     model: ModelConfig = field(default_factory=ModelConfig)
 
 
@@ -60,6 +63,29 @@ def macro_f1(y_true: np.ndarray, y_pred: np.ndarray, num_classes: int = NUM_CLAS
 def set_seed(seed: int) -> None:
     np.random.seed(seed)
     torch.manual_seed(seed)
+
+
+def channel_energy_alignment_loss(
+    relevance: torch.Tensor, windows: torch.Tensor
+) -> torch.Tensor:
+    """Encourage the relevance channel-mass to match the input energy per channel.
+
+    The mechanical metric is time-degenerate on length-100 windows, so only the
+    *per-channel* relevance total matters; aligning it with each channel's energy
+    share steers mass toward channels that carry the fault-band energy (which also
+    helps faithfulness, since high-energy channels dominate the zero-baseline
+    deletion/insertion). Implemented as a soft cross-entropy between the relevance
+    channel distribution and the energy channel distribution.
+    """
+
+    eps = 1e-8
+    # Per-channel relevance mass and input energy, as distributions over channels.
+    rel_mass = relevance.sum(dim=2)  # [N, 8]
+    rel_dist = rel_mass / rel_mass.sum(dim=1, keepdim=True).clamp_min(eps)
+    energy = (windows * windows).sum(dim=2)  # [N, 8]
+    energy_dist = energy / energy.sum(dim=1, keepdim=True).clamp_min(eps)
+    # Cross-entropy H(energy_dist, rel_dist); minimized when rel_dist == energy_dist.
+    return -(energy_dist * (rel_dist + eps).log()).sum(dim=1).mean()
 
 
 @torch.no_grad()
@@ -121,8 +147,16 @@ def train_baseline(config: TrainConfig) -> dict:
             idx = perm[start : start + config.batch_size]
             xb, yb = x_train[idx], y_train[idx]
             optimizer.zero_grad(set_to_none=True)
-            logits = model.classify(xb)
-            loss = criterion(logits, yb)
+            if config.relevance_weight > 0:
+                # One forward pass returning logits + relevance, so the
+                # channel-attention gate receives gradients from the relevance
+                # regularizer while cross-entropy still sees raw logits.
+                logits, relevance = model.forward_train(xb)
+                cls_loss = criterion(logits, yb)
+                rel_loss = channel_energy_alignment_loss(relevance, xb)
+                loss = cls_loss + config.relevance_weight * rel_loss
+            else:
+                loss = criterion(model.classify(xb), yb)
             loss.backward()
             optimizer.step()
             running += loss.item() * len(idx)
