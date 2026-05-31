@@ -315,3 +315,33 @@ uv run --no-sync gearxai package --model runs\<name>\model.onnx `
 - **决定 / 下一步**: 最优可提交模型 = **narrow (32,64,128)，无蒸馏、无能量门控**。
   下一步：用此配置**全量训练**（更大子集 + 更多 epoch）产出最终 `runs/narrow/submission.zip`，
   作为新的最佳提交，替代 exp-001 baseline。蒸馏代码保留为 opt-in（默认关）。
+
+---
+
+## exp-006 — Relevance 时间维公式探针（固定分类器，CPU，与 GPU 训练并行）
+
+- **日期**: 2026-06-01
+- **commit (代码来源)**: `09cbd6c`
+- **目标**: exp-003a 显示时间维 `\|x\|` 优于遮挡。本探针在固定 baseline ONNX 上扫时间维的
+  各种变换，看 faith 能否再升。与全量训练并行（CPU ORT，不占 GPU）。
+- **结果**（1000 验证样本）:
+
+  | 时间维 relevance | faith | 说明 |
+  | --- | ---: | --- |
+  | `\|x\|`（基线） | 0.7054 | 现状 |
+  | `\|x\|^0.5 / ^1.5 / ^2 / ^3` | 0.7054 | **完全相同** |
+  | `\|x\|`-rank | 0.7054 | **完全相同** |
+  | `\|x\|` channel-normalized | 0.6231 | 更差 |
+  | `\|x\|` top-4 能量通道 | 0.6249 | 更差 |
+
+- **关键发现（决定性）**: **任何单调变换给出完全相同的 faith**。原因：devkit `topk_mask` 只按
+  relevance **排序**取 top-k cell，单调变换不改排序 → faith 不变。即 **relevance 的数值无关，
+  只有 cell 的相对排序重要**。锐化/展平/rank 都无用。channel-normalized 和 top-4 更差，
+  因为破坏了**跨通道幅值排序**（把低能量通道 cell 排到高能量通道前）。
+- **结论**: **时间维 relevance 在固定 `\|x\|` 通道权重下已是最优，无提升空间**。faith 天花板由
+  "哪些 cell 进 top-k"决定，而 `\|x\|` 的全局排序已最优。结合 exp-003（蒸馏在小模型有害）、
+  exp-005（narrow 最优），**faithfulness 在当前 forward-Grad-CAM×`\|x\|` 框架下已收敛到
+  ~0.705–0.708**。要再升需换框架（如改变分类器使其决策更依赖稀疏可定位的 cell），属高风险大改。
+- **决定 / 下一步**: faithfulness 这条线收敛。当前最优可提交模型 = narrow（exp-005，
+  expl_partial 0.466，全量训练中产出 `runs/narrow/submission.zip`）。下一步可探索的新方向：
+  (a) 全量 737k 数据是否进一步提 macro-F1 裕度；(b) 训练角度（增强/正则）对 faith 的间接影响。
