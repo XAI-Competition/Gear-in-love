@@ -514,3 +514,27 @@ relevance 框架级重构（高风险）。确定性收益已基本挖尽。
   faithfulness（noise 增强 +0.014，time-mask 再 +0.011）。faith 链路 0.708→0.722→**0.7325**。
   最终 expl_partial **0.4774，比 exp-001 baseline 高 +0.027（+6.0%）**，macro-F1 仍 0.989
   远超门槛（全量训练把子集时的 0.960 拉回到 0.989，印证预判）。这是 8 方向系统探索的最佳可提交模型。
+
+---
+
+## exp-009 — Channel-dropout 增强（GPU sweep）：增强叠加已收敛
+
+- **日期**: 2026-06-01
+- **commit (代码来源)**: `d98ae0c` — channel-dropout augmentation
+- **硬件**: RTX 4060，narrow + noise=0.1 + mask=0.15 基底
+- **假设**: channel-dropout（随机置零整通道）能否在 noise+time-mask 上再叠加提 faith。
+- **结果**（narrow，train 10000/类、20 epoch、eval 5000）:
+
+  | channel_drop | macro-F1 | faith | expl_partial |
+  | ---: | ---: | ---: | ---: |
+  | 0.0（基底） | 0.9617 | 0.7276 | 0.4754 |
+  | 0.1 | 0.9438 | 0.7112 | 0.4689 |
+  | 0.2 | 0.9163 | 0.6962 | 0.4629 |
+
+- **关键发现（负面，边界确认）**: channel-dropout **单调伤害 faith 和 macro-F1**。原因清晰：
+  置零整通道破坏了模型对**高能量通道**的依赖，而 faith 恰恰奖励标注高 `|x|` 通道的 cell。
+  这与 noise/time-mask **本质不同**——后两者保留通道幅值结构、只扰动细节，而 channel-dropout
+  直接删通道信息，适得其反。
+- **结论**: **增强叠加在 noise(0.1) + time-mask(0.15) 处收敛**。并非所有增强都帮 faith，
+  **只有保留通道幅值结构的增强才行**。最佳模型仍是 exp-008-final（`runs/final2/submission.zip`，
+  faith 0.7325，expl_partial 0.4774）。增强这条线探索完毕。
