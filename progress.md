@@ -538,3 +538,54 @@ relevance 框架级重构（高风险）。确定性收益已基本挖尽。
 - **结论**: **增强叠加在 noise(0.1) + time-mask(0.15) 处收敛**。并非所有增强都帮 faith，
   **只有保留通道幅值结构的增强才行**。最佳模型仍是 exp-008-final（`runs/final2/submission.zip`，
   faith 0.7325，expl_partial 0.4774）。增强这条线探索完毕。
+
+---
+
+## exp-010 — mask=0.2 全量训练对比：确认 mask=0.15 最优
+
+- **日期**: 2026-06-01
+- **commit (代码来源)**: `277cff2`
+- **硬件**: RTX 4060，全量 360k 训练，45 epoch
+- **动机**: exp-008 子集上 mask=0.2 faith（0.7296）略高于 mask=0.15，但 macro-F1 较低。
+  验证全量数据能否让 mask=0.2 两全（拉回 macro-F1 + 更高 faith）。
+- **结果（完整验证集 83,790 样本）**:
+
+  | 模型 | macro-F1 | faith | expl_partial |
+  | --- | ---: | ---: | ---: |
+  | **final2 (mask=0.15)** | 0.9893 | **0.7325** | **0.4774** |
+  | final3 (mask=0.2) | 0.9870 | 0.7308 | 0.4763 |
+
+- **结论**: **final2 (mask=0.15) 仍是最佳**。全量数据下 mask=0.2 并不优于 mask=0.15——
+  子集上 mask=0.2 的 faith 优势在全量训练后消失（全量数据本身已正则，过强 mask 略伤 faith
+  与 macro-F1）。**确认 mask=0.15 是稳健最优点**，不必更激进。增强超参收敛。
+
+## 本轮长程探索最终收敛总结（截至 277cff2）
+
+**最佳可提交模型**: `runs/final2/submission.zip`（narrow + noise=0.1 + time_mask=0.15）
+- macro-F1 **0.9893**、faithfulness **0.7325**、simplicity **0.9220**、expl_partial **0.4774**
+- vs exp-001 baseline（0.4504）：**+0.027（+6.0%）**，eligible，CPU-only ONNX（39,689 参数/41 算子）
+- 默认 CLI 即可复现：`uv run --no-sync python scripts\train_baseline.py --device cuda`
+
+**10 个方向系统探索，结论矩阵**:
+
+| 方向 | 实验 | 结论 |
+| --- | --- | --- |
+| GPU 基础设施 | env-001 | cu126，~18× 加速 ✅ |
+| 机械对齐（40%） | exp-002 | 本地不可优化（窗口<1转/变速/私有频带），通道先验净负 ❌ |
+| faith 通道遮挡蒸馏 | exp-003 | 大模型微弱、小模型有害 ❌ |
+| **simplicity（20%）** | exp-004/005 | **narrow (32,64,128)，+0.086** ✅✅ |
+| faith 时间维公式 | exp-006 | 固定分类器下 \|x\| 已最优（仅排序重要） |
+| **faith 噪声增强** | exp-007 | **noise=0.1，+0.014** ✅✅ |
+| **faith 时间遮挡增强** | exp-008 | **time-mask=0.15，+0.011** ✅✅ |
+| faith 通道dropout增强 | exp-009 | 伤 faith（破坏通道幅值结构）❌ |
+| 增强超参全量验证 | exp-010 | mask=0.15 稳健最优，增强收敛 |
+
+**核心科学结论**（已写入 CLAUDE.md）:
+1. 机械对齐在 100 点窗口上本地不可优化（时间维退化、私有频带未知、变速工况）。
+2. faithfulness 由 cell 排序决定；固定分类器下 \|x\| 已最优，但**保留通道幅值结构的增强
+   （noise/time-mask）能抬高 faith 天花板**，破坏结构的增强（channel-dropout）反而有害。
+3. simplicity 是最大杠杆（narrow 减 73% 参数几乎不掉 faith）。
+
+**剩余候选方向（未做，预计收益递减或高风险）**: 全量 737k 数据训练（当前用 360k 子集，
+macro-F1 已 0.989 裕度充足，预计微小提升）、mixup/cutmix（结构保留性存疑）、
+relevance 框架级重构（高风险）。**确定性收益已基本挖尽，本轮探索收敛。**
