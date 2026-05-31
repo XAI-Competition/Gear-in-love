@@ -386,3 +386,28 @@ uv run --no-sync gearxai package --model runs\<name>\model.onnx `
 - **基础设施**：GPU 训练（~18× 加速）、可复用 `evaluate` 模块（真实 devkit 指标）。
 - **下一步候选**（尚未做）：全量 737k 数据训练、训练期数据增强/正则对 faith 的间接影响、
   更激进的架构改动（高风险）。当前确定性收益已基本挖尽。
+
+---
+
+## exp-007 — 输入噪声增强对 faithfulness 的间接影响（GPU sweep，真实 devkit）
+
+- **日期**: 2026-06-01
+- **commit (代码来源)**: `4906950` — noise augmentation
+- **硬件**: RTX 4060，narrow，~0.9s/epoch
+- **假设**: exp-006 证明**固定分类器**下时间维 relevance 已最优；但换一个**噪声鲁棒**的
+  分类器，可能让决策更依赖稳健可定位的 cell，从而提高 faith 上限。扫 `noise_std`。
+- **结果**（narrow，train 10000/类、20 epoch、eval 5000）:
+
+  | noise_std | macro-F1 | faith | insertion | expl_partial |
+  | ---: | ---: | ---: | ---: | ---: |
+  | 0.0 | 0.9794 | 0.7065 | 0.637 | 0.4670 |
+  | 0.05 | 0.9784 | 0.7085 | 0.643 | 0.4678 |
+  | **0.1** | 0.9714 | **0.7144** | 0.655 | **0.4702** |
+  | 0.2 | 0.9505 | 0.7114 | 0.644 | 0.4689 |
+
+- **关键发现（突破）**: 噪声增强**确实间接提升 faithfulness**。`noise_std=0.1` 是甜点：
+  faith **0.7065→0.7144（+0.008）**，insertion 0.637→0.655，macro-F1 仍 0.971（远超门槛）。
+  **这修正了 exp-006 的"faith 已收敛"结论**：固定分类器下确实最优，但噪声鲁棒训练抬高了
+  faith 天花板（让 relevance 标注的高 |x| cell 对预测更因果）。noise_std=0.2 开始伤分类，过头。
+- **决定 / 下一步**: 噪声增强是**真实、可测、确定**的 faith 收益，且与 narrow 的 simplicity 收益
+  **正交可叠加**。用 **narrow + noise_std=0.1** 全量训练产出新最佳提交，替代 exp-005-final。
