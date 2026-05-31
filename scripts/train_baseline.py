@@ -64,6 +64,15 @@ def parse_args() -> argparse.Namespace:
             "exp-002d found it net-negative, so it is off by default)"
         ),
     )
+    parser.add_argument(
+        "--occlusion-weight",
+        type=float,
+        default=0.0,
+        help=(
+            "weight of the occlusion-distillation loss that trains the channel "
+            "gate to predict causal channel importance (exp-003b; 0 disables it)"
+        ),
+    )
     return parser.parse_args()
 
 
@@ -81,6 +90,7 @@ def main() -> int:
         num_threads=args.num_threads,
         device=args.device,
         relevance_weight=args.relevance_weight,
+        occlusion_weight=args.occlusion_weight,
     )
 
     result = train_baseline(config)
@@ -115,6 +125,7 @@ def main() -> int:
             "seed": config.seed,
             "device": config.device,
             "relevance_weight": config.relevance_weight,
+            "occlusion_weight": config.occlusion_weight,
             "channel_attention": config.model.channel_attention,
         },
     }

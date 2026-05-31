@@ -124,18 +124,30 @@ class GearXAINet(nn.Module):
 
         return self._logits_from_features(self._features(windows))
 
-    def forward_train(self, windows: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
-        """Return ``(logits[N, 9], relevance[N, 8, 100])`` in one forward pass.
+    def channel_gate_values(self, probabilities: torch.Tensor) -> torch.Tensor | None:
+        """Return the raw per-channel gate ``[N, 8]`` (``None`` if disabled)."""
+
+        if self.channel_gate is None:
+            return None
+        return F.softplus(self.channel_gate(probabilities) + _SOFTPLUS_INV_1)
+
+    def forward_train(
+        self, windows: torch.Tensor
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor | None]:
+        """Return ``(logits[N, 9], relevance[N, 8, 100], channel_gate[N, 8])``.
 
         Training uses this so the classifier loss sees raw logits (numerically
-        stable cross-entropy) while the relevance regularizer can train the
-        channel-attention gate — without recomputing the conv features.
+        stable cross-entropy), the relevance regularizer can train the channel
+        gate, and occlusion distillation can supervise the gate directly — all
+        without recomputing the conv features. ``channel_gate`` is ``None`` when
+        channel attention is disabled.
         """
 
         feat = self._features(windows)
         logits = self._logits_from_features(feat)
-        relevance = self._relevance_from(feat, torch.softmax(logits, dim=1), windows)
-        return logits, relevance
+        probabilities = torch.softmax(logits, dim=1)
+        relevance = self._relevance_from(feat, probabilities, windows)
+        return logits, relevance, self.channel_gate_values(probabilities)
 
     def _relevance_from(
         self, feat: torch.Tensor, probabilities: torch.Tensor, windows: torch.Tensor

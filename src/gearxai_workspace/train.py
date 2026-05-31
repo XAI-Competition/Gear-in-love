@@ -36,6 +36,10 @@ class TrainConfig:
     # prior trades a certain ~0.018 faithfulness loss for only a tiny, uncertain
     # proxy mechanical gain (net negative). Kept as an opt-in lever.
     relevance_weight: float = 0.0
+    # Weight of the occlusion-distillation loss (exp-003b): trains the channel
+    # gate to predict causal channel importance (zero a channel -> predicted-class
+    # confidence drop), which the faithfulness probe showed is the key lever.
+    occlusion_weight: float = 0.0
     model: ModelConfig = field(default_factory=ModelConfig)
 
 
@@ -89,6 +93,44 @@ CHANNEL_PRIOR = np.array(
     ],
     dtype=np.float32,
 )
+
+
+@torch.no_grad()
+def occlusion_channel_importance(model: GearXAINet, windows: torch.Tensor) -> torch.Tensor:
+    """Causal per-channel importance: drop in predicted-class prob when a channel
+    is zeroed. Returns a nonnegative ``[N, 8]`` distribution (sums to 1 per row).
+
+    This is the "gold" channel signal from the exp-003a faithfulness probe. It
+    costs ``num_channels`` extra forward passes, so it is computed only as a
+    distillation target (no grad) for the channel gate, not at inference.
+    """
+
+    n, num_ch, _ = windows.shape
+    base_probs = torch.softmax(model.classify(windows), dim=1)
+    pred = base_probs.argmax(dim=1)
+    rows = torch.arange(n, device=windows.device)
+    base_conf = base_probs[rows, pred]  # [N]
+
+    importance = torch.zeros(n, num_ch, device=windows.device)
+    for ch in range(num_ch):
+        occluded = windows.clone()
+        occluded[:, ch, :] = 0.0
+        conf = torch.softmax(model.classify(occluded), dim=1)[rows, pred]
+        importance[:, ch] = (base_conf - conf).clamp_min(0.0)
+
+    total = importance.sum(dim=1, keepdim=True).clamp_min(1e-8)
+    return importance / total
+
+
+def channel_gate_distill_loss(
+    gate: torch.Tensor, target: torch.Tensor
+) -> torch.Tensor:
+    """Soft cross-entropy pulling the (normalized) channel gate toward the
+    occlusion-importance target. ``gate`` is the raw per-channel gate ``[N, 8]``."""
+
+    eps = 1e-8
+    gate_dist = gate / gate.sum(dim=1, keepdim=True).clamp_min(eps)
+    return -(target * (gate_dist + eps).log()).sum(dim=1).mean()
 
 
 def channel_prior_loss(
@@ -173,14 +215,22 @@ def train_baseline(config: TrainConfig) -> dict:
             idx = perm[start : start + config.batch_size]
             xb, yb = x_train[idx], y_train[idx]
             optimizer.zero_grad(set_to_none=True)
-            if config.relevance_weight > 0:
-                # One forward pass returning logits + relevance, so the
-                # channel-attention gate receives gradients from the relevance
-                # regularizer while cross-entropy still sees raw logits.
-                logits, relevance = model.forward_train(xb)
-                cls_loss = criterion(logits, yb)
-                rel_loss = channel_prior_loss(relevance, yb, channel_prior)
-                loss = cls_loss + config.relevance_weight * rel_loss
+            use_relevance = config.relevance_weight > 0 or config.occlusion_weight > 0
+            if use_relevance:
+                # One forward returning logits + relevance + channel gate, so the
+                # gate can be trained by the relevance regularizer and/or the
+                # occlusion-distillation target while cross-entropy sees logits.
+                logits, relevance, ch_gate = model.forward_train(xb)
+                loss = criterion(logits, yb)
+                if config.relevance_weight > 0:
+                    loss = loss + config.relevance_weight * channel_prior_loss(
+                        relevance, yb, channel_prior
+                    )
+                if config.occlusion_weight > 0 and ch_gate is not None:
+                    target = occlusion_channel_importance(model, xb)
+                    loss = loss + config.occlusion_weight * channel_gate_distill_loss(
+                        ch_gate, target
+                    )
             else:
                 loss = criterion(model.classify(xb), yb)
             loss.backward()
