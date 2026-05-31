@@ -121,20 +121,23 @@ upsampled to length 100 by `F.interpolate`) — nonnegative, deterministic, expo
 autograd.
 
 **Current best submittable model** is `narrow` (`ModelConfig.widths=(32,64,128)`, the default)
-trained with **input-noise augmentation `--noise-std 0.1`** (also the default): on the full
-public validation split macro-F1 **0.993**, faithfulness **0.722**, simplicity **0.922**
-(`runs/final/submission.zip`). It beats the original `(64,128,256)` baseline on the
-locally-measurable explainability (`0.4·faith + 0.2·simplicity`) by **+0.023** — stacking two
-orthogonal, certain gains: narrow lifts simplicity (+0.086; conv layers held ~96% of the params,
-and simplicity is 20% of the score) and noise augmentation lifts faithfulness (+0.014; see below).
+trained with **input-noise `--noise-std 0.1` + time-masking `--time-mask-frac 0.15`** (both
+defaults): on the full public validation split macro-F1 **0.989**, faithfulness **0.733**,
+simplicity **0.922** (`runs/final2/submission.zip`). It beats the original `(64,128,256)`
+baseline on the locally-measurable explainability (`0.4·faith + 0.2·simplicity`) by **+0.027** —
+stacking three orthogonal, certain gains: narrow lifts simplicity (+0.086; conv layers held ~96%
+of the params, and simplicity is 20% of the score), and noise + time-mask augmentation lift
+faithfulness (0.708→0.722→0.733; see below). A plain `uv run … train_baseline.py` with defaults
+reproduces it.
 
 Hard-won scoring facts from the experiment sweep (don't re-litigate without reading progress.md):
 - **Faithfulness** (40%) is deletion/insertion AUC against an **all-zero** baseline; the devkit's
   `topk_mask` only uses relevance *ranking*, so monotonic transforms of relevance don't change it
   and `|x|` for the time axis is already optimal *for a fixed classifier* (exp-006). The lever that
-  works is **changing the classifier**: input-noise augmentation (`--noise-std 0.1`) makes it rely
-  on robust cells and raises faith 0.706→0.722 (exp-007). Occlusion-distilling the channel gate
-  helps the big model slightly but **hurts** the narrow one (exp-003/005) — leave it off.
+  works is **changing the classifier via augmentation** so it relies on robust cells: input-noise
+  `--noise-std 0.1` (exp-007) + time-masking `--time-mask-frac 0.15` (exp-008) stack to raise faith
+  0.708→0.722→0.733. Occlusion-distilling the channel gate helps the big model slightly but
+  **hurts** the narrow one (exp-003/005) — leave it off.
 - **Mechanical alignment** (40%) needs a private STFT band config the devkit doesn't ship, so
   `gearxai package` reports `mechanical_score: null` locally. It is also **time-degenerate** on
   100-sample windows (STFT → 1 frame) and the channel-prior lever tested net-negative against

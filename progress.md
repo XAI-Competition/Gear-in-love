@@ -483,3 +483,34 @@ relevance 框架级重构（高风险）。确定性收益已基本挖尽。
 - **决定 / 下一步**: 增强可叠加（noise + time-mask）是又一确定收益。用 **narrow + noise=0.1 +
   time_mask=0.15**（0.1 与 0.2 的折中，平衡 faith 与 macro-F1 裕度）全量训练，产出新最佳提交，
   对比 exp-007-final（faith 0.722）。
+
+---
+
+## exp-008-final — 最终最佳提交：narrow + noise=0.1 + time_mask=0.15（叠加 3 收益）
+
+- **日期**: 2026-06-01
+- **commit (代码来源)**: `1a1740e`
+- **硬件**: RTX 4060，全量 360k 训练窗口，45 epoch，~2.7s/epoch
+- **命令**:
+  ```powershell
+  uv run --no-sync python scripts\train_baseline.py --train-per-class 40000 `
+    --val-per-class 4000 --epochs 45 --batch-size 768 --device cuda `
+    --noise-std 0.1 --time-mask-frac 0.15 --out runs\final2\model.onnx
+  uv run --no-sync gearxai package --model runs\final2\model.onnx `
+    --data-dir data\prepared --split validation --out runs\final2\submission.zip
+  ```
+- **最终指标（完整公开验证集 83,790 样本）**:
+
+  | 指标 | **final2 (noise+mask)** | final (noise) | exp-001 baseline |
+  | --- | ---: | ---: | ---: |
+  | macro-F1 | **0.9893** | 0.9926 | 0.9968 |
+  | faithfulness | **0.7325** | 0.7219 | 0.7077 |
+  | simplicity | **0.9220** | 0.9220 | 0.8363 |
+  | expl_partial (0.4·f+0.2·s) | **0.4774** | 0.4732 | 0.4504 |
+
+- **产物**: `runs/final2/submission.zip`（valid + eligible；model_sha256 `d69017ef…`，
+  39,689 参数、41 算子）。
+- **结论（本轮最佳交付）**: **3 个正交确定收益成功叠加**——simplicity（narrow，+0.086）+
+  faithfulness（noise 增强 +0.014，time-mask 再 +0.011）。faith 链路 0.708→0.722→**0.7325**。
+  最终 expl_partial **0.4774，比 exp-001 baseline 高 +0.027（+6.0%）**，macro-F1 仍 0.989
+  远超门槛（全量训练把子集时的 0.960 拉回到 0.989，印证预判）。这是 8 方向系统探索的最佳可提交模型。
