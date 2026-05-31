@@ -345,3 +345,44 @@ uv run --no-sync gearxai package --model runs\<name>\model.onnx `
 - **决定 / 下一步**: faithfulness 这条线收敛。当前最优可提交模型 = narrow（exp-005，
   expl_partial 0.466，全量训练中产出 `runs/narrow/submission.zip`）。下一步可探索的新方向：
   (a) 全量 737k 数据是否进一步提 macro-F1 裕度；(b) 训练角度（增强/正则）对 faith 的间接影响。
+
+---
+
+## exp-005-final — narrow 全量训练最终提交（GPU 全量 + 全验证集打包）
+
+- **日期**: 2026-06-01
+- **commit (代码来源)**: `0efe392`（narrow 为默认架构）
+- **硬件**: RTX 4060，全量 360k 训练窗口，40 epoch，~2.5s/epoch（约 2 分钟训练）
+- **命令**:
+  ```powershell
+  uv run --no-sync python scripts\train_baseline.py --train-per-class 40000 `
+    --val-per-class 4000 --epochs 40 --batch-size 768 --device cuda --out runs\narrow\model.onnx
+  uv run --no-sync gearxai package --model runs\narrow\model.onnx `
+    --data-dir data\prepared --split validation --out runs\narrow\submission.zip
+  ```
+- **最终指标（完整公开验证集 83,790 样本，来自 submission.zip 的 metrics.json）**:
+
+  | 指标 | narrow 最终 | exp-001 baseline | 变化 |
+  | --- | ---: | ---: | ---: |
+  | macro-F1 | **0.9914** | 0.9968 | −0.005（仍远超 0.80 门槛）|
+  | faithfulness | **0.7022** | 0.7077 | −0.006 |
+  | simplicity | **0.9220** | 0.8363 | **+0.086** |
+  | expl_partial (0.4·f+0.2·s) | **0.4653** | 0.4504 | **+0.0149** |
+
+- **产物**: `runs/narrow/submission.zip`（valid、eligible；model_sha256
+  `341fbd70…`，39,689 参数、41 算子）、`runs/narrow/model.onnx`、`model.pt`、`train_summary.json`。
+- **结论**: **narrow 是本轮探索的最佳可提交模型**，本地可测解释性比 exp-001 baseline **+0.015**
+  （纯 simplicity 贡献，faith 几乎不变，macro-F1 仍 0.991）。这是经 6 轮系统实验
+  （exp-002 机械对齐否决、exp-003 蒸馏小模型否决、exp-004 simplicity 甜点、exp-005 组合验证、
+  exp-006 时间维已最优）收敛得到的确定性最优。
+
+## 本轮长程探索小结（截至 0efe392）
+
+- **机械对齐（40%）**：本地不可靠（窗口 100 点 < 1 转、变速工况、私有频带未知），
+  时间维退化只剩通道杠杆；通道先验经 A/B 实测净负（exp-002）。**放弃**。
+- **faithfulness（40% 中本地可测部分）**：占主导的是 cell 排序，`|x|` 全局排序已最优（exp-006）；
+  通道遮挡蒸馏在大模型微弱正、小模型负（exp-003/005）。**收敛于 ~0.70**。
+- **simplicity（20%）**：**narrow (32,64,128) 是明确赢家，+0.086**（exp-004/005）。**已采纳为默认**。
+- **基础设施**：GPU 训练（~18× 加速）、可复用 `evaluate` 模块（真实 devkit 指标）。
+- **下一步候选**（尚未做）：全量 737k 数据训练、训练期数据增强/正则对 faith 的间接影响、
+  更激进的架构改动（高风险）。当前确定性收益已基本挖尽。
