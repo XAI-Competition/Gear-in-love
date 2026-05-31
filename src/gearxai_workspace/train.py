@@ -44,6 +44,10 @@ class TrainConfig:
     # training. Tests whether augmentation makes the classifier rely on robust,
     # localizable cells and thereby indirectly raises faithfulness. 0 disables it.
     noise_std: float = 0.0
+    # exp-008: fraction of time steps randomly zeroed per window during training
+    # (time masking). Tests whether forcing the classifier to spread its reliance
+    # across time further improves faithfulness. 0 disables it.
+    time_mask_frac: float = 0.0
     model: ModelConfig = field(default_factory=ModelConfig)
 
 
@@ -220,6 +224,13 @@ def train_baseline(config: TrainConfig) -> dict:
             xb, yb = x_train[idx], y_train[idx]
             if config.noise_std > 0:
                 xb = xb + torch.randn_like(xb) * config.noise_std
+            if config.time_mask_frac > 0:
+                # Zero a random fraction of time steps (shared across channels).
+                keep = (
+                    torch.rand(xb.shape[0], 1, xb.shape[2], device=xb.device)
+                    >= config.time_mask_frac
+                ).float()
+                xb = xb * keep
             optimizer.zero_grad(set_to_none=True)
             use_relevance = config.relevance_weight > 0 or config.occlusion_weight > 0
             if use_relevance:
