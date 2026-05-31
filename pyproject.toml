@@ -3,7 +3,7 @@ name = "gearxai-workspace"
 version = "0.1.0"
 description = "Workspace for the GearXAI IJCAI-ECAI 2026 explainable gearbox fault diagnosis challenge."
 readme = "README.md"
-requires-python = ">=3.11,<3.13"
+requires-python = ">=3.12,<3.13"
 dependencies = [
     "captum>=0.8.0",
     "datasets>=4.4.1",
@@ -28,7 +28,7 @@ dependencies = [
     "scipy>=1.16.3",
     "seaborn>=0.13.2",
     "tensorboard>=2.20.0",
-    "torch>=2.7.0,<2.8",
+    "torch==2.10.0+cu126",
     "torchmetrics>=1.8.2",
     "tqdm>=4.67.1",
 ]
@@ -60,9 +60,4 @@ select = ["E", "F", "I", "UP", "B"]
 
 [tool.uv.sources]
 gearxai-devkit = { path = "external/gearxai-devkit-v1.0.1" }
-torch = { index = "pytorch-cu126" }
-
-[[tool.uv.index]]
-name = "pytorch-cu126"
-url = "https://download.pytorch.org/whl/cu126"
-explicit = true
+torch = { path = "D:/AppCache/wheelhouse/torch-2.10.0+cu126-cp312-cp312-win_amd64.whl" }

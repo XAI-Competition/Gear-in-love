@@ -49,6 +49,12 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="torch CPU threads (default: leave to torch)",
     )
+    parser.add_argument(
+        "--device",
+        default="auto",
+        choices=["auto", "cuda", "cpu"],
+        help="training device; 'auto' uses cuda when available (default: auto)",
+    )
     return parser.parse_args()
 
 
@@ -64,6 +70,7 @@ def main() -> int:
         lr=args.lr,
         seed=args.seed,
         num_threads=args.num_threads,
+        device=args.device,
     )
 
     result = train_baseline(config)
@@ -87,6 +94,7 @@ def main() -> int:
         "onnx_path": str(onnx_path),
         "parameters": count_parameters(model),
         "best_val_macro_f1_subset": result["best_val_macro_f1"],
+        "device": result.get("device"),
         "history": result["history"],
         "config": {
             "train_per_class": config.train_per_class,
@@ -95,6 +103,7 @@ def main() -> int:
             "batch_size": config.batch_size,
             "lr": config.lr,
             "seed": config.seed,
+            "device": config.device,
         },
     }
     summary_path = onnx_path.parent / "train_summary.json"

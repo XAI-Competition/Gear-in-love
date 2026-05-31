@@ -35,11 +35,11 @@ $env:UV_CACHE_DIR = (Resolve-Path .\.uv-cache-local).Path
 uv sync --python 3.12          # create/sync .venv from pyproject + uv.lock
 ```
 
-**Heads up:** the installed `.venv` has `torch==2.12.0+cpu`, but `pyproject.toml` pins
-`torch>=2.7,<2.8` from the cu126 index. Because of that mismatch, plain `uv run …` tries to
-re-resolve and download torch on every call. Use **`uv run --no-sync …`** to run against the
-existing venv without re-syncing. With this CPU torch, training runs **on CPU** even though a
-GPU is present — see *Compute resources* below before scaling up.
+**Heads up:** the `.venv` has a **CUDA build of torch** (`torch==2.10.0+cu126`,
+`torch.cuda.is_available() == True` on the local RTX 4060). `pyproject.toml` pins it to a local
+wheel under `[tool.uv.sources]`, so a plain `uv run …` may still try to re-resolve; keep using
+**`uv run --no-sync …`** to run against the existing venv without re-syncing. Training auto-selects
+the GPU (`--device auto`); ONNX export always happens on a CPU copy — see *Compute resources*.
 
 ```powershell
 uv run pytest                            # run the test suite (testpaths = tests/)
@@ -75,8 +75,10 @@ so test runs don't litter the repo.
 
 - **`numpy<2` is pinned on purpose.** The devkit calls `numpy.trapz`, which was removed in NumPy 2.
   Do not bump numpy past 1.x or the devkit breaks.
-- **Torch is pinned to the CUDA 12.6 wheel index** (`torch>=2.7,<2.8` from the `pytorch-cu126`
-  explicit index). Don't replace it with a default-index torch.
+- **Torch is a CUDA 12.6 build** (`torch==2.10.0+cu126`), pinned to a local wheel via
+  `[tool.uv.sources]`. It enables GPU training but the **ONNX submission must stay CPU-only** —
+  export from a `model.cpu()` copy (the loop already does this). Don't swap in a default-index
+  (CPU) torch.
 - **The devkit is a local path dependency**, not a PyPI package:
   `gearxai-devkit = { path = "external/gearxai-devkit-v1.0.1" }`. It provides the `gearxai` CLI and
   the ONNX baselines under `external/gearxai-devkit-v1.0.1/baselines/`. Its presence depends on
@@ -131,25 +133,22 @@ installed torch 2.12 defaults to the dynamo path, which needs `onnxscript` (not 
 
 ## Compute resources
 
-Training is **not** locked to CPU — it only runs on CPU today because the installed `.venv` has
-`torch==2.12.0+cpu`. Hardware available:
+Training runs on **GPU** now (the venv has `torch==2.10.0+cu126`,
+`torch.cuda.is_available() == True`). `train.py` auto-selects the device (`--device auto`),
+keeps the whole balanced subset resident in VRAM, and trains there; on the RTX 4060 an epoch
+over 270k windows drops from ~21 s (CPU) to a fraction of a second. Hardware available:
 
-- **Local:** NVIDIA **RTX 4060 Laptop, 8 GB VRAM** (driver 566.07). Good for fast iteration on
-  the small baseline; 8 GB is the constraint — keep batch/model modest. The current baseline
-  (~150k params, windows `[8,100]`) is tiny, so even large batches fit easily.
+- **Local:** NVIDIA **RTX 4060 Laptop, 8 GB VRAM** (driver 566.07). Default for fast iteration;
+  8 GB is the constraint — the current baseline (~150k params, windows `[8,100]`) is tiny so the
+  subset + model fit easily. Watch VRAM only if the subset or model grows a lot.
 - **Remote (on request):** the user can provision **multiple H20 GPUs** — ample capacity. **Ask
   the user** when a run genuinely needs more than the 4060 (full 737k-window training, large
   sweeps, bigger models, multi-seed studies). Don't assume it silently; request it.
 
-To actually use a GPU you must first install a **CUDA build of torch** (the venv is CPU-only
-right now). `pyproject.toml` already pins the `pytorch-cu126` index, so a CUDA wheel is the
-intended target — installing it then makes `torch.cuda.is_available()` true. After that:
-
-- move the model and tensors to `cuda` in `train.py` (the loop is currently CPU/`from_numpy`),
-- **export ONNX from the CPU copy** (`model.cpu()`), and keep the submission **CPU-only** — the
-  evaluator runs ONNX Runtime on `CPUExecutionProvider`, so the deliverable must not require CUDA.
-- after switching torch, plain `uv run` re-sync behavior may differ; keep using `--no-sync` and
-  verify `torch.cuda.is_available()` before a long run.
+Hard rule: **the ONNX submission must stay CPU-only.** `train_baseline` returns a `model.cpu()`
+copy and `export_onnx` runs on CPU, because the evaluator uses ONNX Runtime on
+`CPUExecutionProvider` — the deliverable must not require CUDA. Keep using `uv run --no-sync` so
+the existing CUDA venv isn't re-resolved.
 
 Rule of thumb: prototype on the 4060; **request H20s for any heavy/long run** and log which
 hardware each experiment used in `progress.md`.
