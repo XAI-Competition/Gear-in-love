@@ -60,6 +60,10 @@ class ModelConfig:
     # lets each predicted class emphasize the channels carrying its fault-band
     # energy — without touching the time profile that drives faithfulness.
     channel_attention: bool = True
+    # exp-003c: also feed per-sample log channel energy [N, 8] into the gate, so
+    # it can capture sample-level channel importance (the class-conditioned gate
+    # alone caps faithfulness — per-sample occlusion reached 0.81 in the probe).
+    channel_gate_energy_input: bool = False
 
 
 class ConvBlock(nn.Module):
@@ -101,12 +105,15 @@ class GearXAINet(nn.Module):
         # Head consumes concatenated [mean-pool, max-pool] features.
         self.head = nn.Linear(2 * in_ch, cfg.num_classes)
 
-        # Class-conditioned channel attention: maps class probabilities to a
-        # per-channel gate. Tiny (num_classes x in_channels), so simplicity is
-        # barely affected. Initialized to ~uniform so training starts from the
+        # Channel attention: maps class probabilities (and optionally per-sample
+        # log channel energy) to a per-channel gate. Tiny, so simplicity is
+        # barely affected. Initialized to zero so training starts from the
         # |x|-only relevance and learns channel emphasis from there.
         if cfg.channel_attention:
-            self.channel_gate = nn.Linear(cfg.num_classes, cfg.in_channels)
+            gate_in = cfg.num_classes
+            if cfg.channel_gate_energy_input:
+                gate_in += cfg.in_channels
+            self.channel_gate = nn.Linear(gate_in, cfg.in_channels)
             nn.init.zeros_(self.channel_gate.weight)
             nn.init.zeros_(self.channel_gate.bias)
         else:
@@ -124,12 +131,24 @@ class GearXAINet(nn.Module):
 
         return self._logits_from_features(self._features(windows))
 
-    def channel_gate_values(self, probabilities: torch.Tensor) -> torch.Tensor | None:
-        """Return the raw per-channel gate ``[N, 8]`` (``None`` if disabled)."""
+    def channel_gate_values(
+        self, probabilities: torch.Tensor, windows: torch.Tensor
+    ) -> torch.Tensor | None:
+        """Return the raw per-channel gate ``[N, 8]`` (``None`` if disabled).
+
+        The gate is conditioned on class probabilities, optionally augmented with
+        per-sample log channel energy so it can capture sample-level channel
+        importance (exp-003c).
+        """
 
         if self.channel_gate is None:
             return None
-        return F.softplus(self.channel_gate(probabilities) + _SOFTPLUS_INV_1)
+        gate_in = probabilities
+        if self.config.channel_gate_energy_input:
+            energy = (windows * windows).mean(dim=2)  # [N, 8]
+            log_energy = torch.log(energy + 1e-6)
+            gate_in = torch.cat([probabilities, log_energy], dim=1)
+        return F.softplus(self.channel_gate(gate_in) + _SOFTPLUS_INV_1)
 
     def forward_train(
         self, windows: torch.Tensor
@@ -147,7 +166,7 @@ class GearXAINet(nn.Module):
         logits = self._logits_from_features(feat)
         probabilities = torch.softmax(logits, dim=1)
         relevance = self._relevance_from(feat, probabilities, windows)
-        return logits, relevance, self.channel_gate_values(probabilities)
+        return logits, relevance, self.channel_gate_values(probabilities, windows)
 
     def _relevance_from(
         self, feat: torch.Tensor, probabilities: torch.Tensor, windows: torch.Tensor
@@ -166,11 +185,11 @@ class GearXAINet(nn.Module):
         gate = F.softplus(cam_up)  # [N, 1, 100] >= 0
         relevance = gate * windows.abs()  # [N, 8, 100], nonnegative
 
-        if self.channel_gate is not None:
-            # Per-channel multiplicative gate, class-conditioned. softplus keeps
-            # it positive; centered at 1.0 since channel_gate starts at zero, so
-            # the model departs from the |x|-only relevance only as it learns.
-            ch_gate = F.softplus(self.channel_gate(probabilities) + _SOFTPLUS_INV_1)
+        ch_gate = self.channel_gate_values(probabilities, windows)
+        if ch_gate is not None:
+            # Per-channel multiplicative gate. softplus keeps it positive; centered
+            # at 1.0 since channel_gate starts at zero, so the model departs from
+            # the |x|-only relevance only as it learns.
             relevance = relevance * ch_gate.unsqueeze(2)  # [N, 8, 1] broadcast
 
         return relevance

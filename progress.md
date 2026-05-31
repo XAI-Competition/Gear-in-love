@@ -258,3 +258,30 @@ uv run --no-sync gearxai package --model runs\<name>\model.onnx `
   是较好折中（faith +0.008，macro-F1 仅降到 0.971）。exp-003c 候选：给门控加 **per-sample
   通道能量输入** `[N,8]`，逼近 per-sample occ_ch（探针上限 0.81），但要权衡 simplicity。
   先去做 exp-004（simplicity，确定可测），再回头评估 exp-003c。
+
+---
+
+## exp-004 — Simplicity：宽度 vs 精度权衡（GPU sweep，真实 devkit）
+
+- **日期**: 2026-06-01
+- **commit (代码来源)**: `ebfdc7d`
+- **硬件**: RTX 4060，每 epoch 0.5–1.0s
+- **目标**: simplicity（20%，本地可测）。参数 breakdown 显示 ~96% 参数在卷积层
+  （baseline 150k 中 144k）。减窄能大幅提 simplicity，问题是 macro-F1 不能破 0.80 门槛。
+- **方法**: 训 5 个宽度配置，evaluate 模块在 4000 验证样本测真实 macro-F1/faith/simplicity。
+- **结果**:
+
+  | 配置 | macro-F1 | faith | simplicity | params |
+  | --- | ---: | ---: | ---: | ---: |
+  | baseline (64,128,256) | 0.9898 | 0.7084 | 0.8313 | 150k |
+  | **narrow (32,64,128)** | **0.9697** | 0.7058 | **0.9220** | 40k |
+  | narrow2 (24,48,96) | 0.9698 | 0.6887 | 0.9374 | 24k |
+  | tiny (16,32,64) | 0.9440 | 0.6880 | 0.9492 | 12k |
+  | 2block (32,64) | 0.9311 | 0.6998 | 0.9495 | 14k |
+
+- **结论**: **`narrow (32,64,128)` 是明确甜点**。simplicity 0.831→**0.922（+0.091，×0.2 = +0.018
+  解释性分）**，macro-F1 仍 0.970（远超门槛），faith 几乎不变（0.706）。这是**确定、可测的
+  正收益，比 exp-003b 的 faith 收益还大**。更窄（narrow2/tiny）开始掉 faith，不划算。
+- **决定 / 下一步**: 采用 narrow 作为新默认架构候选。下一步 exp-005：把 **narrow + occlusion
+  蒸馏**组合，叠加两个确定收益（simplicity +0.018 与 faith +0.005~0.008），并测 exp-003c
+  的 per-sample 能量门控能否进一步提 faith。
