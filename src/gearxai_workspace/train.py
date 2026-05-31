@@ -31,9 +31,11 @@ class TrainConfig:
     seed: int = 42
     num_threads: int | None = None
     device: str = "auto"  # "auto" | "cuda" | "cpu"
-    # Weight of the relevance regularizer that trains the channel-attention gate
-    # (the classifier path alone never touches it). 0 disables it.
-    relevance_weight: float = 0.1
+    # Weight of the channel-prior relevance regularizer that trains the
+    # channel-attention gate. Default 0 (disabled): the exp-002d A/B showed the
+    # prior trades a certain ~0.018 faithfulness loss for only a tiny, uncertain
+    # proxy mechanical gain (net negative). Kept as an opt-in lever.
+    relevance_weight: float = 0.0
     model: ModelConfig = field(default_factory=ModelConfig)
 
 
@@ -65,27 +67,50 @@ def set_seed(seed: int) -> None:
     torch.manual_seed(seed)
 
 
-def channel_energy_alignment_loss(
-    relevance: torch.Tensor, windows: torch.Tensor
+# Class-conditioned channel prior [9, 8]: for each fault class, which of the 8
+# channels carry its discriminative energy. Estimated empirically (exp-002a) and
+# backed by physical intuition for the DDS-SEU rig (planetary/parallel gearbox
+# sensors + torque). Kept SOFT and broad on purpose — we don't know the official
+# private band config, so we only nudge mass toward plausibly-relevant channels
+# rather than overfitting a single channel.
+# Channels: 0 motor, 1 rgb_y, 2 rgb_x, 3 rgb_z, 4 torque, 5 pgb_y, 6 pgb_x, 7 pgb_z
+# Classes:  0 HEA, 1 CTF, 2 MTF, 3 RCF, 4 SWF, 5 BWF, 6 CWF, 7 IRF, 8 ORF
+CHANNEL_PRIOR = np.array(
+    [
+        [1, 1, 1, 1, 1, 1, 1, 1],  # HEA: no preference (healthy)
+        [0, 1, 1, 1, 0, 2, 2, 1],  # CTF: pgb vibration (gear tooth)
+        [0, 1, 1, 1, 0, 2, 2, 1],  # MTF: pgb vibration (missing tooth)
+        [0, 1, 1, 1, 2, 2, 2, 1],  # RCF: torque + pgb (root crack)
+        [1, 2, 1, 1, 1, 2, 1, 1],  # SWF: low-band vibration (surface wear)
+        [1, 1, 1, 1, 0, 2, 1, 2],  # BWF: pgb bearing (ball fault)
+        [2, 1, 1, 1, 0, 1, 1, 1],  # CWF: motor (combination)
+        [0, 1, 1, 1, 2, 2, 2, 1],  # IRF: torque + pgb (inner race)
+        [2, 1, 1, 1, 0, 1, 1, 1],  # ORF: motor + low band (outer race)
+    ],
+    dtype=np.float32,
+)
+
+
+def channel_prior_loss(
+    relevance: torch.Tensor,
+    labels: torch.Tensor,
+    prior: torch.Tensor,
 ) -> torch.Tensor:
-    """Encourage the relevance channel-mass to match the input energy per channel.
+    """Nudge each sample's relevance channel-mass toward its class channel prior.
 
     The mechanical metric is time-degenerate on length-100 windows, so only the
-    *per-channel* relevance total matters; aligning it with each channel's energy
-    share steers mass toward channels that carry the fault-band energy (which also
-    helps faithfulness, since high-energy channels dominate the zero-baseline
-    deletion/insertion). Implemented as a soft cross-entropy between the relevance
-    channel distribution and the energy channel distribution.
+    per-channel relevance total matters; concentrating mass on the channels that
+    carry a class's fault energy is the robust, speed-invariant lever for
+    mechanical alignment. Soft cross-entropy between the relevance channel
+    distribution and the (normalized) class prior — minimized when they match.
     """
 
     eps = 1e-8
-    # Per-channel relevance mass and input energy, as distributions over channels.
     rel_mass = relevance.sum(dim=2)  # [N, 8]
     rel_dist = rel_mass / rel_mass.sum(dim=1, keepdim=True).clamp_min(eps)
-    energy = (windows * windows).sum(dim=2)  # [N, 8]
-    energy_dist = energy / energy.sum(dim=1, keepdim=True).clamp_min(eps)
-    # Cross-entropy H(energy_dist, rel_dist); minimized when rel_dist == energy_dist.
-    return -(energy_dist * (rel_dist + eps).log()).sum(dim=1).mean()
+    target = prior[labels]  # [N, 8]
+    target = target / target.sum(dim=1, keepdim=True).clamp_min(eps)
+    return -(target * (rel_dist + eps).log()).sum(dim=1).mean()
 
 
 @torch.no_grad()
@@ -132,6 +157,7 @@ def train_baseline(config: TrainConfig) -> dict:
     )
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=config.epochs)
     criterion = nn.CrossEntropyLoss(label_smoothing=config.label_smoothing)
+    channel_prior = torch.from_numpy(CHANNEL_PRIOR).to(device)
 
     history: list[dict] = []
     best_f1 = -1.0
@@ -153,7 +179,7 @@ def train_baseline(config: TrainConfig) -> dict:
                 # regularizer while cross-entropy still sees raw logits.
                 logits, relevance = model.forward_train(xb)
                 cls_loss = criterion(logits, yb)
-                rel_loss = channel_energy_alignment_loss(relevance, xb)
+                rel_loss = channel_prior_loss(relevance, yb, channel_prior)
                 loss = cls_loss + config.relevance_weight * rel_loss
             else:
                 loss = criterion(model.classify(xb), yb)

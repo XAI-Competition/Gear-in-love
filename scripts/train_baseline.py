@@ -58,8 +58,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--relevance-weight",
         type=float,
-        default=0.1,
-        help="weight of the channel-energy relevance regularizer (0 disables it)",
+        default=0.0,
+        help=(
+            "weight of the channel-prior relevance regularizer (0 disables it; "
+            "exp-002d found it net-negative, so it is off by default)"
+        ),
     )
     return parser.parse_args()
 
