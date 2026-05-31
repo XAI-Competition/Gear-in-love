@@ -40,6 +40,10 @@ class TrainConfig:
     # gate to predict causal channel importance (zero a channel -> predicted-class
     # confidence drop), which the faithfulness probe showed is the key lever.
     occlusion_weight: float = 0.0
+    # exp-007: additive Gaussian input noise (std, in standardized units) during
+    # training. Tests whether augmentation makes the classifier rely on robust,
+    # localizable cells and thereby indirectly raises faithfulness. 0 disables it.
+    noise_std: float = 0.0
     model: ModelConfig = field(default_factory=ModelConfig)
 
 
@@ -214,6 +218,8 @@ def train_baseline(config: TrainConfig) -> dict:
         for start in range(0, n, config.batch_size):
             idx = perm[start : start + config.batch_size]
             xb, yb = x_train[idx], y_train[idx]
+            if config.noise_std > 0:
+                xb = xb + torch.randn_like(xb) * config.noise_std
             optimizer.zero_grad(set_to_none=True)
             use_relevance = config.relevance_weight > 0 or config.occlusion_weight > 0
             if use_relevance:
