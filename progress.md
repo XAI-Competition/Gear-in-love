@@ -285,3 +285,33 @@ uv run --no-sync gearxai package --model runs\<name>\model.onnx `
 - **决定 / 下一步**: 采用 narrow 作为新默认架构候选。下一步 exp-005：把 **narrow + occlusion
   蒸馏**组合，叠加两个确定收益（simplicity +0.018 与 faith +0.005~0.008），并测 exp-003c
   的 per-sample 能量门控能否进一步提 faith。
+
+---
+
+## exp-005 — 组合 sweep：narrow × 蒸馏 × 能量门控（GPU，真实 devkit）
+
+- **日期**: 2026-06-01
+- **commit (代码来源)**: `3b76672`
+- **硬件**: RTX 4060；narrow 无蒸馏 ~0.8s/epoch，含蒸馏 ~2.7s/epoch
+- **目标**: 把已验证的确定收益组合，找最佳可提交模型。排名用本地可测的
+  `expl_partial = 0.4·faith + 0.2·simplicity`（机械项本地未知，已证不可靠优化）。
+- **结果**（train 10000/类、20 epoch、eval 5000 验证样本）:
+
+  | 配置 | macro-F1 | faith | simplicity | expl_partial |
+  | --- | ---: | ---: | ---: | ---: |
+  | **narrow_base** | 0.9793 | **0.7051** | 0.9220 | **0.4664** |
+  | narrow_occ1 | 0.9584 | 0.6972 | 0.9220 | 0.4633 |
+  | narrow_occ1_energy | 0.9566 | 0.6941 | 0.9169 | 0.4610 |
+  | narrow_occ2_energy | 0.9548 | 0.6945 | 0.9169 | 0.4612 |
+  | exp-001 baseline（参考） | 0.997 | 0.708 | 0.836 | **0.4504** |
+
+- **决定性结论**:
+  1. **`narrow_base` (32,64,128，无蒸馏) 是明确赢家**：expl_partial **0.4664，比 exp-001 baseline
+     的 0.4504 高 +0.016**，纯来自 simplicity（0.836→0.922），faith 几乎不变（0.705 vs 0.708），
+     macro-F1 0.979 仍远超门槛。
+  2. **occlusion 蒸馏在 narrow 架构上一致有害**：所有蒸馏组合 faith（0.694–0.697）都低于
+     narrow_base（0.705），能量门控也无帮助还多耗算子（simplicity 0.922→0.917）。
+     → **否决 exp-003b/c 的蒸馏路线在小模型上的应用**（蒸馏伤分类与 insertion，小模型更敏感）。
+- **决定 / 下一步**: 最优可提交模型 = **narrow (32,64,128)，无蒸馏、无能量门控**。
+  下一步：用此配置**全量训练**（更大子集 + 更多 epoch）产出最终 `runs/narrow/submission.zip`，
+  作为新的最佳提交，替代 exp-001 baseline。蒸馏代码保留为 opt-in（默认关）。

@@ -49,7 +49,10 @@ _SOFTPLUS_INV_1 = 0.5413248538970947
 class ModelConfig:
     in_channels: int = NUM_CHANNELS
     num_classes: int = NUM_CLASSES
-    widths: tuple[int, ...] = (64, 128, 256)
+    # Default to the exp-005 winner: narrow (32,64,128) lifts simplicity
+    # 0.836 -> 0.922 (+0.018 score) at macro-F1 ~0.98 (>> 0.80 gate) with faith
+    # essentially unchanged — a certain, locally-measured net gain.
+    widths: tuple[int, ...] = (32, 64, 128)
     kernel_sizes: tuple[int, ...] = (7, 5, 3)
     pool: int = 2
     dropout: float = 0.1
