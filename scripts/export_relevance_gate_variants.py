@@ -303,6 +303,31 @@ def lowfreq_asym_preset(token: str) -> Preset | None:
     )
 
 
+def lowfreq_focus_preset(token: str) -> Preset | None:
+    """Parse ``lowfreq_focus:<bwf>:<cwf>:<orf>:<other>`` dynamic presets."""
+
+    prefix = "lowfreq_focus:"
+    if not token.startswith(prefix):
+        return None
+    parts = token[len(prefix) :].split(":")
+    if len(parts) != 4:
+        raise ValueError("Expected dynamic preset format lowfreq_focus:<bwf>:<cwf>:<orf>:<other>.")
+    bwf, cwf, orf, other = (float(part) for part in parts)
+    gates = ones()
+    for class_name, motor in (("BWF", bwf), ("CWF", cwf), ("ORF", orf)):
+        set_gate(gates, class_name, {channel: other for channel in CHANNELS})
+        set_gate(gates, class_name, {"motor": motor})
+    name = f"lowfreq_focus_b{bwf:g}_c{cwf:g}_o{orf:g}_other{other:g}"
+    return Preset(
+        safe_name(name),
+        (
+            f"dynamic focused low-frequency gates: BWF {bwf:g}, CWF {cwf:g}, "
+            f"ORF {orf:g}, other channels {other:g}"
+        ),
+        gates,
+    )
+
+
 def resolve_selected_presets(tokens: list[str], available: dict[str, Preset]) -> list[Preset]:
     if tokens == ["all"]:
         return list(available.values())
@@ -313,6 +338,10 @@ def resolve_selected_presets(tokens: list[str], available: dict[str, Preset]) ->
             selected.append(available[token])
             continue
         dynamic = lowfreq_asym_preset(token)
+        if dynamic is not None:
+            selected.append(dynamic)
+            continue
+        dynamic = lowfreq_focus_preset(token)
         if dynamic is not None:
             selected.append(dynamic)
             continue
