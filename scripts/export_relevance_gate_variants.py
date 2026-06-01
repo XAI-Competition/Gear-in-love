@@ -126,6 +126,22 @@ def presets() -> dict[str, Preset]:
     orf_motor_2p2 = ones()
     set_gate(orf_motor_2p2, "ORF", {"motor": 2.2})
 
+    cwf_orf_motor_2p2 = ones()
+    for class_name in ("CWF", "ORF"):
+        set_gate(cwf_orf_motor_2p2, class_name, {"motor": 2.2})
+
+    orf_motor_3p0 = ones()
+    set_gate(orf_motor_3p0, "ORF", {"motor": 3.0})
+
+    cwf2p2_orf3p0 = ones()
+    set_gate(cwf2p2_orf3p0, "CWF", {"motor": 2.2})
+    set_gate(cwf2p2_orf3p0, "ORF", {"motor": 3.0})
+
+    bwf1p4_cwf2p2_orf3p0 = ones()
+    set_gate(bwf1p4_cwf2p2_orf3p0, "BWF", {"motor": 1.4})
+    set_gate(bwf1p4_cwf2p2_orf3p0, "CWF", {"motor": 2.2})
+    set_gate(bwf1p4_cwf2p2_orf3p0, "ORF", {"motor": 3.0})
+
     lowfreq_motor_3p0 = ones()
     for class_name in ("BWF", "CWF", "ORF"):
         set_gate(lowfreq_motor_3p0, class_name, {"motor": 3.0})
@@ -212,6 +228,26 @@ def presets() -> dict[str, Preset]:
             "orf_motor_2p2",
             "only ORF receives the strong motor gate",
             orf_motor_2p2,
+        ),
+        "cwf_orf_motor_2p2": Preset(
+            "cwf_orf_motor_2p2",
+            "CWF and ORF receive the strong motor gate; BWF stays unchanged",
+            cwf_orf_motor_2p2,
+        ),
+        "orf_motor_3p0": Preset(
+            "orf_motor_3p0",
+            "only ORF receives a stronger motor gate",
+            orf_motor_3p0,
+        ),
+        "cwf2p2_orf3p0": Preset(
+            "cwf2p2_orf3p0",
+            "CWF keeps the 2.2 motor gate while ORF is strengthened to 3.0",
+            cwf2p2_orf3p0,
+        ),
+        "bwf1p4_cwf2p2_orf3p0": Preset(
+            "bwf1p4_cwf2p2_orf3p0",
+            "asymmetric low-frequency motor gates: BWF 1.4, CWF 2.2, ORF 3.0",
+            bwf1p4_cwf2p2_orf3p0,
         ),
         "lowfreq_motor_3p0": Preset(
             "lowfreq_motor_3p0",
