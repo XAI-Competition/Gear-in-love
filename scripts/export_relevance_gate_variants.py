@@ -15,6 +15,7 @@ they are used only for Pareto screening.
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import tempfile
 from dataclasses import dataclass
@@ -32,6 +33,7 @@ from gearxai_workspace.model import ModelConfig, build_model, count_parameters
 
 CHANNELS = ("motor", "rgb_y", "rgb_x", "rgb_z", "torque", "pgb_y", "pgb_x", "pgb_z")
 CLASSES = ("HEA", "CTF", "MTF", "RCF", "SWF", "BWF", "CWF", "IRF", "ORF")
+SOFTPLUS_INV_1 = 0.5413248538970947
 
 
 @dataclass(frozen=True)
@@ -187,6 +189,28 @@ def load_base_model(checkpoint: Path) -> nn.Module:
     return model
 
 
+def softplus_inverse(values: np.ndarray) -> np.ndarray:
+    values = np.asarray(values, dtype=np.float32)
+    return np.log(np.expm1(values)).astype(np.float32)
+
+
+def install_direct_channel_gate(model: nn.Module, gates: np.ndarray) -> None:
+    """Bake class-conditioned gates into GearXAINet's existing channel gate.
+
+    For a one-hot class probability vector, this makes the exported relevance
+    gate equal to ``gates[class_id]`` while keeping the original model graph.
+    Soft probabilities interpolate in pre-softplus space, which is acceptable
+    for high-confidence validation predictions and avoids wrapper-only ops.
+    """
+
+    if not hasattr(model, "channel_gate") or model.channel_gate is None:
+        raise ValueError("Direct gate mode requires a model with channel_attention=True.")
+    preactivation = softplus_inverse(gates) - SOFTPLUS_INV_1  # [9, 8]
+    with torch.no_grad():
+        model.channel_gate.weight.copy_(torch.from_numpy(preactivation.T))
+        model.channel_gate.bias.zero_()
+
+
 def evaluate_with_optional_band(
     onnx_path: Path,
     windows: np.ndarray,
@@ -236,6 +260,15 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--data-dir", type=Path, default=Path("data/prepared"))
     parser.add_argument("--out-dir", type=Path, default=Path("runs/mech_gate_exp014"))
     parser.add_argument("--presets", nargs="+", default=["all"])
+    parser.add_argument(
+        "--implementation",
+        choices=["direct", "wrapper"],
+        default="direct",
+        help=(
+            "direct writes gates into the existing GearXAINet channel_gate; "
+            "wrapper multiplies relevance outside the trained model"
+        ),
+    )
     parser.add_argument("--eval-n", type=int, default=3000)
     parser.add_argument("--seed", type=int, default=14014)
     parser.add_argument("--batch-size", type=int, default=256)
@@ -267,8 +300,12 @@ def main() -> int:
         preset = available[name]
         variant_dir = args.out_dir / name
         onnx_path = variant_dir / "model.onnx"
-        wrapper = RelevanceGateWrapper(base, preset.gates)
-        export_onnx(wrapper, onnx_path, sample=sample_for_check)
+        if args.implementation == "direct":
+            model = copy.deepcopy(base)
+            install_direct_channel_gate(model, preset.gates)
+        else:
+            model = RelevanceGateWrapper(base, preset.gates)
+        export_onnx(model, onnx_path, sample=sample_for_check)
         check = self_check(onnx_path, sample_for_check)
         report = evaluate_with_optional_band(
             onnx_path,
@@ -290,8 +327,9 @@ def main() -> int:
 
         result = {
             "description": preset.description,
+            "implementation": args.implementation,
             "onnx_path": str(onnx_path),
-            "parameters": count_parameters(wrapper),
+            "parameters": count_parameters(model),
             "gates": preset.gates.tolist(),
             "self_check": check,
             "public_metrics": metrics,
