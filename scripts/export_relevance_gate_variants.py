@@ -109,6 +109,18 @@ def presets() -> dict[str, Preset]:
     for class_name in ("CTF", "MTF", "RCF", "SWF", "IRF"):
         set_gate(lowfreq_motor_2p2, class_name, {"torque": 1.2})
 
+    lowfreq_motor_3p0 = ones()
+    for class_name in ("BWF", "CWF", "ORF"):
+        set_gate(lowfreq_motor_3p0, class_name, {"motor": 3.0})
+    for class_name in ("CTF", "MTF", "RCF", "SWF", "IRF"):
+        set_gate(lowfreq_motor_3p0, class_name, {"torque": 1.3})
+
+    lowfreq_motor_4p0 = ones()
+    for class_name in ("BWF", "CWF", "ORF"):
+        set_gate(lowfreq_motor_4p0, class_name, {"motor": 4.0})
+    for class_name in ("CTF", "MTF", "RCF", "SWF", "IRF"):
+        set_gate(lowfreq_motor_4p0, class_name, {"torque": 1.4})
+
     sharp_proxy = ones()
     set_gate(sharp_proxy, "CTF", {"torque": 2.0})
     set_gate(sharp_proxy, "MTF", {"rgb_z": 2.0, "pgb_y": 1.4, "pgb_x": 1.4})
@@ -158,6 +170,16 @@ def presets() -> dict[str, Preset]:
             "lowfreq_motor_2p2",
             "stronger low-frequency motor bias with moderate torque elsewhere",
             lowfreq_motor_2p2,
+        ),
+        "lowfreq_motor_3p0": Preset(
+            "lowfreq_motor_3p0",
+            "aggressive low-frequency motor bias with stronger torque elsewhere",
+            lowfreq_motor_3p0,
+        ),
+        "lowfreq_motor_4p0": Preset(
+            "lowfreq_motor_4p0",
+            "stress test for over-strong low-frequency motor and torque bias",
+            lowfreq_motor_4p0,
         ),
         "sharp_proxy": Preset(
             "sharp_proxy",
