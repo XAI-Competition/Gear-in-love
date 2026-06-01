@@ -97,6 +97,18 @@ def presets() -> dict[str, Preset]:
     for class_name in ("CTF", "MTF", "RCF", "SWF", "IRF"):
         set_gate(lowfreq_motor, class_name, {"torque": 1.15})
 
+    lowfreq_motor_1p4 = ones()
+    for class_name in ("BWF", "CWF", "ORF"):
+        set_gate(lowfreq_motor_1p4, class_name, {"motor": 1.4})
+    for class_name in ("CTF", "MTF", "RCF", "SWF", "IRF"):
+        set_gate(lowfreq_motor_1p4, class_name, {"torque": 1.1})
+
+    lowfreq_motor_2p2 = ones()
+    for class_name in ("BWF", "CWF", "ORF"):
+        set_gate(lowfreq_motor_2p2, class_name, {"motor": 2.2})
+    for class_name in ("CTF", "MTF", "RCF", "SWF", "IRF"):
+        set_gate(lowfreq_motor_2p2, class_name, {"torque": 1.2})
+
     sharp_proxy = ones()
     set_gate(sharp_proxy, "CTF", {"torque": 2.0})
     set_gate(sharp_proxy, "MTF", {"rgb_z": 2.0, "pgb_y": 1.4, "pgb_x": 1.4})
@@ -105,6 +117,15 @@ def presets() -> dict[str, Preset]:
     for class_name in ("BWF", "CWF", "ORF"):
         set_gate(sharp_proxy, class_name, {"motor": 2.2})
     set_gate(sharp_proxy, "IRF", {"torque": 2.0, "pgb_y": 1.3})
+
+    sharp_proxy_soft = ones()
+    set_gate(sharp_proxy_soft, "CTF", {"torque": 1.5})
+    set_gate(sharp_proxy_soft, "MTF", {"rgb_z": 1.5, "pgb_y": 1.2, "pgb_x": 1.2})
+    set_gate(sharp_proxy_soft, "RCF", {"torque": 1.5})
+    set_gate(sharp_proxy_soft, "SWF", {"torque": 1.5})
+    for class_name in ("BWF", "CWF", "ORF"):
+        set_gate(sharp_proxy_soft, class_name, {"motor": 1.6})
+    set_gate(sharp_proxy_soft, "IRF", {"torque": 1.5, "pgb_y": 1.15})
 
     torque_only_faults = ones()
     for class_name in CLASSES[1:]:
@@ -128,10 +149,25 @@ def presets() -> dict[str, Preset]:
             "motor bias only for low-frequency proxy classes; mild torque elsewhere",
             lowfreq_motor,
         ),
+        "lowfreq_motor_1p4": Preset(
+            "lowfreq_motor_1p4",
+            "softer low-frequency motor bias with very mild torque elsewhere",
+            lowfreq_motor_1p4,
+        ),
+        "lowfreq_motor_2p2": Preset(
+            "lowfreq_motor_2p2",
+            "stronger low-frequency motor bias with moderate torque elsewhere",
+            lowfreq_motor_2p2,
+        ),
         "sharp_proxy": Preset(
             "sharp_proxy",
             "aggressive proxy best-channel bets from the mechanical audit",
             sharp_proxy,
+        ),
+        "sharp_proxy_soft": Preset(
+            "sharp_proxy_soft",
+            "softer proxy best-channel bets from the mechanical audit",
+            sharp_proxy_soft,
         ),
         "torque_only_faults": Preset(
             "torque_only_faults",
