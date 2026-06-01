@@ -109,6 +109,23 @@ def presets() -> dict[str, Preset]:
     for class_name in ("CTF", "MTF", "RCF", "SWF", "IRF"):
         set_gate(lowfreq_motor_2p2, class_name, {"torque": 1.2})
 
+    lowfreq_motor_only_2p2 = ones()
+    for class_name in ("BWF", "CWF", "ORF"):
+        set_gate(lowfreq_motor_only_2p2, class_name, {"motor": 2.2})
+
+    torque_mild_only = ones()
+    for class_name in ("CTF", "MTF", "RCF", "SWF", "IRF"):
+        set_gate(torque_mild_only, class_name, {"torque": 1.2})
+
+    bwf_motor_2p2 = ones()
+    set_gate(bwf_motor_2p2, "BWF", {"motor": 2.2})
+
+    cwf_motor_2p2 = ones()
+    set_gate(cwf_motor_2p2, "CWF", {"motor": 2.2})
+
+    orf_motor_2p2 = ones()
+    set_gate(orf_motor_2p2, "ORF", {"motor": 2.2})
+
     lowfreq_motor_3p0 = ones()
     for class_name in ("BWF", "CWF", "ORF"):
         set_gate(lowfreq_motor_3p0, class_name, {"motor": 3.0})
@@ -170,6 +187,31 @@ def presets() -> dict[str, Preset]:
             "lowfreq_motor_2p2",
             "stronger low-frequency motor bias with moderate torque elsewhere",
             lowfreq_motor_2p2,
+        ),
+        "lowfreq_motor_only_2p2": Preset(
+            "lowfreq_motor_only_2p2",
+            "only BWF/CWF/ORF receive the strong motor gate",
+            lowfreq_motor_only_2p2,
+        ),
+        "torque_mild_only": Preset(
+            "torque_mild_only",
+            "only non-low-frequency fault classes receive the mild torque gate",
+            torque_mild_only,
+        ),
+        "bwf_motor_2p2": Preset(
+            "bwf_motor_2p2",
+            "only BWF receives the strong motor gate",
+            bwf_motor_2p2,
+        ),
+        "cwf_motor_2p2": Preset(
+            "cwf_motor_2p2",
+            "only CWF receives the strong motor gate",
+            cwf_motor_2p2,
+        ),
+        "orf_motor_2p2": Preset(
+            "orf_motor_2p2",
+            "only ORF receives the strong motor gate",
+            orf_motor_2p2,
         ),
         "lowfreq_motor_3p0": Preset(
             "lowfreq_motor_3p0",
