@@ -277,6 +277,51 @@ def presets() -> dict[str, Preset]:
     }
 
 
+def safe_name(name: str) -> str:
+    return name.replace(":", "_").replace(".", "p").replace("-", "m")
+
+
+def lowfreq_asym_preset(token: str) -> Preset | None:
+    """Parse ``lowfreq_asym:<bwf>:<cwf>:<orf>`` dynamic presets."""
+
+    prefix = "lowfreq_asym:"
+    if not token.startswith(prefix):
+        return None
+    parts = token[len(prefix) :].split(":")
+    if len(parts) != 3:
+        raise ValueError("Expected dynamic preset format lowfreq_asym:<bwf>:<cwf>:<orf>.")
+    bwf, cwf, orf = (float(part) for part in parts)
+    gates = ones()
+    set_gate(gates, "BWF", {"motor": bwf})
+    set_gate(gates, "CWF", {"motor": cwf})
+    set_gate(gates, "ORF", {"motor": orf})
+    name = f"lowfreq_asym_b{bwf:g}_c{cwf:g}_o{orf:g}"
+    return Preset(
+        safe_name(name),
+        f"dynamic asymmetric motor gates: BWF {bwf:g}, CWF {cwf:g}, ORF {orf:g}",
+        gates,
+    )
+
+
+def resolve_selected_presets(tokens: list[str], available: dict[str, Preset]) -> list[Preset]:
+    if tokens == ["all"]:
+        return list(available.values())
+    selected: list[Preset] = []
+    unknown: list[str] = []
+    for token in tokens:
+        if token in available:
+            selected.append(available[token])
+            continue
+        dynamic = lowfreq_asym_preset(token)
+        if dynamic is not None:
+            selected.append(dynamic)
+            continue
+        unknown.append(token)
+    if unknown:
+        raise ValueError(f"Unknown presets: {unknown}. Available: {sorted(available)}")
+    return selected
+
+
 def proxy_band_configs() -> dict[str, dict[str, Any]]:
     """Explicit local proxy bands for sensitivity analysis, not official scoring."""
 
@@ -414,10 +459,7 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     available = presets()
-    selected = list(available) if args.presets == ["all"] else args.presets
-    unknown = sorted(set(selected) - set(available))
-    if unknown:
-        raise ValueError(f"Unknown presets: {unknown}. Available: {sorted(available)}")
+    selected = resolve_selected_presets(args.presets, available)
 
     args.out_dir.mkdir(parents=True, exist_ok=True)
     windows, labels = sample_validation(args.data_dir, args.eval_n, seed=args.seed)
@@ -432,8 +474,8 @@ def main() -> int:
         "seed": args.seed,
         "presets": {},
     }
-    for name in selected:
-        preset = available[name]
+    for preset in selected:
+        name = preset.name
         variant_dir = args.out_dir / name
         onnx_path = variant_dir / "model.onnx"
         if args.implementation == "direct":
