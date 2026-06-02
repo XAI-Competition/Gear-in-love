@@ -1,4 +1,4 @@
-"""Held-out transfer check for relevance-only channel-gate candidates.
+r"""Held-out transfer check for relevance-only channel-gate candidates.
 
 The gate sweep (progress.md exp-014..023) tuned every gate strength on the same
 public validation split it was scored on, so we cannot tell how much of the
