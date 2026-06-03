@@ -12,6 +12,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import numpy as np
+import onnx
 import torch
 
 from gearxai_workspace.data import NUM_CHANNELS, WINDOW_LENGTH
@@ -20,6 +21,42 @@ from gearxai_workspace.model import GearXAINet
 INPUT_NAME = "windows"
 OUTPUT_NAMES = ("probabilities", "relevance")
 OPSET = 17
+
+
+def fold_constants_to_initializers(model: onnx.ModelProto) -> int:
+    """Rewrite ``Constant`` nodes as graph initializers, in place.
+
+    The simplicity metric counts every graph *node* (``operator_count``), so a
+    ``Constant`` node costs exactly as much as a real operator while doing no
+    computation. Moving its tensor into ``graph.initializer`` is numerically
+    identical (an initializer and a ``Constant`` output are interchangeable as a
+    tensor input) but drops the node from the operator count. The folded tensors
+    here are scalars/length-1 vectors, so ``parameter_count`` barely moves.
+
+    Returns the number of nodes folded.
+    """
+
+    graph = model.graph
+    existing = {init.name for init in graph.initializer}
+    kept: list = []
+    folded = 0
+    for node in graph.node:
+        if node.op_type == "Constant" and len(node.output) == 1:
+            value = next((a for a in node.attribute if a.name == "value"), None)
+            if value is not None and value.HasField("t"):
+                tensor = onnx.TensorProto()
+                tensor.CopyFrom(value.t)
+                tensor.name = node.output[0]
+                if tensor.name not in existing:
+                    graph.initializer.append(tensor)
+                    existing.add(tensor.name)
+                folded += 1
+                continue
+        kept.append(node)
+    if folded:
+        del graph.node[:]
+        graph.node.extend(kept)
+    return folded
 
 
 def export_onnx(
@@ -58,6 +95,13 @@ def export_onnx(
     except TypeError:
         # Older torch without the ``dynamo`` keyword.
         torch.onnx.export(model, dummy, str(output_path), **export_kwargs)
+
+    # Free simplicity: fold leftover Constant nodes into initializers so they no
+    # longer count toward operator_count (numerically identical; see exp-025).
+    proto = onnx.load(str(output_path))
+    if fold_constants_to_initializers(proto):
+        onnx.checker.check_model(proto)
+        onnx.save(proto, str(output_path))
     return output_path
 
 
