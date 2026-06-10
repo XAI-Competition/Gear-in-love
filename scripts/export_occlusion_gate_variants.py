@@ -130,6 +130,12 @@ def default_variants() -> list[Variant]:
         Variant("occ_a1_eps0p2_exp023_T8", alpha=1.0, eps=0.2, static_gate=True, temperature=8.0),
         Variant("occ_a1_eps0p05_exp023_T8", alpha=1.0, eps=0.05, static_gate=True, temperature=8.0),
         Variant("occ_a0p5_eps0p05_T8", alpha=0.5, eps=0.05, static_gate=False, temperature=8.0),
+        # lb-002 attribution probes: S0a vs S0b confounds occ params with the
+        # static trio gate — these isolate each factor on the S0a/S0b axes.
+        Variant("occ_a1_eps0p2_T8", alpha=1.0, eps=0.2, static_gate=False, temperature=8.0),
+        Variant(
+            "occ_a0p5_eps0p05_exp023_T8", alpha=0.5, eps=0.05, static_gate=True, temperature=8.0
+        ),
     ]
 
 

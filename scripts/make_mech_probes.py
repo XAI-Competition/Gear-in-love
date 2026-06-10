@@ -61,6 +61,9 @@ PROBES: dict[str, tuple[tuple[str, ...], str]] = {
     "probe_quintet_pgby": (("CTF", "MTF", "RCF", "SWF", "IRF"), "pgb_y"),
     "probe_trio_motor_hard": (("BWF", "CWF", "ORF"), "motor"),
     "probe_mtf_rgbz": (("MTF",), "rgb_z"),
+    # round 2 (lb-002): torque refuted for the quintet (-0.0137 mech); motor is
+    # the remaining plausible direction given the low-frequency trio's success.
+    "probe_quintet_motor": (("CTF", "MTF", "RCF", "SWF", "IRF"), "motor"),
 }
 
 
