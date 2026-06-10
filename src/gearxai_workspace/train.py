@@ -314,7 +314,13 @@ def train_baseline(config: TrainConfig) -> dict:
                 ) * torch.rand(b, 1, device=xb.device)
                 keep_rest = (ranks >= d * ranks.shape[1]).float().view(b, num_ch, length)
                 # Deletion-protocol analog: top cells gone -> maximize entropy.
+                # Forward in eval mode: gradients still flow, but the heavily
+                # masked anti-objective inputs must not pollute the BatchNorm
+                # running statistics (exp-030 first round crashed val F1 to 0.83
+                # exactly through that pollution).
+                model.eval()
                 log_probs = torch.log_softmax(model.classify(xb_clean * keep_rest), dim=1)
+                model.train()
                 negative_entropy = (log_probs.exp() * log_probs).sum(dim=1).mean()
                 loss = loss + config.deletion_entropy_weight * negative_entropy
             loss.backward()
