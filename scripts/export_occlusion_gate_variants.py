@@ -61,16 +61,24 @@ class Variant:
     alpha: float
     eps: float
     static_gate: bool  # also apply the exp-023 class-conditioned motor gate
+    temperature: float = 1.0  # exp-026 output sharpening, composed on top
 
 
 class OcclusionGateModel(nn.Module):
-    """Frozen GearXAINet + in-graph per-sample channel-occlusion relevance gate."""
+    """Frozen GearXAINet + in-graph per-sample channel-occlusion relevance gate.
 
-    def __init__(self, base: GearXAINet, *, alpha: float, eps: float):
+    ``temperature`` sharpens only the ``probabilities`` output via the
+    op-frugal identity softmax(T*logits) == p**T / sum(p**T) (+3 ops). The
+    occlusion drops and the relevance conditioning keep using the T=1 softmax,
+    preserving the graded channel ordering that exp-027 selected.
+    """
+
+    def __init__(self, base: GearXAINet, *, alpha: float, eps: float, temperature: float = 1.0):
         super().__init__()
         self.base = base
         self.alpha = float(alpha)
         self.eps = float(eps)
+        self.temperature = float(temperature)
         masks = torch.ones(NUM_CHANNELS, 1, NUM_CHANNELS, 1)
         for channel in range(NUM_CHANNELS):
             masks[channel, 0, channel, 0] = 0.0
@@ -99,7 +107,12 @@ class OcclusionGateModel(nn.Module):
 
         feat = feat_all.reshape(9, -1, self.base.feat_channels, FEATURE_LENGTH)[0]
         relevance = self.base._relevance_from(feat, probs, windows)
-        return probs, relevance * gate.unsqueeze(2)
+
+        probs_out = probs
+        if self.temperature != 1.0:
+            powered = probs.pow(self.temperature)
+            probs_out = powered / powered.sum(dim=1, keepdim=True)
+        return probs_out, relevance * gate.unsqueeze(2)
 
 
 def default_variants() -> list[Variant]:
@@ -111,6 +124,12 @@ def default_variants() -> list[Variant]:
         Variant("occ_a2_eps0p05", alpha=2.0, eps=0.05, static_gate=False),
         Variant("occ_a1_eps0p05_exp023", alpha=1.0, eps=0.05, static_gate=True),
         Variant("occ_a1_eps0p2_exp023", alpha=1.0, eps=0.2, static_gate=True),
+        # exp-026 x exp-027 composition: occlusion ordering (deletion lever) plus
+        # output temperature (insertion calibration lever).
+        Variant("occ_a1_eps0p2_exp023_T4", alpha=1.0, eps=0.2, static_gate=True, temperature=4.0),
+        Variant("occ_a1_eps0p2_exp023_T8", alpha=1.0, eps=0.2, static_gate=True, temperature=8.0),
+        Variant("occ_a1_eps0p05_exp023_T8", alpha=1.0, eps=0.05, static_gate=True, temperature=8.0),
+        Variant("occ_a0p5_eps0p05_T8", alpha=0.5, eps=0.05, static_gate=False, temperature=8.0),
     ]
 
 
@@ -156,7 +175,9 @@ def main() -> int:
         if variant.alpha == 0.0:
             model: nn.Module = base  # control: plain (optionally gated) model
         else:
-            model = OcclusionGateModel(base, alpha=variant.alpha, eps=variant.eps)
+            model = OcclusionGateModel(
+                base, alpha=variant.alpha, eps=variant.eps, temperature=variant.temperature
+            )
 
         variant_dir = args.out_dir / variant.name
         onnx_path = variant_dir / "model.onnx"
