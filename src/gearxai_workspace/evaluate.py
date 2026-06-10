@@ -33,6 +33,9 @@ def _write_eval_dir(out_dir: Path, windows: np.ndarray, labels: np.ndarray) -> N
     # Zero baseline: the released windows are pre-standardized (see exp-002a).
     stats = {"format": "[N, 8, 100]", "standardized_channel_mean": [0.0] * NUM_CHANNELS}
     (out_dir / "stats.json").write_text(json.dumps(stats), encoding="utf-8")
+    # devkit v1.1.0's evaluator hashes the metadata file for provenance even
+    # when no mechanical scoring runs; an empty JSONL keeps both devkits happy.
+    (out_dir / "validation_metadata.jsonl").write_text("", encoding="utf-8")
 
 
 def sample_validation(
