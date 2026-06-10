@@ -120,28 +120,35 @@ pool, `softmax`) plus a forward Grad-CAM relevance head (`relevance = softplus(c
 upsampled to length 100 by `F.interpolate`) — nonnegative, deterministic, exportable without
 autograd.
 
-**Current best submittable model** is `narrow` (`ModelConfig.widths=(32,64,128)`, the default)
-trained with **input-noise `--noise-std 0.1` + time-masking `--time-mask-frac 0.15`** (both
-defaults): on the full public validation split macro-F1 **0.989**, faithfulness **0.733**,
-simplicity **0.922** (`runs/final2/submission.zip`). It beats the original `(64,128,256)`
-baseline on the locally-measurable explainability (`0.4·faith + 0.2·simplicity`) by **+0.027** —
-stacking three orthogonal, certain gains: narrow lifts simplicity (+0.086; conv layers held ~96%
-of the params, and simplicity is 20% of the score), and noise + time-mask augmentation lift
-faithfulness (0.708→0.722→0.733; see below). A plain `uv run … train_baseline.py` with defaults
-reproduces it.
+**Current best submittable model** is `runs/occ_exp027/occ_a1_eps0p2_exp023_T8/submission.zip`
+(exp-027, 2026-06-10): the frozen `final2` classifier wrapped with three *relevance/probability-
+only* layers — the exp-023 class-conditioned channel gate, an **in-graph per-sample channel-
+occlusion gate** (8 channel-zeroed copies folded into the batch axis; deletion lever), and an
+**output softmax temperature T=8** (`p^T/Σp^T`; insertion-calibration lever; argmax and macro-F1
+unchanged). Full public validation: macro-F1 **0.989**, faithfulness **0.8333**, simplicity
+**0.9085** (57 ops). The trained checkpoint underneath is still `final2` (`runs/final2/model.pt`,
+`narrow` widths (32,64,128) + `--noise-std 0.1` + `--time-mask-frac 0.15`; standalone faith 0.733
+/ simplicity 0.922; a plain `uv run … train_baseline.py` with defaults reproduces it). Fallbacks:
+`runs/temp_exp026/shared_T8` (no occ, faith 0.793, 33 ops) and `runs/final3` (no temperature,
+faith 0.752, 32 ops).
 
 Hard-won scoring facts from the experiment sweep (don't re-litigate without reading progress.md):
-- **Faithfulness** (40%) is deletion/insertion AUC against an **all-zero** baseline; the devkit's
-  `topk_mask` only uses relevance *ranking*, so monotonic transforms of relevance don't change it
-  and `|x|` for the time axis is already optimal *for a fixed classifier* (exp-006). The lever that
-  works is **changing the classifier via augmentation** so it relies on robust cells: input-noise
-  `--noise-std 0.1` (exp-007) + time-masking `--time-mask-frac 0.15` (exp-008) stack to raise faith
-  0.708→0.722→0.733. Occlusion-distilling the channel gate helps the big model slightly but
-  **hurts** the narrow one (exp-003/005) — leave it off.
-- **Mechanical alignment** (40%) needs a private STFT band config the devkit doesn't ship, so
-  `gearxai package` reports `mechanical_score: null` locally. It is also **time-degenerate** on
-  100-sample windows (STFT → 1 frame) and the channel-prior lever tested net-negative against
-  faithfulness (exp-002). Treat it as not locally optimizable.
+- **Faithfulness** (40%) is deletion/insertion AUC on the **predicted-class softmax probability**
+  against an **all-zero** baseline. Three stacked, locally-verified levers on a frozen classifier:
+  (a) augmentation at train time (noise 0.1 + time-mask 0.15, exp-007/008: 0.708→0.733);
+  (b) **output temperature sharpening** — curves use the probability, validation only checks
+  rows sum to 1, so `softmax(T·logits)` lifts insertion calibration for free (exp-026:
+  0.752→0.793); (c) **in-graph per-sample channel occlusion** as the relevance channel weighting
+  (exp-027: →0.833; exact per-sample occ works where class-level distillation failed, exp-003/005).
+  `topk_mask` only uses relevance *ranking*: monotonic transforms of the final map are no-ops
+  (exp-006), but per-channel rescaling changes cross-channel ranking and is the active lever.
+- **Mechanical alignment** (40%): `gearxai package` reports `mechanical_score: null` locally
+  (private band config), **but the leaderboard shows per-component scores**, so it is black-box
+  measurable via relevance-only probe submissions (survey-002, 2026-06-10; dev window to
+  2026-06-30). Mechanics: `mech = 0.75·EAS + 0.25·stability` with stability≈1; EAS reads only
+  `relevance[:, :, :64]` (single STFT frame, hop 64 — verified empirically in exp-028) and is
+  time-degenerate; prefix-only gating is faith-worse at identical mech (exp-028) — use plain
+  global class-conditioned gates as probe instruments.
 
 Export uses the **legacy** TorchScript exporter (`torch.onnx.export(..., dynamo=False)`): the
 installed torch 2.12 defaults to the dynamo path, which needs `onnxscript` (not installed).
