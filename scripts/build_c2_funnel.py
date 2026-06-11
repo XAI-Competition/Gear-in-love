@@ -96,18 +96,20 @@ class FunnelModel(nn.Module):
         v_scale: float = 1e4,
         mode: str = "strict",  # strict: top-decile cells only (faith bit-exact)
         shape: str = "rel",  # rel: funnel value follows R0 (noise-stable)
+        normalize: bool = False,  # equalize per-window funnel mass (sim parity)
         w_var: np.ndarray | None = None,
         w_fixed: np.ndarray | None = None,
     ):
         super().__init__()
-        if mode not in ("strict", "always"):
-            raise ValueError(f"mode must be 'strict' or 'always', got {mode!r}.")
+        if mode not in ("strict", "always", "hybrid"):
+            raise ValueError(f"mode must be 'strict', 'always' or 'hybrid', got {mode!r}.")
         if shape not in ("rel", "flat"):
             raise ValueError(f"shape must be 'rel' or 'flat', got {shape!r}.")
         self.occ = occ
         self.v_scale = float(v_scale)
         self.mode = mode
         self.shape = shape
+        self.normalize = bool(normalize)
 
         bins = sorted({b for f in DETECTOR["features"] for b in range(f["bin_lo"], f["bin_hi"])})
         t = torch.arange(WINDOW_LENGTH, dtype=torch.float32)
@@ -146,22 +148,35 @@ class FunnelModel(nn.Module):
         w_ch = lam * (probs @ self.w_var) + (1.0 - lam) * (probs @ self.w_fixed)  # [N, 8]
 
         # Funnel-eligible cells.
-        if self.mode == "strict":
+        if self.mode in ("strict", "hybrid"):
             tau = rel.flatten(1).topk(80, dim=1).values[:, 79:80]  # [N, 1]
             eligible = (rel >= tau.unsqueeze(2)).to(rel.dtype)  # [N, 8, 100]
+            if self.mode == "hybrid":
+                # Channels with no top-decile cell fall back to their max cell
+                # (<=1-cell change of the k=80 set; activation goes to 100%).
+                argmax_cell = (rel >= rel.amax(dim=2, keepdim=True)).to(rel.dtype)
+                has_top = eligible.amax(dim=2, keepdim=True)  # [N, 8, 1]
+                eligible = eligible + argmax_cell * (1.0 - has_top)
         else:  # always: each channel's max cell (<=1-cell change of the k=80 set)
             eligible = (rel >= rel.amax(dim=2, keepdim=True)).to(rel.dtype)
         profile = rel * eligible if self.shape == "rel" else eligible
 
+        weighted = w_ch.unsqueeze(2) * profile  # [N, 8, 100]
+        if self.normalize:
+            # Equal funnel mass per window: matches the offline mixture sim and
+            # stops loud-argmax windows from dominating the context profile.
+            weighted = weighted / (weighted.sum(dim=(1, 2), keepdim=True) + 1e-12)
         scale = self.v_scale * rel.sum(dim=(1, 2), keepdim=True)  # [N, 1, 1]
-        funnel = scale * w_ch.unsqueeze(2) * profile
+        funnel = scale * weighted
         return probs, rel + funnel
 
 
-def build_variant(checkpoint: Path, *, v_scale: float, mode: str, shape: str) -> FunnelModel:
+def build_variant(
+    checkpoint: Path, *, v_scale: float, mode: str, shape: str, normalize: bool
+) -> FunnelModel:
     base = load_base_model(checkpoint, widths=NARROW2)
     occ = OcclusionGateModel(base, alpha=1.0, eps=0.2, temperature=8.0)
-    return FunnelModel(occ, v_scale=v_scale, mode=mode, shape=shape)
+    return FunnelModel(occ, v_scale=v_scale, mode=mode, shape=shape, normalize=normalize)
 
 
 def parse_args() -> argparse.Namespace:
@@ -193,10 +208,16 @@ def main() -> int:
             base = load_base_model(args.checkpoint, widths=NARROW2)
             model: nn.Module = OcclusionGateModel(base, alpha=1.0, eps=0.2, temperature=8.0)
         else:
-            parts = name.split("_")  # e.g. strict_rel_V1e4
+            parts = name.split("_")  # e.g. hybrid_rel_V1e4_norm
             mode, shape, v_token = parts[0], parts[1], parts[2]
             v_scale = float(v_token[1:].replace("p", "."))
-            model = build_variant(args.checkpoint, v_scale=v_scale, mode=mode, shape=shape)
+            model = build_variant(
+                args.checkpoint,
+                v_scale=v_scale,
+                mode=mode,
+                shape=shape,
+                normalize=len(parts) > 3 and parts[3] == "norm",
+            )
 
         out = args.out_dir / name
         onnx_path = out / "model.onnx"
