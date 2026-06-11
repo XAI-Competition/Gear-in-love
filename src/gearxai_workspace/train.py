@@ -23,6 +23,7 @@ class TrainConfig:
     data_dir: str = "data/prepared"
     train_per_class: int | None = 8000
     val_per_class: int | None = 2000
+    train_variable_fraction: float | None = None
     epochs: int = 12
     batch_size: int = 512
     lr: float = 1e-3
@@ -69,6 +70,10 @@ class TrainConfig:
     deletion_entropy_weight: float = 0.0
     deletion_d_min: float = 0.1
     deletion_d_max: float = 0.4
+    # Speed-robustness augmentation: resample each window with a slight random
+    # time scale and interpolate back to length 100. This targets variable-speed
+    # failures more directly than oversampling variable-speed rows.
+    time_warp_std: float = 0.0
     model: ModelConfig = field(default_factory=ModelConfig)
 
 
@@ -182,6 +187,26 @@ def channel_prior_loss(
     return -(target * (rel_dist + eps).log()).sum(dim=1).mean()
 
 
+def random_time_warp(windows: torch.Tensor, std: float) -> torch.Tensor:
+    """Apply mild per-sample time scaling and resample back to length 100."""
+
+    if std <= 0:
+        return windows
+    n, channels, length = windows.shape
+    scale = torch.exp(torch.randn(n, device=windows.device) * std).clamp(0.85, 1.18)
+    center = (length - 1) / 2.0
+    base = torch.linspace(0, length - 1, length, device=windows.device)
+    src = (base.unsqueeze(0) - center) / scale.unsqueeze(1) + center
+    src = src.clamp(0, length - 1)
+
+    left = torch.floor(src).long()
+    right = (left + 1).clamp(max=length - 1)
+    weight = (src - left.float()).unsqueeze(1)
+    left_values = torch.gather(windows, 2, left.unsqueeze(1).expand(n, channels, length))
+    right_values = torch.gather(windows, 2, right.unsqueeze(1).expand(n, channels, length))
+    return left_values * (1.0 - weight) + right_values * weight
+
+
 @torch.no_grad()
 def relevance_cell_ranks(model: GearXAINet, windows: torch.Tensor) -> torch.Tensor:
     """Per-cell relevance ranks ``[N, 800]`` (0 = most relevant) from the model's
@@ -223,6 +248,7 @@ def train_baseline(config: TrainConfig) -> dict:
         config.data_dir,
         train_per_class=config.train_per_class,
         val_per_class=config.val_per_class,
+        train_variable_fraction=config.train_variable_fraction,
         seed=config.seed,
     )
     # The balanced subset is small (~0.8 GB for 270k windows), so keep all
@@ -258,6 +284,8 @@ def train_baseline(config: TrainConfig) -> dict:
             idx = perm[start : start + config.batch_size]
             xb_clean, yb = x_train[idx], y_train[idx]
             xb = xb_clean
+            if config.time_warp_std > 0:
+                xb = random_time_warp(xb, config.time_warp_std)
             if config.noise_std > 0:
                 xb = xb + torch.randn_like(xb) * config.noise_std
             if config.time_mask_frac > 0:
