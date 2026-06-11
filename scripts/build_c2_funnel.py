@@ -97,6 +97,9 @@ class FunnelModel(nn.Module):
         mode: str = "strict",  # strict: top-decile cells only (faith bit-exact)
         shape: str = "rel",  # rel: funnel value follows R0 (noise-stable)
         normalize: bool = False,  # equalize per-window funnel mass (sim parity)
+        kappa: float = 6.0,  # detector logit gain: mech's A weights mass by
+        # channel POWER, so even ~2% soft-lam mass on the high-power torque
+        # channel poisons variable contexts (motor has 10-100x less power).
         w_var: np.ndarray | None = None,
         w_fixed: np.ndarray | None = None,
     ):
@@ -127,8 +130,11 @@ class FunnelModel(nn.Module):
                 selector[base, fi] = 1.0
                 selector[base + 1, fi] = 1.0
         self.register_buffer("selector", selector)  # [8*2B, F]
-        self.register_buffer("det_w", torch.tensor(DETECTOR["w"], dtype=torch.float32).unsqueeze(1))
-        self.det_b = float(DETECTOR["b"])
+        self.register_buffer(
+            "det_w",
+            float(kappa) * torch.tensor(DETECTOR["w"], dtype=torch.float32).unsqueeze(1),
+        )
+        self.det_b = float(kappa) * float(DETECTOR["b"])
 
         if w_var is None or w_fixed is None:
             w_var, w_fixed = default_channel_tables()
