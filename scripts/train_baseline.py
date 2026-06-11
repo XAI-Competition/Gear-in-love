@@ -38,6 +38,15 @@ def parse_args() -> argparse.Namespace:
         default=8000,
         help="balanced subsample size per class (-1 uses all rows)",
     )
+    parser.add_argument(
+        "--train-variable-fraction",
+        type=float,
+        default=None,
+        help=(
+            "target fraction of variable-speed windows within each class for the "
+            "training subset (default: ordinary random class-balanced sampling)"
+        ),
+    )
     parser.add_argument("--val-per-class", type=int, default=2000)
     parser.add_argument("--epochs", type=int, default=12)
     parser.add_argument("--batch-size", type=int, default=512)
@@ -113,6 +122,15 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--deletion-d-min", type=float, default=0.1)
     parser.add_argument("--deletion-d-max", type=float, default=0.4)
+    parser.add_argument(
+        "--time-warp-std",
+        type=float,
+        default=0.0,
+        help=(
+            "std of log-normal random time scaling during training; targets "
+            "variable-speed robustness (0 disables it)"
+        ),
+    )
     return parser.parse_args()
 
 
@@ -123,6 +141,7 @@ def main() -> int:
         data_dir=args.data_dir,
         train_per_class=None if args.train_per_class < 0 else args.train_per_class,
         val_per_class=None if args.val_per_class < 0 else args.val_per_class,
+        train_variable_fraction=args.train_variable_fraction,
         epochs=args.epochs,
         batch_size=args.batch_size,
         lr=args.lr,
@@ -139,6 +158,7 @@ def main() -> int:
         deletion_entropy_weight=args.deletion_entropy_weight,
         deletion_d_min=args.deletion_d_min,
         deletion_d_max=args.deletion_d_max,
+        time_warp_std=args.time_warp_std,
     )
 
     result = train_baseline(config)
@@ -167,6 +187,7 @@ def main() -> int:
         "config": {
             "train_per_class": config.train_per_class,
             "val_per_class": config.val_per_class,
+            "train_variable_fraction": config.train_variable_fraction,
             "epochs": config.epochs,
             "batch_size": config.batch_size,
             "lr": config.lr,
@@ -180,6 +201,7 @@ def main() -> int:
             "insertion_q": [config.insertion_q_min, config.insertion_q_max],
             "deletion_entropy_weight": config.deletion_entropy_weight,
             "deletion_d": [config.deletion_d_min, config.deletion_d_max],
+            "time_warp_std": config.time_warp_std,
             "channel_attention": config.model.channel_attention,
         },
     }
