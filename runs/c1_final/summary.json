@@ -1,0 +1,46 @@
+{
+  "c1_occ12": {
+    "n": 3000,
+    "macro_f1": 0.9648864786500749,
+    "faith": 0.8800831668078899,
+    "deletion_auc": 0.1388674929738045,
+    "insertion_auc": 0.8990338265895843,
+    "simplicity": 0.9234612823241003,
+    "operator_count": 57,
+    "parameter_count": 23906,
+    "eligible": true
+  },
+  "c1_occ12_mtf2": {
+    "n": 3000,
+    "macro_f1": 0.9648864786500749,
+    "faith": 0.878884801082313,
+    "deletion_auc": 0.13837708272039892,
+    "insertion_auc": 0.896146684885025,
+    "simplicity": 0.9234612823241003,
+    "operator_count": 57,
+    "parameter_count": 23906,
+    "eligible": true
+  },
+  "c1_occ12_mtf3": {
+    "n": 3000,
+    "macro_f1": 0.9648864786500749,
+    "faith": 0.8781861826777458,
+    "deletion_auc": 0.13883360326290128,
+    "insertion_auc": 0.895205968618393,
+    "simplicity": 0.9234612823241003,
+    "operator_count": 57,
+    "parameter_count": 23906,
+    "eligible": true
+  },
+  "c1_occ12_mtf4": {
+    "n": 3000,
+    "macro_f1": 0.9648864786500749,
+    "faith": 0.8773172613233329,
+    "deletion_auc": 0.1392473764717579,
+    "insertion_auc": 0.8938818991184235,
+    "simplicity": 0.9234612823241003,
+    "operator_count": 57,
+    "parameter_count": 23906,
+    "eligible": true
+  }
+}

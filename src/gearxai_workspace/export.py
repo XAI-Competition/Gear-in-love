@@ -14,6 +14,7 @@ from pathlib import Path
 import numpy as np
 import onnx
 import torch
+from torch import nn
 
 from gearxai_workspace.data import NUM_CHANNELS, WINDOW_LENGTH
 from gearxai_workspace.model import GearXAINet
@@ -57,6 +58,32 @@ def fold_constants_to_initializers(model: onnx.ModelProto) -> int:
         del graph.node[:]
         graph.node.extend(kept)
     return folded
+
+
+def fuse_gearxai_batchnorms(model: GearXAINet) -> GearXAINet:
+    """Fold each conv block's post-conv BatchNorm into the conv weights.
+
+    Eval-mode BatchNorm is an affine map; a BN that *follows* a conv folds
+    exactly into that conv's weight/bias (``W' = W·s``, ``b' = s·(b−μ)+β``),
+    removing 3 ``BatchNormalization`` nodes and their parameters from the
+    exported graph — the simplicity metric counts both. ``input_norm`` is NOT
+    folded: it precedes the first conv, and folding it forward would also
+    rescale the conv's zero padding (the original pads after normalization),
+    which changes boundary outputs. Returns a deep copy; the original
+    (trainable) model is untouched.
+    """
+
+    import copy
+
+    model = copy.deepcopy(model).eval()
+    for block in model.features:
+        bn = block.bn
+        scale = bn.weight / torch.sqrt(bn.running_var + bn.eps)
+        with torch.no_grad():
+            block.conv.weight *= scale.view(-1, 1, 1)
+            block.conv.bias.copy_((block.conv.bias - bn.running_mean) * scale + bn.bias)
+        block.bn = nn.Identity()
+    return model
 
 
 def export_onnx(

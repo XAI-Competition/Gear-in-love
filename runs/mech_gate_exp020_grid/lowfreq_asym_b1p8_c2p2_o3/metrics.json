@@ -1,0 +1,194 @@
+{
+  "description": "dynamic asymmetric motor gates: BWF 1.8, CWF 2.2, ORF 3",
+  "implementation": "direct",
+  "onnx_path": "runs\\mech_gate_exp020_grid\\lowfreq_asym_b1p8_c2p2_o3\\model.onnx",
+  "parameters": 39689,
+  "gates": [
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.7999999523162842,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      2.200000047683716,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      3.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ]
+  ],
+  "self_check": {
+    "devkit_validation": {
+      "valid": true,
+      "samples": 8,
+      "input_name": "windows",
+      "probability_output": "probabilities",
+      "relevance_output": "relevance",
+      "load_seconds": 0.006089500006055459,
+      "inference_seconds": 0.0007796999998390675,
+      "probability_sum_min": 0.9999998211860657,
+      "probability_sum_max": 1.0,
+      "relevance_min": 0.0013198633678257465,
+      "relevance_max": 19.675323486328125
+    },
+    "prob_shape": [
+      8,
+      9
+    ],
+    "relevance_shape": [
+      8,
+      8,
+      100
+    ],
+    "prob_row_sum_range": [
+      0.9999998211860657,
+      1.0
+    ],
+    "relevance_min": 0.0013198633678257465
+  },
+  "public_metrics": {
+    "n": 5000,
+    "macro_f1": 0.9866912321255268,
+    "faith": 0.749840358644724,
+    "deletion_auc": 0.2123361140489578,
+    "insertion_auc": 0.7120168313384057,
+    "simplicity": 0.9220046544939587,
+    "operator_count": 41,
+    "parameter_count": 40409,
+    "eligible": true,
+    "mechanical": null,
+    "expected_band_mass": null
+  },
+  "proxy_metrics": {
+    "audit_peaks": {
+      "n": 5000,
+      "macro_f1": 0.9866912321255268,
+      "faith": 0.749840358644724,
+      "deletion_auc": 0.2123361140489578,
+      "insertion_auc": 0.7120168313384057,
+      "simplicity": 0.9220046544939587,
+      "operator_count": 41,
+      "parameter_count": 40409,
+      "eligible": true,
+      "mechanical": 0.43034356825306075,
+      "expected_band_mass": 0.2410200453893582
+    },
+    "audit_peaks_broad": {
+      "n": 5000,
+      "macro_f1": 0.9866912321255268,
+      "faith": 0.749840358644724,
+      "deletion_auc": 0.2123361140489578,
+      "insertion_auc": 0.7120168313384057,
+      "simplicity": 0.9220046544939587,
+      "operator_count": 41,
+      "parameter_count": 40409,
+      "eligible": true,
+      "mechanical": 0.4411369830001653,
+      "expected_band_mass": 0.25539947395887425
+    },
+    "low_frequency": {
+      "n": 5000,
+      "macro_f1": 0.9866912321255268,
+      "faith": 0.749840358644724,
+      "deletion_auc": 0.2123361140489578,
+      "insertion_auc": 0.7120168313384057,
+      "simplicity": 0.9220046544939587,
+      "operator_count": 41,
+      "parameter_count": 40409,
+      "eligible": true,
+      "mechanical": 0.6179252697374165,
+      "expected_band_mass": 0.4916250040105231
+    },
+    "high_mid": {
+      "n": 5000,
+      "macro_f1": 0.9866912321255268,
+      "faith": 0.749840358644724,
+      "deletion_auc": 0.2123361140489578,
+      "insertion_auc": 0.7120168313384057,
+      "simplicity": 0.9220046544939587,
+      "operator_count": 41,
+      "parameter_count": 40409,
+      "eligible": true,
+      "mechanical": 0.335108721309484,
+      "expected_band_mass": 0.11366229532987682
+    }
+  }
+}

@@ -96,10 +96,15 @@ class TemperatureModel(nn.Module):
         return probs_out, relevance
 
 
-def load_base_model(checkpoint: Path) -> GearXAINet:
-    model = build_model(ModelConfig())
+def load_base_model(checkpoint: Path, widths: tuple[int, ...] = (32, 64, 128)) -> GearXAINet:
+    from gearxai_workspace.export import fuse_gearxai_batchnorms
+
+    model = build_model(ModelConfig(widths=widths, kernel_sizes=(7, 5, 3)))
     state = torch.load(checkpoint, map_location="cpu")
     model.load_state_dict(state)
+    # Fold post-conv BatchNorms into the conv weights: numerically equivalent
+    # (verified max|dP| ~1e-7) and -3 ONNX nodes / ~-700 params for simplicity.
+    model = fuse_gearxai_batchnorms(model)
     model.eval()
     for parameter in model.parameters():
         parameter.requires_grad_(False)

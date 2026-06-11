@@ -1,0 +1,24 @@
+{
+  "sampling_rate_hz": 5120,
+  "sequence_length": 100,
+  "num_channels": 8,
+  "num_conditions": 19,
+  "public_splits": [
+    "train",
+    "validation"
+  ],
+  "hidden_leaderboard_split": "source test, not published",
+  "samples_train_total": 754281,
+  "samples_validation_total": 100719,
+  "samples_public_total": 855000,
+  "hidden_samples_test_total": 171000,
+  "windows_train_total": 737352,
+  "windows_validation_total": 83790,
+  "windows_public_total": 821142,
+  "hidden_windows_test_total": 154071,
+  "split_policy": {
+    "dev_fraction": 0.1,
+    "gap_windows": 99,
+    "notes": "Same aggregate train/dev split policy used for the published baseline ONNX models."
+  }
+}

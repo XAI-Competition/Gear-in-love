@@ -1,0 +1,88 @@
+{
+  "checkpoint": "runs\\exp030b\\b_narrow_del05\\model.pt",
+  "eval_n": 5000,
+  "seed": 27027,
+  "variants": {
+    "occ_a0p5_eps0p05_T8": {
+      "variant": {
+        "name": "occ_a0p5_eps0p05_T8",
+        "alpha": 0.5,
+        "eps": 0.05,
+        "static_gate": false,
+        "temperature": 8.0
+      },
+      "onnx_path": "runs\\exp030b\\b_narrow_del05\\wrapped\\occ_a0p5_eps0p05_T8\\model.onnx",
+      "self_check": {
+        "devkit_validation": {
+          "valid": true,
+          "samples": 8,
+          "input_name": "windows",
+          "probability_output": "probabilities",
+          "relevance_output": "relevance",
+          "load_seconds": 0.06743210001150146,
+          "inference_seconds": 0.006578499989700504,
+          "probability_sum_min": 1.0,
+          "probability_sum_max": 1.0,
+          "relevance_min": 9.961085015675053e-05,
+          "relevance_max": 10.962786674499512
+        },
+        "prob_shape": [
+          8,
+          9
+        ],
+        "relevance_shape": [
+          8,
+          8,
+          100
+        ],
+        "prob_row_sum_range": [
+          1.0,
+          1.0
+        ],
+        "relevance_min": 9.961085015675053e-05,
+        "max_abs_prob_diff_vs_torch": 3.524291969370097e-12,
+        "max_abs_relevance_diff_vs_torch": 1.33514404296875e-05
+      },
+      "public_metrics": {
+        "n": 5000,
+        "macro_f1": 0.9075186741707005,
+        "faith": 0.8668704561889171,
+        "deletion_auc": 0.1474127247929573,
+        "insertion_auc": 0.8811536371707916,
+        "simplicity": 0.9084745982680427,
+        "operator_count": 57,
+        "parameter_count": 40506,
+        "eligible": true,
+        "mechanical": null,
+        "expected_band_mass": null,
+        "deletion_curve": [
+          0.982261598110199,
+          0.25249117612838745,
+          0.09972827881574631,
+          0.07325491309165955,
+          0.06475216150283813,
+          0.05673098936676979,
+          0.07021400332450867,
+          0.08792230486869812,
+          0.11280231922864914,
+          0.10834594815969467,
+          0.1135086938738823
+        ],
+        "insertion_curve": [
+          0.1135086938738823,
+          0.7824457883834839,
+          0.8683872222900391,
+          0.9076593518257141,
+          0.9327545166015625,
+          0.9486455917358398,
+          0.9346429705619812,
+          0.959068238735199,
+          0.9606893658638,
+          0.9693582057952881,
+          0.982261598110199
+        ]
+      },
+      "proxy_metrics": {}
+    }
+  }
+}

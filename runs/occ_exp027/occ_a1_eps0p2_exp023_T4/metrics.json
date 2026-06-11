@@ -1,0 +1,98 @@
+{
+  "variant": {
+    "name": "occ_a1_eps0p2_exp023_T4",
+    "alpha": 1.0,
+    "eps": 0.2,
+    "static_gate": true,
+    "temperature": 4.0
+  },
+  "onnx_path": "runs\\occ_exp027\\occ_a1_eps0p2_exp023_T4\\model.onnx",
+  "self_check": {
+    "devkit_validation": {
+      "valid": true,
+      "samples": 8,
+      "input_name": "windows",
+      "probability_output": "probabilities",
+      "relevance_output": "relevance",
+      "load_seconds": 0.06855449998693075,
+      "inference_seconds": 0.005765299996710382,
+      "probability_sum_min": 1.0,
+      "probability_sum_max": 1.0,
+      "relevance_min": 0.00011054988135583699,
+      "relevance_max": 19.04071807861328
+    },
+    "prob_shape": [
+      8,
+      9
+    ],
+    "relevance_shape": [
+      8,
+      8,
+      100
+    ],
+    "prob_row_sum_range": [
+      1.0,
+      1.0
+    ],
+    "relevance_min": 0.00011054988135583699,
+    "max_abs_prob_diff_vs_torch": 2.9559688030644793e-15,
+    "max_abs_relevance_diff_vs_torch": 1.52587890625e-05
+  },
+  "public_metrics": {
+    "n": 5000,
+    "macro_f1": 0.9892862526407371,
+    "faith": 0.8311123944818972,
+    "deletion_auc": 0.16487739533185958,
+    "insertion_auc": 0.8271021842956542,
+    "simplicity": 0.9084745982680427,
+    "operator_count": 57,
+    "parameter_count": 40506,
+    "eligible": true,
+    "mechanical": null,
+    "expected_band_mass": null,
+    "deletion_curve": [
+      0.9959760904312134,
+      0.31826528906822205,
+      0.12238305807113647,
+      0.08565495908260345,
+      0.07655241340398788,
+      0.07840139418840408,
+      0.0905037373304367,
+      0.10262512415647507,
+      0.11333339661359787,
+      0.10943639278411865,
+      0.10726025700569153
+    ],
+    "insertion_curve": [
+      0.10726025700569153,
+      0.43537431955337524,
+      0.6668125987052917,
+      0.8190370798110962,
+      0.8939123153686523,
+      0.9488799571990967,
+      0.9786938428878784,
+      0.9901711940765381,
+      0.9924307465553284,
+      0.9940916299819946,
+      0.9959760904312134
+    ]
+  },
+  "proxy_metrics": {
+    "audit_peaks": {
+      "mechanical": 0.4516155280450986,
+      "expected_band_mass": 0.26970161603641957
+    },
+    "audit_peaks_broad": {
+      "mechanical": 0.46102759411629113,
+      "expected_band_mass": 0.2822355843532732
+    },
+    "low_frequency": {
+      "mechanical": 0.6526603798164273,
+      "expected_band_mass": 0.5383183373129797
+    },
+    "high_mid": {
+      "mechanical": 0.34454090542387683,
+      "expected_band_mass": 0.126423297467343
+    }
+  }
+}

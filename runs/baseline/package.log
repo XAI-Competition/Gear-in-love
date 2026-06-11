@@ -1,0 +1,23 @@
+{
+  "members": [
+    "metrics.json",
+    "model.onnx",
+    "submission.json",
+    "validation.json"
+  ],
+  "metrics": {
+    "eligible": true,
+    "explainability_score": null,
+    "faith_score": 0.7077087696641684,
+    "local_metrics_computed": true,
+    "macro_f1": 0.9967906381610988,
+    "mechanical_score": null,
+    "reason": "mechanical score unavailable; pass official band config",
+    "simplicity_score": 0.8362597782520123
+  },
+  "model_sha256": "855499eb02205864b49be4ac6a1604f84ce67ca61e971b761dc25c4edfb0f8fd",
+  "package_path": "runs\\baseline\\submission.zip",
+  "schema_version": "gearxai.submission.v1",
+  "valid": true,
+  "zip_sha256": "865b49ae36c643b8ae05111dac69149bd3d9279554e52d5aa398b9c85f08d431"
+}

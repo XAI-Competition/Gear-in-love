@@ -1,0 +1,194 @@
+{
+  "description": "dynamic asymmetric motor gates: BWF 1.4, CWF 2.2, ORF 3",
+  "implementation": "direct",
+  "onnx_path": "runs\\mech_gate_exp020_grid\\lowfreq_asym_b1p4_c2p2_o3\\model.onnx",
+  "parameters": 39689,
+  "gates": [
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.399999976158142,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      2.200000047683716,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      3.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ]
+  ],
+  "self_check": {
+    "devkit_validation": {
+      "valid": true,
+      "samples": 8,
+      "input_name": "windows",
+      "probability_output": "probabilities",
+      "relevance_output": "relevance",
+      "load_seconds": 0.006864599999971688,
+      "inference_seconds": 0.0007523000094806775,
+      "probability_sum_min": 0.9999998211860657,
+      "probability_sum_max": 1.0,
+      "relevance_min": 0.0013198633678257465,
+      "relevance_max": 19.675323486328125
+    },
+    "prob_shape": [
+      8,
+      9
+    ],
+    "relevance_shape": [
+      8,
+      8,
+      100
+    ],
+    "prob_row_sum_range": [
+      0.9999998211860657,
+      1.0
+    ],
+    "relevance_min": 0.0013198633678257465
+  },
+  "public_metrics": {
+    "n": 5000,
+    "macro_f1": 0.9866912321255268,
+    "faith": 0.7498856473714113,
+    "deletion_auc": 0.21311193034052853,
+    "insertion_auc": 0.7128832250833511,
+    "simplicity": 0.9220046544939587,
+    "operator_count": 41,
+    "parameter_count": 40409,
+    "eligible": true,
+    "mechanical": null,
+    "expected_band_mass": null
+  },
+  "proxy_metrics": {
+    "audit_peaks": {
+      "n": 5000,
+      "macro_f1": 0.9866912321255268,
+      "faith": 0.7498856473714113,
+      "deletion_auc": 0.21311193034052853,
+      "insertion_auc": 0.7128832250833511,
+      "simplicity": 0.9220046544939587,
+      "operator_count": 41,
+      "parameter_count": 40409,
+      "eligible": true,
+      "mechanical": 0.4294020685820198,
+      "expected_band_mass": 0.23974201333201245
+    },
+    "audit_peaks_broad": {
+      "n": 5000,
+      "macro_f1": 0.9866912321255268,
+      "faith": 0.7498856473714113,
+      "deletion_auc": 0.21311193034052853,
+      "insertion_auc": 0.7128832250833511,
+      "simplicity": 0.9220046544939587,
+      "operator_count": 41,
+      "parameter_count": 40409,
+      "eligible": true,
+      "mechanical": 0.4402326189279495,
+      "expected_band_mass": 0.25417080970624095
+    },
+    "low_frequency": {
+      "n": 5000,
+      "macro_f1": 0.9866912321255268,
+      "faith": 0.7498856473714113,
+      "deletion_auc": 0.21311193034052853,
+      "insertion_auc": 0.7128832250833511,
+      "simplicity": 0.9220046544939587,
+      "operator_count": 41,
+      "parameter_count": 40409,
+      "eligible": true,
+      "mechanical": 0.6169595980964974,
+      "expected_band_mass": 0.4903141250601604
+    },
+    "high_mid": {
+      "n": 5000,
+      "macro_f1": 0.9866912321255268,
+      "faith": 0.7498856473714113,
+      "deletion_auc": 0.21311193034052853,
+      "insertion_auc": 0.7128832250833511,
+      "simplicity": 0.9220046544939587,
+      "operator_count": 41,
+      "parameter_count": 40409,
+      "eligible": true,
+      "mechanical": 0.33522620821148574,
+      "expected_band_mass": 0.11382039390374867
+    }
+  }
+}

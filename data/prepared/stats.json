@@ -1,0 +1,14 @@
+{
+  "format": "[N, 8, 100]",
+  "source": "GearXAI windows_100 Parquet release",
+  "standardized_channel_mean": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ]
+}

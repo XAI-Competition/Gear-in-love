@@ -1,0 +1,182 @@
+{
+  "onnx_path": "runs\\exp032\\scale_20k_30ep\\model.onnx",
+  "parameters": 39689,
+  "best_val_macro_f1_subset": 0.9683951939962545,
+  "device": "cuda",
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 1.0181487812678018,
+      "val_macro_f1": 0.8339441303122024
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.6913944716771444,
+      "val_macro_f1": 0.8897252406498749
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.5942375659942627,
+      "val_macro_f1": 0.8971015758764853
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.5433257110595703,
+      "val_macro_f1": 0.9140252524950326
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.5093584538459778,
+      "val_macro_f1": 0.9141643084472556
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.4893129600842794,
+      "val_macro_f1": 0.9424818195189538
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.4706859473546346,
+      "val_macro_f1": 0.946796977370313
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.4576915317058563,
+      "val_macro_f1": 0.9435922626585909
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.4488447864214579,
+      "val_macro_f1": 0.9552038647781728
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.438866225083669,
+      "val_macro_f1": 0.9555016729073783
+    },
+    {
+      "epoch": 11,
+      "train_loss": 0.43326940224965416,
+      "val_macro_f1": 0.951826193403027
+    },
+    {
+      "epoch": 12,
+      "train_loss": 0.4250083783467611,
+      "val_macro_f1": 0.9423895182136239
+    },
+    {
+      "epoch": 13,
+      "train_loss": 0.4211345716794332,
+      "val_macro_f1": 0.9482375273940815
+    },
+    {
+      "epoch": 14,
+      "train_loss": 0.4157067715962728,
+      "val_macro_f1": 0.9581857681423419
+    },
+    {
+      "epoch": 15,
+      "train_loss": 0.41241500732103986,
+      "val_macro_f1": 0.956299575258227
+    },
+    {
+      "epoch": 16,
+      "train_loss": 0.4075655162811279,
+      "val_macro_f1": 0.962013358033485
+    },
+    {
+      "epoch": 17,
+      "train_loss": 0.403856892267863,
+      "val_macro_f1": 0.9662393250047354
+    },
+    {
+      "epoch": 18,
+      "train_loss": 0.402315202999115,
+      "val_macro_f1": 0.9637366067277525
+    },
+    {
+      "epoch": 19,
+      "train_loss": 0.39867686376571654,
+      "val_macro_f1": 0.9621428162870702
+    },
+    {
+      "epoch": 20,
+      "train_loss": 0.3957060275395711,
+      "val_macro_f1": 0.9667825759504891
+    },
+    {
+      "epoch": 21,
+      "train_loss": 0.39497826601664227,
+      "val_macro_f1": 0.9645493335027735
+    },
+    {
+      "epoch": 22,
+      "train_loss": 0.3933789392153422,
+      "val_macro_f1": 0.9664294277440327
+    },
+    {
+      "epoch": 23,
+      "train_loss": 0.3916553969542185,
+      "val_macro_f1": 0.9676629634939256
+    },
+    {
+      "epoch": 24,
+      "train_loss": 0.39036053047180175,
+      "val_macro_f1": 0.9660383811316561
+    },
+    {
+      "epoch": 25,
+      "train_loss": 0.388916237227122,
+      "val_macro_f1": 0.9671265396726157
+    },
+    {
+      "epoch": 26,
+      "train_loss": 0.38804854594866434,
+      "val_macro_f1": 0.9672786625071704
+    },
+    {
+      "epoch": 27,
+      "train_loss": 0.3872529885450999,
+      "val_macro_f1": 0.9659302917428264
+    },
+    {
+      "epoch": 28,
+      "train_loss": 0.38735131492614744,
+      "val_macro_f1": 0.9683951939962545
+    },
+    {
+      "epoch": 29,
+      "train_loss": 0.3856166950543721,
+      "val_macro_f1": 0.9675191776780055
+    },
+    {
+      "epoch": 30,
+      "train_loss": 0.386197637907664,
+      "val_macro_f1": 0.9677792017067647
+    }
+  ],
+  "config": {
+    "train_per_class": 20000,
+    "val_per_class": 4000,
+    "epochs": 30,
+    "batch_size": 768,
+    "lr": 0.001,
+    "seed": 42,
+    "device": "cuda",
+    "relevance_weight": 0.0,
+    "occlusion_weight": 0.0,
+    "noise_std": 0.1,
+    "time_mask_frac": 0.15,
+    "insertion_frac": 0.3,
+    "insertion_q": [
+      0.05,
+      0.5
+    ],
+    "deletion_entropy_weight": 0.0,
+    "deletion_d": [
+      0.1,
+      0.4
+    ],
+    "channel_attention": true
+  }
+}

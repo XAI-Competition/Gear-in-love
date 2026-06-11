@@ -1,0 +1,194 @@
+{
+  "description": "moderate gear-channel and torque bias, low-frequency classes to motor",
+  "implementation": "direct",
+  "onnx_path": "runs\\mech_gate_exp015_direct\\mixed_pgb_torque\\model.onnx",
+  "parameters": 39689,
+  "gates": [
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.2000000476837158,
+      1.2999999523162842,
+      1.2999999523162842,
+      1.2999999523162842
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.2000000476837158,
+      1.2999999523162842,
+      1.2999999523162842,
+      1.2999999523162842
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.350000023841858,
+      1.2000000476837158,
+      1.0,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.350000023841858,
+      1.2000000476837158,
+      1.0,
+      1.0
+    ],
+    [
+      1.350000023841858,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.149999976158142,
+      1.0
+    ],
+    [
+      1.350000023841858,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.149999976158142,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.350000023841858,
+      1.2000000476837158,
+      1.0,
+      1.0
+    ],
+    [
+      1.350000023841858,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.149999976158142,
+      1.0
+    ]
+  ],
+  "self_check": {
+    "devkit_validation": {
+      "valid": true,
+      "samples": 8,
+      "input_name": "windows",
+      "probability_output": "probabilities",
+      "relevance_output": "relevance",
+      "load_seconds": 0.010030699995695613,
+      "inference_seconds": 0.0017102999991038814,
+      "probability_sum_min": 0.9999998211860657,
+      "probability_sum_max": 1.0,
+      "relevance_min": 0.0013198633678257465,
+      "relevance_max": 19.71106719970703
+    },
+    "prob_shape": [
+      8,
+      9
+    ],
+    "relevance_shape": [
+      8,
+      8,
+      100
+    ],
+    "prob_row_sum_range": [
+      0.9999998211860657,
+      1.0
+    ],
+    "relevance_min": 0.0013198633678257465
+  },
+  "public_metrics": {
+    "n": 12000,
+    "macro_f1": 0.9901629614780799,
+    "faith": 0.7406953029334545,
+    "deletion_auc": 0.22897147983312607,
+    "insertion_auc": 0.7103620857000351,
+    "simplicity": 0.9220046544939587,
+    "operator_count": 41,
+    "parameter_count": 40409,
+    "eligible": true,
+    "mechanical": null,
+    "expected_band_mass": null
+  },
+  "proxy_metrics": {
+    "audit_peaks": {
+      "n": 12000,
+      "macro_f1": 0.9901629614780799,
+      "faith": 0.7406953029334545,
+      "deletion_auc": 0.22897147983312607,
+      "insertion_auc": 0.7103620857000351,
+      "simplicity": 0.9220046544939587,
+      "operator_count": 41,
+      "parameter_count": 40409,
+      "eligible": true,
+      "mechanical": 0.4217273925907942,
+      "expected_band_mass": 0.22936410653986664
+    },
+    "audit_peaks_broad": {
+      "n": 12000,
+      "macro_f1": 0.9901629614780799,
+      "faith": 0.7406953029334545,
+      "deletion_auc": 0.22897147983312607,
+      "insertion_auc": 0.7103620857000351,
+      "simplicity": 0.9220046544939587,
+      "operator_count": 41,
+      "parameter_count": 40409,
+      "eligible": true,
+      "mechanical": 0.43305443241267394,
+      "expected_band_mass": 0.24445727650965016
+    },
+    "low_frequency": {
+      "n": 12000,
+      "macro_f1": 0.9901629614780799,
+      "faith": 0.7406953029334545,
+      "deletion_auc": 0.22897147983312607,
+      "insertion_auc": 0.7103620857000351,
+      "simplicity": 0.9220046544939587,
+      "operator_count": 41,
+      "parameter_count": 40409,
+      "eligible": true,
+      "mechanical": 0.6081979183165668,
+      "expected_band_mass": 0.4784459847956323
+    },
+    "high_mid": {
+      "n": 12000,
+      "macro_f1": 0.9901629614780799,
+      "faith": 0.7406953029334545,
+      "deletion_auc": 0.22897147983312607,
+      "insertion_auc": 0.7103620857000351,
+      "simplicity": 0.9220046544939587,
+      "operator_count": 41,
+      "parameter_count": 40409,
+      "eligible": true,
+      "mechanical": 0.3384228136821984,
+      "expected_band_mass": 0.11805056684497743
+    }
+  }
+}

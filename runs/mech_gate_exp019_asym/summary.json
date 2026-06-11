@@ -1,0 +1,1171 @@
+{
+  "checkpoint": "runs\\final2\\model.pt",
+  "eval_n": 6000,
+  "seed": 19019,
+  "presets": {
+    "identity": {
+      "description": "base final2 relevance, exported through wrapper",
+      "implementation": "direct",
+      "onnx_path": "runs\\mech_gate_exp019_asym\\identity\\model.onnx",
+      "parameters": 39689,
+      "gates": [
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      ],
+      "self_check": {
+        "devkit_validation": {
+          "valid": true,
+          "samples": 8,
+          "input_name": "windows",
+          "probability_output": "probabilities",
+          "relevance_output": "relevance",
+          "load_seconds": 0.017287100010435097,
+          "inference_seconds": 0.0010094999888679013,
+          "probability_sum_min": 0.9999998211860657,
+          "probability_sum_max": 1.0,
+          "relevance_min": 0.0013198633678257465,
+          "relevance_max": 19.675323486328125
+        },
+        "prob_shape": [
+          8,
+          9
+        ],
+        "relevance_shape": [
+          8,
+          8,
+          100
+        ],
+        "prob_row_sum_range": [
+          0.9999998211860657,
+          1.0
+        ],
+        "relevance_min": 0.0013198633678257465
+      },
+      "public_metrics": {
+        "n": 6000,
+        "macro_f1": 0.9895825696933296,
+        "faith": 0.7337596550583839,
+        "deletion_auc": 0.24051878005266192,
+        "insertion_auc": 0.7080380901694298,
+        "simplicity": 0.9220046544939587,
+        "operator_count": 41,
+        "parameter_count": 40409,
+        "eligible": true,
+        "mechanical": null,
+        "expected_band_mass": null
+      },
+      "proxy_metrics": {
+        "audit_peaks": {
+          "n": 6000,
+          "macro_f1": 0.9895825696933296,
+          "faith": 0.7337596550583839,
+          "deletion_auc": 0.24051878005266192,
+          "insertion_auc": 0.7080380901694298,
+          "simplicity": 0.9220046544939587,
+          "operator_count": 41,
+          "parameter_count": 40409,
+          "eligible": true,
+          "mechanical": 0.4162103888338559,
+          "expected_band_mass": 0.22193450434322154
+        },
+        "audit_peaks_broad": {
+          "n": 6000,
+          "macro_f1": 0.9895825696933296,
+          "faith": 0.7337596550583839,
+          "deletion_auc": 0.24051878005266192,
+          "insertion_auc": 0.7080380901694298,
+          "simplicity": 0.9220046544939587,
+          "operator_count": 41,
+          "parameter_count": 40409,
+          "eligible": true,
+          "mechanical": 0.4275607293929662,
+          "expected_band_mass": 0.23705694447672548
+        },
+        "low_frequency": {
+          "n": 6000,
+          "macro_f1": 0.9895825696933296,
+          "faith": 0.7337596550583839,
+          "deletion_auc": 0.24051878005266192,
+          "insertion_auc": 0.7080380901694298,
+          "simplicity": 0.9220046544939587,
+          "operator_count": 41,
+          "parameter_count": 40409,
+          "eligible": true,
+          "mechanical": 0.607980370966563,
+          "expected_band_mass": 0.4781203570889871
+        },
+        "high_mid": {
+          "n": 6000,
+          "macro_f1": 0.9895825696933296,
+          "faith": 0.7337596550583839,
+          "deletion_auc": 0.24051878005266192,
+          "insertion_auc": 0.7080380901694298,
+          "simplicity": 0.9220046544939587,
+          "operator_count": 41,
+          "parameter_count": 40409,
+          "eligible": true,
+          "mechanical": 0.33275669353672116,
+          "expected_band_mass": 0.11046133792295469
+        }
+      }
+    },
+    "lowfreq_motor_only_2p2": {
+      "description": "only BWF/CWF/ORF receive the strong motor gate",
+      "implementation": "direct",
+      "onnx_path": "runs\\mech_gate_exp019_asym\\lowfreq_motor_only_2p2\\model.onnx",
+      "parameters": 39689,
+      "gates": [
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          2.200000047683716,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          2.200000047683716,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          2.200000047683716,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      ],
+      "self_check": {
+        "devkit_validation": {
+          "valid": true,
+          "samples": 8,
+          "input_name": "windows",
+          "probability_output": "probabilities",
+          "relevance_output": "relevance",
+          "load_seconds": 0.005592199988313951,
+          "inference_seconds": 0.0007501999934902415,
+          "probability_sum_min": 0.9999998211860657,
+          "probability_sum_max": 1.0,
+          "relevance_min": 0.0013198633678257465,
+          "relevance_max": 19.675323486328125
+        },
+        "prob_shape": [
+          8,
+          9
+        ],
+        "relevance_shape": [
+          8,
+          8,
+          100
+        ],
+        "prob_row_sum_range": [
+          0.9999998211860657,
+          1.0
+        ],
+        "relevance_min": 0.0013198633678257465
+      },
+      "public_metrics": {
+        "n": 6000,
+        "macro_f1": 0.9895825696933296,
+        "faith": 0.7494540564715861,
+        "deletion_auc": 0.2137892380356789,
+        "insertion_auc": 0.7126973509788513,
+        "simplicity": 0.9220046544939587,
+        "operator_count": 41,
+        "parameter_count": 40409,
+        "eligible": true,
+        "mechanical": null,
+        "expected_band_mass": null
+      },
+      "proxy_metrics": {
+        "audit_peaks": {
+          "n": 6000,
+          "macro_f1": 0.9895825696933296,
+          "faith": 0.7494540564715861,
+          "deletion_auc": 0.2137892380356789,
+          "insertion_auc": 0.7126973509788513,
+          "simplicity": 0.9220046544939587,
+          "operator_count": 41,
+          "parameter_count": 40409,
+          "eligible": true,
+          "mechanical": 0.42768375860336605,
+          "expected_band_mass": 0.23744891754404546
+        },
+        "audit_peaks_broad": {
+          "n": 6000,
+          "macro_f1": 0.9895825696933296,
+          "faith": 0.7494540564715861,
+          "deletion_auc": 0.2137892380356789,
+          "insertion_auc": 0.7126973509788513,
+          "simplicity": 0.9220046544939587,
+          "operator_count": 41,
+          "parameter_count": 40409,
+          "eligible": true,
+          "mechanical": 0.4385804575224406,
+          "expected_band_mass": 0.2519662127031954
+        },
+        "low_frequency": {
+          "n": 6000,
+          "macro_f1": 0.9895825696933296,
+          "faith": 0.7494540564715861,
+          "deletion_auc": 0.2137892380356789,
+          "insertion_auc": 0.7126973509788513,
+          "simplicity": 0.9220046544939587,
+          "operator_count": 41,
+          "parameter_count": 40409,
+          "eligible": true,
+          "mechanical": 0.619857114410431,
+          "expected_band_mass": 0.4941848452447146
+        },
+        "high_mid": {
+          "n": 6000,
+          "macro_f1": 0.9895825696933296,
+          "faith": 0.7494540564715861,
+          "deletion_auc": 0.2137892380356789,
+          "insertion_auc": 0.7126973509788513,
+          "simplicity": 0.9220046544939587,
+          "operator_count": 41,
+          "parameter_count": 40409,
+          "eligible": true,
+          "mechanical": 0.33581788791770095,
+          "expected_band_mass": 0.11461052784021564
+        }
+      }
+    },
+    "cwf_orf_motor_2p2": {
+      "description": "CWF and ORF receive the strong motor gate; BWF stays unchanged",
+      "implementation": "direct",
+      "onnx_path": "runs\\mech_gate_exp019_asym\\cwf_orf_motor_2p2\\model.onnx",
+      "parameters": 39689,
+      "gates": [
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          2.200000047683716,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          2.200000047683716,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      ],
+      "self_check": {
+        "devkit_validation": {
+          "valid": true,
+          "samples": 8,
+          "input_name": "windows",
+          "probability_output": "probabilities",
+          "relevance_output": "relevance",
+          "load_seconds": 0.005524499996681698,
+          "inference_seconds": 0.0007397000008495525,
+          "probability_sum_min": 0.9999998211860657,
+          "probability_sum_max": 1.0,
+          "relevance_min": 0.0013198633678257465,
+          "relevance_max": 19.675323486328125
+        },
+        "prob_shape": [
+          8,
+          9
+        ],
+        "relevance_shape": [
+          8,
+          8,
+          100
+        ],
+        "prob_row_sum_range": [
+          0.9999998211860657,
+          1.0
+        ],
+        "relevance_min": 0.0013198633678257465
+      },
+      "public_metrics": {
+        "n": 6000,
+        "macro_f1": 0.9895825696933296,
+        "faith": 0.7495901741087436,
+        "deletion_auc": 0.2158136710524559,
+        "insertion_auc": 0.7149940192699432,
+        "simplicity": 0.9220046544939587,
+        "operator_count": 41,
+        "parameter_count": 40409,
+        "eligible": true,
+        "mechanical": null,
+        "expected_band_mass": null
+      },
+      "proxy_metrics": {
+        "audit_peaks": {
+          "n": 6000,
+          "macro_f1": 0.9895825696933296,
+          "faith": 0.7495901741087436,
+          "deletion_auc": 0.2158136710524559,
+          "insertion_auc": 0.7149940192699432,
+          "simplicity": 0.9220046544939587,
+          "operator_count": 41,
+          "parameter_count": 40409,
+          "eligible": true,
+          "mechanical": 0.42488710356630327,
+          "expected_band_mass": 0.23365054617628775
+        },
+        "audit_peaks_broad": {
+          "n": 6000,
+          "macro_f1": 0.9895825696933296,
+          "faith": 0.7495901741087436,
+          "deletion_auc": 0.2158136710524559,
+          "insertion_auc": 0.7149940192699432,
+          "simplicity": 0.9220046544939587,
+          "operator_count": 41,
+          "parameter_count": 40409,
+          "eligible": true,
+          "mechanical": 0.43588771702540885,
+          "expected_band_mass": 0.2483060489820507
+        },
+        "low_frequency": {
+          "n": 6000,
+          "macro_f1": 0.9895825696933296,
+          "faith": 0.7495901741087436,
+          "deletion_auc": 0.2158136710524559,
+          "insertion_auc": 0.7149940192699432,
+          "simplicity": 0.9220046544939587,
+          "operator_count": 41,
+          "parameter_count": 40409,
+          "eligible": true,
+          "mechanical": 0.6169850075495753,
+          "expected_band_mass": 0.4902838875076275
+        },
+        "high_mid": {
+          "n": 6000,
+          "macro_f1": 0.9895825696933296,
+          "faith": 0.7495901741087436,
+          "deletion_auc": 0.2158136710524559,
+          "insertion_auc": 0.7149940192699432,
+          "simplicity": 0.9220046544939587,
+          "operator_count": 41,
+          "parameter_count": 40409,
+          "eligible": true,
+          "mechanical": 0.33616226265810567,
+          "expected_band_mass": 0.11507442139808263
+        }
+      }
+    },
+    "orf_motor_3p0": {
+      "description": "only ORF receives a stronger motor gate",
+      "implementation": "direct",
+      "onnx_path": "runs\\mech_gate_exp019_asym\\orf_motor_3p0\\model.onnx",
+      "parameters": 39689,
+      "gates": [
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          3.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      ],
+      "self_check": {
+        "devkit_validation": {
+          "valid": true,
+          "samples": 8,
+          "input_name": "windows",
+          "probability_output": "probabilities",
+          "relevance_output": "relevance",
+          "load_seconds": 0.00608500000089407,
+          "inference_seconds": 0.0007620999967912212,
+          "probability_sum_min": 0.9999998211860657,
+          "probability_sum_max": 1.0,
+          "relevance_min": 0.0013198633678257465,
+          "relevance_max": 19.675323486328125
+        },
+        "prob_shape": [
+          8,
+          9
+        ],
+        "relevance_shape": [
+          8,
+          8,
+          100
+        ],
+        "prob_row_sum_range": [
+          0.9999998211860657,
+          1.0
+        ],
+        "relevance_min": 0.0013198633678257465
+      },
+      "public_metrics": {
+        "n": 6000,
+        "macro_f1": 0.9895825696933296,
+        "faith": 0.7468700062483549,
+        "deletion_auc": 0.22058816179633145,
+        "insertion_auc": 0.7143281742930412,
+        "simplicity": 0.9220046544939587,
+        "operator_count": 41,
+        "parameter_count": 40409,
+        "eligible": true,
+        "mechanical": null,
+        "expected_band_mass": null
+      },
+      "proxy_metrics": {
+        "audit_peaks": {
+          "n": 6000,
+          "macro_f1": 0.9895825696933296,
+          "faith": 0.7468700062483549,
+          "deletion_auc": 0.22058816179633145,
+          "insertion_auc": 0.7143281742930412,
+          "simplicity": 0.9220046544939587,
+          "operator_count": 41,
+          "parameter_count": 40409,
+          "eligible": true,
+          "mechanical": 0.4235402468499486,
+          "expected_band_mass": 0.23181449356422756
+        },
+        "audit_peaks_broad": {
+          "n": 6000,
+          "macro_f1": 0.9895825696933296,
+          "faith": 0.7468700062483549,
+          "deletion_auc": 0.22058816179633145,
+          "insertion_auc": 0.7143281742930412,
+          "simplicity": 0.9220046544939587,
+          "operator_count": 41,
+          "parameter_count": 40409,
+          "eligible": true,
+          "mechanical": 0.43461798338212315,
+          "expected_band_mass": 0.24657298735614958
+        },
+        "low_frequency": {
+          "n": 6000,
+          "macro_f1": 0.9895825696933296,
+          "faith": 0.7468700062483549,
+          "deletion_auc": 0.22058816179633145,
+          "insertion_auc": 0.7143281742930412,
+          "simplicity": 0.9220046544939587,
+          "operator_count": 41,
+          "parameter_count": 40409,
+          "eligible": true,
+          "mechanical": 0.6156622160337344,
+          "expected_band_mass": 0.48848120135438117
+        },
+        "high_mid": {
+          "n": 6000,
+          "macro_f1": 0.9895825696933296,
+          "faith": 0.7468700062483549,
+          "deletion_auc": 0.22058816179633145,
+          "insertion_auc": 0.7143281742930412,
+          "simplicity": 0.9220046544939587,
+          "operator_count": 41,
+          "parameter_count": 40409,
+          "eligible": true,
+          "mechanical": 0.33216952840149805,
+          "expected_band_mass": 0.10967354872233875
+        }
+      }
+    },
+    "cwf2p2_orf3p0": {
+      "description": "CWF keeps the 2.2 motor gate while ORF is strengthened to 3.0",
+      "implementation": "direct",
+      "onnx_path": "runs\\mech_gate_exp019_asym\\cwf2p2_orf3p0\\model.onnx",
+      "parameters": 39689,
+      "gates": [
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          2.200000047683716,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          3.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      ],
+      "self_check": {
+        "devkit_validation": {
+          "valid": true,
+          "samples": 8,
+          "input_name": "windows",
+          "probability_output": "probabilities",
+          "relevance_output": "relevance",
+          "load_seconds": 0.006003599992254749,
+          "inference_seconds": 0.0008005999989109114,
+          "probability_sum_min": 0.9999998211860657,
+          "probability_sum_max": 1.0,
+          "relevance_min": 0.0013198633678257465,
+          "relevance_max": 19.675323486328125
+        },
+        "prob_shape": [
+          8,
+          9
+        ],
+        "relevance_shape": [
+          8,
+          8,
+          100
+        ],
+        "prob_row_sum_range": [
+          0.9999998211860657,
+          1.0
+        ],
+        "relevance_min": 0.0013198633678257465
+      },
+      "public_metrics": {
+        "n": 6000,
+        "macro_f1": 0.9895825696933296,
+        "faith": 0.7516400825232268,
+        "deletion_auc": 0.21187992468476297,
+        "insertion_auc": 0.7151600897312165,
+        "simplicity": 0.9220046544939587,
+        "operator_count": 41,
+        "parameter_count": 40409,
+        "eligible": true,
+        "mechanical": null,
+        "expected_band_mass": null
+      },
+      "proxy_metrics": {
+        "audit_peaks": {
+          "n": 6000,
+          "macro_f1": 0.9895825696933296,
+          "faith": 0.7516400825232268,
+          "deletion_auc": 0.21187992468476297,
+          "insertion_auc": 0.7151600897312165,
+          "simplicity": 0.9220046544939587,
+          "operator_count": 41,
+          "parameter_count": 40409,
+          "eligible": true,
+          "mechanical": 0.42737060720295694,
+          "expected_band_mass": 0.2369984068477797
+        },
+        "audit_peaks_broad": {
+          "n": 6000,
+          "macro_f1": 0.9895825696933296,
+          "faith": 0.7516400825232268,
+          "deletion_auc": 0.21187992468476297,
+          "insertion_auc": 0.7151600897312165,
+          "simplicity": 0.9220046544939587,
+          "operator_count": 41,
+          "parameter_count": 40409,
+          "eligible": true,
+          "mechanical": 0.4382782803757283,
+          "expected_band_mass": 0.25152982190692447
+        },
+        "low_frequency": {
+          "n": 6000,
+          "macro_f1": 0.9895825696933296,
+          "faith": 0.7516400825232268,
+          "deletion_auc": 0.21187992468476297,
+          "insertion_auc": 0.7151600897312165,
+          "simplicity": 0.9220046544939587,
+          "operator_count": 41,
+          "parameter_count": 40409,
+          "eligible": true,
+          "mechanical": 0.6195963710657886,
+          "expected_band_mass": 0.4938064570437976
+        },
+        "high_mid": {
+          "n": 6000,
+          "macro_f1": 0.9895825696933296,
+          "faith": 0.7516400825232268,
+          "deletion_auc": 0.21187992468476297,
+          "insertion_auc": 0.7151600897312165,
+          "simplicity": 0.9220046544939587,
+          "operator_count": 41,
+          "parameter_count": 40409,
+          "eligible": true,
+          "mechanical": 0.3359646846279194,
+          "expected_band_mass": 0.11480934874457756
+        }
+      }
+    },
+    "bwf1p4_cwf2p2_orf3p0": {
+      "description": "asymmetric low-frequency motor gates: BWF 1.4, CWF 2.2, ORF 3.0",
+      "implementation": "direct",
+      "onnx_path": "runs\\mech_gate_exp019_asym\\bwf1p4_cwf2p2_orf3p0\\model.onnx",
+      "parameters": 39689,
+      "gates": [
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.399999976158142,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          2.200000047683716,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          3.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      ],
+      "self_check": {
+        "devkit_validation": {
+          "valid": true,
+          "samples": 8,
+          "input_name": "windows",
+          "probability_output": "probabilities",
+          "relevance_output": "relevance",
+          "load_seconds": 0.005725700000766665,
+          "inference_seconds": 0.0008972999930847436,
+          "probability_sum_min": 0.9999998211860657,
+          "probability_sum_max": 1.0,
+          "relevance_min": 0.0013198633678257465,
+          "relevance_max": 19.675323486328125
+        },
+        "prob_shape": [
+          8,
+          9
+        ],
+        "relevance_shape": [
+          8,
+          8,
+          100
+        ],
+        "prob_row_sum_range": [
+          0.9999998211860657,
+          1.0
+        ],
+        "relevance_min": 0.0013198633678257465
+      },
+      "public_metrics": {
+        "n": 6000,
+        "macro_f1": 0.9895825696933296,
+        "faith": 0.7518426042050124,
+        "deletion_auc": 0.21078619584441183,
+        "insertion_auc": 0.7144714042544364,
+        "simplicity": 0.9220046544939587,
+        "operator_count": 41,
+        "parameter_count": 40409,
+        "eligible": true,
+        "mechanical": null,
+        "expected_band_mass": null
+      },
+      "proxy_metrics": {
+        "audit_peaks": {
+          "n": 6000,
+          "macro_f1": 0.9895825696933296,
+          "faith": 0.7518426042050124,
+          "deletion_auc": 0.21078619584441183,
+          "insertion_auc": 0.7144714042544364,
+          "simplicity": 0.9220046544939587,
+          "operator_count": 41,
+          "parameter_count": 40409,
+          "eligible": true,
+          "mechanical": 0.4283930954636852,
+          "expected_band_mass": 0.23838614676907258
+        },
+        "audit_peaks_broad": {
+          "n": 6000,
+          "macro_f1": 0.9895825696933296,
+          "faith": 0.7518426042050124,
+          "deletion_auc": 0.21078619584441183,
+          "insertion_auc": 0.7144714042544364,
+          "simplicity": 0.9220046544939587,
+          "operator_count": 41,
+          "parameter_count": 40409,
+          "eligible": true,
+          "mechanical": 0.43926258552837677,
+          "expected_band_mass": 0.25286676715508283
+        },
+        "low_frequency": {
+          "n": 6000,
+          "macro_f1": 0.9895825696933296,
+          "faith": 0.7518426042050124,
+          "deletion_auc": 0.21078619584441183,
+          "insertion_auc": 0.7144714042544364,
+          "simplicity": 0.9220046544939587,
+          "operator_count": 41,
+          "parameter_count": 40409,
+          "eligible": true,
+          "mechanical": 0.6206470585768258,
+          "expected_band_mass": 0.49523253803485634
+        },
+        "high_mid": {
+          "n": 6000,
+          "macro_f1": 0.9895825696933296,
+          "faith": 0.7518426042050124,
+          "deletion_auc": 0.21078619584441183,
+          "insertion_auc": 0.7144714042544364,
+          "simplicity": 0.9220046544939587,
+          "operator_count": 41,
+          "parameter_count": 40409,
+          "eligible": true,
+          "mechanical": 0.3358383064870501,
+          "expected_band_mass": 0.11463919520998478
+        }
+      }
+    }
+  }
+}

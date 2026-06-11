@@ -1,0 +1,69 @@
+{
+  "classes": [
+    "MTF"
+  ],
+  "channel": "rgb_z",
+  "onnx_path": "runs\\mech_probes_round1\\probe_mtf_rgbz\\model.onnx",
+  "self_check": {
+    "devkit_validation": {
+      "valid": true,
+      "samples": 8,
+      "input_name": "windows",
+      "probability_output": "probabilities",
+      "relevance_output": "relevance",
+      "load_seconds": 0.009338399991975166,
+      "inference_seconds": 0.0034038000012515113,
+      "probability_sum_min": 1.0,
+      "probability_sum_max": 1.0,
+      "relevance_min": 5.1163838179490995e-06,
+      "relevance_max": 17.142656326293945
+    },
+    "prob_shape": [
+      8,
+      9
+    ],
+    "relevance_shape": [
+      8,
+      8,
+      100
+    ],
+    "prob_row_sum_range": [
+      1.0,
+      1.0
+    ],
+    "relevance_min": 5.1163838179490995e-06,
+    "max_abs_prob_diff_vs_torch": 2.005085804828539e-21,
+    "max_abs_relevance_diff_vs_torch": 1.811981201171875e-05
+  },
+  "public_metrics": {
+    "n": 3000,
+    "macro_f1": 0.9881528979415022,
+    "faith": 0.8275368884205818,
+    "deletion_auc": 0.16763193905353546,
+    "insertion_auc": 0.822705715894699,
+    "simplicity": 0.9084745982680427,
+    "operator_count": 57,
+    "parameter_count": 40506,
+    "eligible": true,
+    "mechanical": null,
+    "expected_band_mass": null
+  },
+  "proxy_metrics": {
+    "audit_peaks": {
+      "mechanical": 0.45025488355026533,
+      "expected_band_mass": 0.2678649560836759
+    },
+    "audit_peaks_broad": {
+      "mechanical": 0.46110009563947363,
+      "expected_band_mass": 0.28231392675356093
+    },
+    "low_frequency": {
+      "mechanical": 0.645976313393828,
+      "expected_band_mass": 0.529337501755417
+    },
+    "high_mid": {
+      "mechanical": 0.34244605461755034,
+      "expected_band_mass": 0.12361126243098619
+    }
+  }
+}

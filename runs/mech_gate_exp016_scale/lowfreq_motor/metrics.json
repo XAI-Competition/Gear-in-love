@@ -1,0 +1,194 @@
+{
+  "description": "motor bias only for low-frequency proxy classes; mild torque elsewhere",
+  "implementation": "direct",
+  "onnx_path": "runs\\mech_gate_exp016_scale\\lowfreq_motor\\model.onnx",
+  "parameters": 39689,
+  "gates": [
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.149999976158142,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.149999976158142,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.149999976158142,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.149999976158142,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.7999999523162842,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.7999999523162842,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.149999976158142,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.7999999523162842,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ]
+  ],
+  "self_check": {
+    "devkit_validation": {
+      "valid": true,
+      "samples": 8,
+      "input_name": "windows",
+      "probability_output": "probabilities",
+      "relevance_output": "relevance",
+      "load_seconds": 0.010709299996960908,
+      "inference_seconds": 0.0021714999893447384,
+      "probability_sum_min": 0.9999998211860657,
+      "probability_sum_max": 1.0,
+      "relevance_min": 0.0013198633678257465,
+      "relevance_max": 19.697010040283203
+    },
+    "prob_shape": [
+      8,
+      9
+    ],
+    "relevance_shape": [
+      8,
+      8,
+      100
+    ],
+    "prob_row_sum_range": [
+      0.9999998211860657,
+      1.0
+    ],
+    "relevance_min": 0.0013198633678257465
+  },
+  "public_metrics": {
+    "n": 6000,
+    "macro_f1": 0.9889022559557579,
+    "faith": 0.7429025653749703,
+    "deletion_auc": 0.2232061319053173,
+    "insertion_auc": 0.7090112626552582,
+    "simplicity": 0.9220046544939587,
+    "operator_count": 41,
+    "parameter_count": 40409,
+    "eligible": true,
+    "mechanical": null,
+    "expected_band_mass": null
+  },
+  "proxy_metrics": {
+    "audit_peaks": {
+      "n": 6000,
+      "macro_f1": 0.9889022559557579,
+      "faith": 0.7429025653749703,
+      "deletion_auc": 0.2232061319053173,
+      "insertion_auc": 0.7090112626552582,
+      "simplicity": 0.9220046544939587,
+      "operator_count": 41,
+      "parameter_count": 40409,
+      "eligible": true,
+      "mechanical": 0.4270267570447197,
+      "expected_band_mass": 0.2365171460720278
+    },
+    "audit_peaks_broad": {
+      "n": 6000,
+      "macro_f1": 0.9889022559557579,
+      "faith": 0.7429025653749703,
+      "deletion_auc": 0.2232061319053173,
+      "insertion_auc": 0.7090112626552582,
+      "simplicity": 0.9220046544939587,
+      "operator_count": 41,
+      "parameter_count": 40409,
+      "eligible": true,
+      "mechanical": 0.4380947858016465,
+      "expected_band_mass": 0.25126429157392755
+    },
+    "low_frequency": {
+      "n": 6000,
+      "macro_f1": 0.9889022559557579,
+      "faith": 0.7429025653749703,
+      "deletion_auc": 0.2232061319053173,
+      "insertion_auc": 0.7090112626552582,
+      "simplicity": 0.9220046544939587,
+      "operator_count": 41,
+      "parameter_count": 40409,
+      "eligible": true,
+      "mechanical": 0.6142908915939034,
+      "expected_band_mass": 0.48668089035363793
+    },
+    "high_mid": {
+      "n": 6000,
+      "macro_f1": 0.9889022559557579,
+      "faith": 0.7429025653749703,
+      "deletion_auc": 0.2232061319053173,
+      "insertion_auc": 0.7090112626552582,
+      "simplicity": 0.9220046544939587,
+      "operator_count": 41,
+      "parameter_count": 40409,
+      "eligible": true,
+      "mechanical": 0.3395412396457827,
+      "expected_band_mass": 0.11957060163332621
+    }
+  }
+}

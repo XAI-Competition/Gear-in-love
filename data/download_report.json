@@ -1,0 +1,9 @@
+{
+  "repo_id": "edi45/gearxai-dds-seu",
+  "devkit": "D:\\Codes\\GearXAI\\downloads\\gearxai-devkit-v1.0.1.zip",
+  "snapshot": "D:\\Codes\\GearXAI\\data\\hf_snapshot",
+  "windows_100_counts": {
+    "train": 737352,
+    "validation": 83790
+  }
+}

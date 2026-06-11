@@ -1,0 +1,87 @@
+{
+  "conditions": {
+    "PGB_20_0": {
+      "validation_rows": 4410
+    },
+    "PGB_30_0": {
+      "validation_rows": 4410
+    },
+    "PGB_30_1": {
+      "validation_rows": 4410
+    },
+    "PGB_30_2": {
+      "validation_rows": 4410
+    },
+    "PGB_30_3": {
+      "validation_rows": 4410
+    },
+    "PGB_30_4": {
+      "validation_rows": 4410
+    },
+    "PGB_30_5": {
+      "validation_rows": 4410
+    },
+    "PGB_40_0": {
+      "validation_rows": 4410
+    },
+    "PGB_50_0": {
+      "validation_rows": 4410
+    },
+    "PGB_Variable_speed_Experiment1": {
+      "validation_rows": 4410
+    },
+    "PGB_Variable_speed_Experiment10": {
+      "validation_rows": 4410
+    },
+    "PGB_Variable_speed_Experiment2": {
+      "validation_rows": 4410
+    },
+    "PGB_Variable_speed_Experiment3": {
+      "validation_rows": 4410
+    },
+    "PGB_Variable_speed_Experiment4": {
+      "validation_rows": 4410
+    },
+    "PGB_Variable_speed_Experiment5": {
+      "validation_rows": 4410
+    },
+    "PGB_Variable_speed_Experiment6": {
+      "validation_rows": 4410
+    },
+    "PGB_Variable_speed_Experiment7": {
+      "validation_rows": 4410
+    },
+    "PGB_Variable_speed_Experiment8": {
+      "validation_rows": 4410
+    },
+    "PGB_Variable_speed_Experiment9": {
+      "validation_rows": 4410
+    }
+  },
+  "counts": {
+    "validation": 83790
+  },
+  "exact_window_hash_intersections": {},
+  "format": "[N, 8, 100]",
+  "hash_algorithm": "blake2b-128 over float32 channels-first windows",
+  "hidden_leaderboard_split": "not included",
+  "label_counts": {
+    "validation": {
+      "0": 9310,
+      "1": 9310,
+      "2": 9310,
+      "3": 9310,
+      "4": 9310,
+      "5": 9310,
+      "6": 9310,
+      "7": 9310,
+      "8": 9310
+    }
+  },
+  "output_dir": "data\\prepared_v2",
+  "public_splits": [
+    "validation"
+  ],
+  "split_integrity_verified": true,
+  "windows_dir": "data\\hf_snapshot\\data\\windows_100"
+}

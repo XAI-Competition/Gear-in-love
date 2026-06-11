@@ -1,0 +1,82 @@
+Device: cuda
+Model parameters: 39,689
+Train: 360,000 windows | Val: 36,000 windows
+epoch  1/40 | loss 0.6668 | val_macro_f1 0.9254 | 3.0s
+epoch  2/40 | loss 0.4034 | val_macro_f1 0.9597 | 2.5s
+epoch  3/40 | loss 0.3588 | val_macro_f1 0.9546 | 2.4s
+epoch  4/40 | loss 0.3400 | val_macro_f1 0.9714 | 2.4s
+epoch  5/40 | loss 0.3285 | val_macro_f1 0.9758 | 2.4s
+epoch  6/40 | loss 0.3201 | val_macro_f1 0.9811 | 2.4s
+epoch  7/40 | loss 0.3156 | val_macro_f1 0.9806 | 2.4s
+epoch  8/40 | loss 0.3113 | val_macro_f1 0.9798 | 2.4s
+epoch  9/40 | loss 0.3072 | val_macro_f1 0.9778 | 2.5s
+epoch 10/40 | loss 0.3055 | val_macro_f1 0.9846 | 2.4s
+epoch 11/40 | loss 0.3027 | val_macro_f1 0.9835 | 2.4s
+epoch 12/40 | loss 0.3004 | val_macro_f1 0.9856 | 2.5s
+epoch 13/40 | loss 0.2992 | val_macro_f1 0.9825 | 3.0s
+epoch 14/40 | loss 0.2976 | val_macro_f1 0.9841 | 2.9s
+epoch 15/40 | loss 0.2965 | val_macro_f1 0.9873 | 3.0s
+epoch 16/40 | loss 0.2951 | val_macro_f1 0.9893 | 3.0s
+epoch 17/40 | loss 0.2944 | val_macro_f1 0.9893 | 3.1s
+epoch 18/40 | loss 0.2935 | val_macro_f1 0.9879 | 2.5s
+epoch 19/40 | loss 0.2926 | val_macro_f1 0.9897 | 2.4s
+epoch 20/40 | loss 0.2919 | val_macro_f1 0.9909 | 2.4s
+epoch 21/40 | loss 0.2914 | val_macro_f1 0.9889 | 2.4s
+epoch 22/40 | loss 0.2908 | val_macro_f1 0.9903 | 2.5s
+epoch 23/40 | loss 0.2904 | val_macro_f1 0.9903 | 2.5s
+epoch 24/40 | loss 0.2900 | val_macro_f1 0.9897 | 2.4s
+epoch 25/40 | loss 0.2895 | val_macro_f1 0.9902 | 2.4s
+epoch 26/40 | loss 0.2891 | val_macro_f1 0.9909 | 2.5s
+epoch 27/40 | loss 0.2889 | val_macro_f1 0.9912 | 2.4s
+epoch 28/40 | loss 0.2886 | val_macro_f1 0.9915 | 2.5s
+epoch 29/40 | loss 0.2883 | val_macro_f1 0.9908 | 2.4s
+epoch 30/40 | loss 0.2881 | val_macro_f1 0.9897 | 2.4s
+epoch 31/40 | loss 0.2879 | val_macro_f1 0.9908 | 2.4s
+epoch 32/40 | loss 0.2878 | val_macro_f1 0.9906 | 2.4s
+epoch 33/40 | loss 0.2874 | val_macro_f1 0.9897 | 2.4s
+epoch 34/40 | loss 0.2873 | val_macro_f1 0.9909 | 2.4s
+epoch 35/40 | loss 0.2873 | val_macro_f1 0.9902 | 2.4s
+epoch 36/40 | loss 0.2872 | val_macro_f1 0.9907 | 2.5s
+epoch 37/40 | loss 0.2871 | val_macro_f1 0.9907 | 2.4s
+epoch 38/40 | loss 0.2870 | val_macro_f1 0.9907 | 2.4s
+epoch 39/40 | loss 0.2869 | val_macro_f1 0.9906 | 2.5s
+epoch 40/40 | loss 0.2869 | val_macro_f1 0.9904 | 2.4s
+Saved checkpoint -> runs\narrow\model.pt
+
+Exported ONNX -> runs\narrow\model.onnx
+Self-check: {
+  "devkit_validation": {
+    "valid": true,
+    "samples": 8,
+    "input_name": "windows",
+    "probability_output": "probabilities",
+    "relevance_output": "relevance",
+    "load_seconds": 0.043484099998750025,
+    "inference_seconds": 0.0013395000005402835,
+    "probability_sum_min": 0.9999998211860657,
+    "probability_sum_max": 1.0000001192092896,
+    "relevance_min": 0.0012991095427423716,
+    "relevance_max": 15.779012680053711
+  },
+  "prob_shape": [
+    8,
+    9
+  ],
+  "relevance_shape": [
+    8,
+    8,
+    100
+  ],
+  "prob_row_sum_range": [
+    0.9999998211860657,
+    1.0000001192092896
+  ],
+  "relevance_min": 0.0012991095427423716,
+  "max_abs_prob_diff_vs_torch": 1.1920928955078125e-07,
+  "max_abs_relevance_diff_vs_torch": 1.1444091796875e-05
+}
+Wrote runs\narrow\train_summary.json
+
+Next: package for the leaderboard:
+  uv run gearxai package --model runs\narrow\model.onnx --data-dir data/prepared --split validation --out runs\narrow\submission.zip
+TRAIN_DONE exit=0

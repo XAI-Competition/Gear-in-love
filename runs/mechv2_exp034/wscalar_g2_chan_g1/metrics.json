@@ -1,0 +1,112 @@
+{
+  "variant": {
+    "name": "wscalar_g2_chan_g1",
+    "occ_alpha": 1.0,
+    "occ_eps": 0.2,
+    "gamma_t": 2.0,
+    "gamma_c": 1.0
+  },
+  "onnx_path": "runs\\mechv2_exp034\\wscalar_g2_chan_g1\\model.onnx",
+  "self_check": {
+    "devkit_validation": {
+      "valid": true,
+      "samples": 8,
+      "input_name": "windows",
+      "probability_output": "probabilities",
+      "relevance_output": "relevance",
+      "load_seconds": 0.015512800004216842,
+      "inference_seconds": 0.0029043000104138628,
+      "probability_sum_min": 0.9999999403953552,
+      "probability_sum_max": 1.0000001192092896,
+      "relevance_min": 1.4098529391048942e-05,
+      "relevance_max": 0.8950674533843994
+    },
+    "prob_shape": [
+      8,
+      9
+    ],
+    "relevance_shape": [
+      8,
+      8,
+      100
+    ],
+    "prob_row_sum_range": [
+      0.9999999403953552,
+      1.0000001192092896
+    ],
+    "relevance_min": 1.4098529391048942e-05,
+    "max_abs_prob_diff_vs_torch": 1.9669532775878906e-06,
+    "max_abs_relevance_diff_vs_torch": 7.748603820800781e-07
+  },
+  "mech_gear": {
+    "model": "runs\\mechv2_exp034\\wscalar_g2_chan_g1\\model.onnx",
+    "gear_only": true,
+    "contexts": 76,
+    "overall": {
+      "metric_version": "mechanical_v2",
+      "mechanical_score": 0.10101362389123172,
+      "expected_band_enrichment": 0.10101392174490757,
+      "relevance_stability": 0.9999784340174773,
+      "contexts": 76,
+      "strategy_counts": {
+        "fixed_condition": 36,
+        "spectral_ridge": 40
+      },
+      "estimated_speed_hz_min": 2.9166666666666665,
+      "estimated_speed_hz_max": 50.0
+    },
+    "per_class": {
+      "CTF": {
+        "contexts": 19,
+        "mech": 0.11278346096090137,
+        "enrichment": 0.11278351928724345,
+        "stability": 0.9999965183239073,
+        "strategies": {
+          "fixed_condition": 9,
+          "spectral_ridge": 10
+        }
+      },
+      "MTF": {
+        "contexts": 19,
+        "mech": 0.10136175590269272,
+        "enrichment": 0.1013618694041803,
+        "stability": 0.9999921101790423,
+        "strategies": {
+          "fixed_condition": 9,
+          "spectral_ridge": 10
+        }
+      },
+      "RCF": {
+        "contexts": 19,
+        "mech": 0.11262801668424907,
+        "enrichment": 0.11262891511858548,
+        "stability": 0.9999335383141255,
+        "strategies": {
+          "fixed_condition": 9,
+          "spectral_ridge": 10
+        }
+      },
+      "SWF": {
+        "contexts": 19,
+        "mech": 0.07728126201708375,
+        "enrichment": 0.0772813831696211,
+        "stability": 0.9999915692528347,
+        "strategies": {
+          "fixed_condition": 9,
+          "spectral_ridge": 10
+        }
+      }
+    }
+  },
+  "faith_check": {
+    "n": 2000,
+    "macro_f1": 0.9815408452021583,
+    "faith": 0.8108871497213841,
+    "deletion_auc": 0.21869492083787923,
+    "insertion_auc": 0.8404692202806473,
+    "simplicity": 0.8765381066403053,
+    "operator_count": 86,
+    "parameter_count": 50773,
+    "eligible": true
+  }
+}

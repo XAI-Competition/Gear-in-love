@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gearxai-devkit"
+version = "1.0.1"
+description = "Evaluation toolkit for the GearXAI gearbox fault diagnosis challenge"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+  {name = "GearXAI Organizers"}
+]
+dependencies = [
+  "numpy>=1.23",
+  "onnx>=1.14",
+  "onnxruntime>=1.16",
+  "pandas>=2.0",
+  "psutil>=5.9",
+  "pyarrow>=14.0",
+  "scipy>=1.10"
+]
+
+[project.optional-dependencies]
+test = ["pytest>=7.0"]
+baselines = [
+  "scikit-learn>=1.4",
+  "skl2onnx>=1.16",
+  "joblib>=1.3"
+]
+
+[project.scripts]
+gearxai = "gearxai_devkit.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["gearxai_devkit*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

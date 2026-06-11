@@ -1,0 +1,74 @@
+Model parameters: 148,825
+Train: 270,000 windows | Val: 36,000 windows
+epoch  1/35 | loss 0.6082 | val_macro_f1 0.9493 | 45.2s
+epoch  2/35 | loss 0.3655 | val_macro_f1 0.9801 | 50.9s
+epoch  3/35 | loss 0.3306 | val_macro_f1 0.9805 | 45.2s
+epoch  4/35 | loss 0.3170 | val_macro_f1 0.9835 | 49.4s
+epoch  5/35 | loss 0.3093 | val_macro_f1 0.9904 | 47.8s
+epoch  6/35 | loss 0.3044 | val_macro_f1 0.9849 | 45.6s
+epoch  7/35 | loss 0.2998 | val_macro_f1 0.9892 | 46.6s
+epoch  8/35 | loss 0.2973 | val_macro_f1 0.9898 | 43.5s
+epoch  9/35 | loss 0.2953 | val_macro_f1 0.9930 | 38.8s
+epoch 10/35 | loss 0.2934 | val_macro_f1 0.9870 | 37.9s
+epoch 11/35 | loss 0.2919 | val_macro_f1 0.9920 | 37.1s
+epoch 12/35 | loss 0.2905 | val_macro_f1 0.9935 | 38.3s
+epoch 13/35 | loss 0.2895 | val_macro_f1 0.9922 | 36.7s
+epoch 14/35 | loss 0.2887 | val_macro_f1 0.9944 | 36.5s
+epoch 15/35 | loss 0.2876 | val_macro_f1 0.9946 | 37.0s
+epoch 16/35 | loss 0.2869 | val_macro_f1 0.9945 | 37.8s
+epoch 17/35 | loss 0.2859 | val_macro_f1 0.9949 | 37.2s
+epoch 18/35 | loss 0.2854 | val_macro_f1 0.9939 | 37.5s
+epoch 19/35 | loss 0.2848 | val_macro_f1 0.9959 | 37.3s
+epoch 20/35 | loss 0.2844 | val_macro_f1 0.9950 | 36.9s
+epoch 21/35 | loss 0.2840 | val_macro_f1 0.9955 | 37.3s
+epoch 22/35 | loss 0.2835 | val_macro_f1 0.9954 | 36.7s
+epoch 23/35 | loss 0.2831 | val_macro_f1 0.9968 | 37.4s
+epoch 24/35 | loss 0.2828 | val_macro_f1 0.9956 | 37.0s
+epoch 25/35 | loss 0.2825 | val_macro_f1 0.9951 | 39.1s
+epoch 26/35 | loss 0.2822 | val_macro_f1 0.9960 | 36.6s
+epoch 27/35 | loss 0.2820 | val_macro_f1 0.9963 | 39.3s
+epoch 28/35 | loss 0.2818 | val_macro_f1 0.9955 | 36.5s
+epoch 29/35 | loss 0.2817 | val_macro_f1 0.9955 | 37.4s
+epoch 30/35 | loss 0.2815 | val_macro_f1 0.9956 | 37.1s
+epoch 31/35 | loss 0.2814 | val_macro_f1 0.9959 | 37.7s
+epoch 32/35 | loss 0.2813 | val_macro_f1 0.9956 | 37.1s
+epoch 33/35 | loss 0.2812 | val_macro_f1 0.9957 | 36.8s
+epoch 34/35 | loss 0.2812 | val_macro_f1 0.9958 | 36.5s
+epoch 35/35 | loss 0.2811 | val_macro_f1 0.9958 | 37.0s
+
+Exported ONNX -> runs\baseline\model.onnx
+Self-check: {
+  "devkit_validation": {
+    "valid": true,
+    "samples": 8,
+    "input_name": "windows",
+    "probability_output": "probabilities",
+    "relevance_output": "relevance",
+    "load_seconds": 0.04825409999466501,
+    "inference_seconds": 0.0017325000080745667,
+    "probability_sum_min": 0.9999998211860657,
+    "probability_sum_max": 1.000000238418579,
+    "relevance_min": 0.0018163544591516256,
+    "relevance_max": 8.588729858398438
+  },
+  "prob_shape": [
+    8,
+    9
+  ],
+  "relevance_shape": [
+    8,
+    8,
+    100
+  ],
+  "prob_row_sum_range": [
+    0.9999998211860657,
+    1.000000238418579
+  ],
+  "relevance_min": 0.0018163544591516256,
+  "max_abs_prob_diff_vs_torch": 3.5762786865234375e-07,
+  "max_abs_relevance_diff_vs_torch": 5.245208740234375e-06
+}
+Wrote runs\baseline\train_summary.json
+
+Next: package for the leaderboard:
+  uv run gearxai package --model runs\baseline\model.onnx --data-dir data/prepared --split validation --out runs\baseline\submission.zip

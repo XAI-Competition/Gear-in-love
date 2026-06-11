@@ -1,0 +1,193 @@
+{
+  "description": "aggressive proxy best-channel bets from the mechanical audit",
+  "onnx_path": "runs\\mech_gate_exp014\\sharp_proxy\\model.onnx",
+  "parameters": 39689,
+  "gates": [
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      2.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      2.0,
+      1.0,
+      1.399999976158142,
+      1.399999976158142,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      2.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      2.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      2.200000047683716,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      2.200000047683716,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      2.0,
+      1.2999999523162842,
+      1.0,
+      1.0
+    ],
+    [
+      2.200000047683716,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ]
+  ],
+  "self_check": {
+    "devkit_validation": {
+      "valid": true,
+      "samples": 8,
+      "input_name": "windows",
+      "probability_output": "probabilities",
+      "relevance_output": "relevance",
+      "load_seconds": 0.00888880000275094,
+      "inference_seconds": 0.0010744000028353184,
+      "probability_sum_min": 0.9999998211860657,
+      "probability_sum_max": 1.0,
+      "relevance_min": 0.0013198633678257465,
+      "relevance_max": 19.750431060791016
+    },
+    "prob_shape": [
+      8,
+      9
+    ],
+    "relevance_shape": [
+      8,
+      8,
+      100
+    ],
+    "prob_row_sum_range": [
+      0.9999998211860657,
+      1.0
+    ],
+    "relevance_min": 0.0013198633678257465
+  },
+  "public_metrics": {
+    "n": 3000,
+    "macro_f1": 0.9923999582204964,
+    "faith": 0.7446406625211239,
+    "deletion_auc": 0.2157662644982338,
+    "insertion_auc": 0.7050475895404815,
+    "simplicity": 0.9185350883144372,
+    "operator_count": 45,
+    "parameter_count": 40481,
+    "eligible": true,
+    "mechanical": null,
+    "expected_band_mass": null
+  },
+  "proxy_metrics": {
+    "audit_peaks": {
+      "n": 3000,
+      "macro_f1": 0.9923999582204964,
+      "faith": 0.7446406625211239,
+      "deletion_auc": 0.2157662644982338,
+      "insertion_auc": 0.7050475895404815,
+      "simplicity": 0.9185350883144372,
+      "operator_count": 45,
+      "parameter_count": 40481,
+      "eligible": true,
+      "mechanical": 0.4330012571063645,
+      "expected_band_mass": 0.24457082618930062
+    },
+    "audit_peaks_broad": {
+      "n": 3000,
+      "macro_f1": 0.9923999582204964,
+      "faith": 0.7446406625211239,
+      "deletion_auc": 0.2157662644982338,
+      "insertion_auc": 0.7050475895404815,
+      "simplicity": 0.9185350883144372,
+      "operator_count": 45,
+      "parameter_count": 40481,
+      "eligible": true,
+      "mechanical": 0.4441762445227859,
+      "expected_band_mass": 0.25946253391504215
+    },
+    "low_frequency": {
+      "n": 3000,
+      "macro_f1": 0.9923999582204964,
+      "faith": 0.7446406625211239,
+      "deletion_auc": 0.2157662644982338,
+      "insertion_auc": 0.7050475895404815,
+      "simplicity": 0.9185350883144372,
+      "operator_count": 45,
+      "parameter_count": 40481,
+      "eligible": true,
+      "mechanical": 0.6118489016415023,
+      "expected_band_mass": 0.48346550687407125
+    },
+    "high_mid": {
+      "n": 3000,
+      "macro_f1": 0.9923999582204964,
+      "faith": 0.7446406625211239,
+      "deletion_auc": 0.2157662644982338,
+      "insertion_auc": 0.7050475895404815,
+      "simplicity": 0.9185350883144372,
+      "operator_count": 45,
+      "parameter_count": 40481,
+      "eligible": true,
+      "mechanical": 0.33922540833274595,
+      "expected_band_mass": 0.11916385404477677
+    }
+  }
+}

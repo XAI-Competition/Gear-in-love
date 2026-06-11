@@ -1,0 +1,81 @@
+{
+  "variant": {
+    "name": "occ_a1_eps0p2_exp023_T8",
+    "alpha": 1.0,
+    "eps": 0.2,
+    "static_gate": true,
+    "temperature": 8.0
+  },
+  "onnx_path": "runs\\exp029\\a3_ins50\\wrapped\\occ_a1_eps0p2_exp023_T8\\model.onnx",
+  "self_check": {
+    "devkit_validation": {
+      "valid": true,
+      "samples": 8,
+      "input_name": "windows",
+      "probability_output": "probabilities",
+      "relevance_output": "relevance",
+      "load_seconds": 0.028783699992345646,
+      "inference_seconds": 0.002728499996010214,
+      "probability_sum_min": 1.0,
+      "probability_sum_max": 1.0,
+      "relevance_min": 4.3451236706459895e-05,
+      "relevance_max": 11.435757637023926
+    },
+    "prob_shape": [
+      8,
+      9
+    ],
+    "relevance_shape": [
+      8,
+      8,
+      100
+    ],
+    "prob_row_sum_range": [
+      1.0,
+      1.0
+    ],
+    "relevance_min": 4.3451236706459895e-05,
+    "max_abs_prob_diff_vs_torch": 2.136221155524254e-08,
+    "max_abs_relevance_diff_vs_torch": 1.239776611328125e-05
+  },
+  "public_metrics": {
+    "n": 5000,
+    "macro_f1": 0.9372098004379877,
+    "faith": 0.8751966409385205,
+    "deletion_auc": 0.13336959928274156,
+    "insertion_auc": 0.8837628811597824,
+    "simplicity": 0.9084745982680427,
+    "operator_count": 57,
+    "parameter_count": 40506,
+    "eligible": true,
+    "mechanical": null,
+    "expected_band_mass": null,
+    "deletion_curve": [
+      0.9926502108573914,
+      0.24810978770256042,
+      0.08404121547937393,
+      0.05615420639514923,
+      0.04128435626626015,
+      0.043425917625427246,
+      0.04690660163760185,
+      0.06892954558134079,
+      0.07866839319467545,
+      0.10975223034620285,
+      0.12019730359315872
+    ],
+    "insertion_curve": [
+      0.12019730359315872,
+      0.6734337210655212,
+      0.8654441237449646,
+      0.911683201789856,
+      0.944694995880127,
+      0.9573462009429932,
+      0.979017972946167,
+      0.980853796005249,
+      0.981972336769104,
+      0.9867587089538574,
+      0.9926502108573914
+    ]
+  },
+  "proxy_metrics": {}
+}

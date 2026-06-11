@@ -1,0 +1,194 @@
+{
+  "description": "dynamic asymmetric motor gates: BWF 1.4, CWF 3, ORF 3.4",
+  "implementation": "direct",
+  "onnx_path": "runs\\mech_gate_exp021_grid_hi\\lowfreq_asym_b1p4_c3_o3p4\\model.onnx",
+  "parameters": 39689,
+  "gates": [
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.399999976158142,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      3.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      3.4000000953674316,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ]
+  ],
+  "self_check": {
+    "devkit_validation": {
+      "valid": true,
+      "samples": 8,
+      "input_name": "windows",
+      "probability_output": "probabilities",
+      "relevance_output": "relevance",
+      "load_seconds": 0.00621240001055412,
+      "inference_seconds": 0.0009888000058708712,
+      "probability_sum_min": 0.9999998211860657,
+      "probability_sum_max": 1.0,
+      "relevance_min": 0.0013198633678257465,
+      "relevance_max": 19.675323486328125
+    },
+    "prob_shape": [
+      8,
+      9
+    ],
+    "relevance_shape": [
+      8,
+      8,
+      100
+    ],
+    "prob_row_sum_range": [
+      0.9999998211860657,
+      1.0
+    ],
+    "relevance_min": 0.0013198633678257465
+  },
+  "public_metrics": {
+    "n": 5000,
+    "macro_f1": 0.9870387458226878,
+    "faith": 0.7487961109727621,
+    "deletion_auc": 0.21199821308255198,
+    "insertion_auc": 0.7095904350280762,
+    "simplicity": 0.9220046544939587,
+    "operator_count": 41,
+    "parameter_count": 40409,
+    "eligible": true,
+    "mechanical": null,
+    "expected_band_mass": null
+  },
+  "proxy_metrics": {
+    "audit_peaks": {
+      "n": 5000,
+      "macro_f1": 0.9870387458226878,
+      "faith": 0.7487961109727621,
+      "deletion_auc": 0.21199821308255198,
+      "insertion_auc": 0.7095904350280762,
+      "simplicity": 0.9220046544939587,
+      "operator_count": 41,
+      "parameter_count": 40409,
+      "eligible": true,
+      "mechanical": 0.4298346702769004,
+      "expected_band_mass": 0.2403558929831384
+    },
+    "audit_peaks_broad": {
+      "n": 5000,
+      "macro_f1": 0.9870387458226878,
+      "faith": 0.7487961109727621,
+      "deletion_auc": 0.21199821308255198,
+      "insertion_auc": 0.7095904350280762,
+      "simplicity": 0.9220046544939587,
+      "operator_count": 41,
+      "parameter_count": 40409,
+      "eligible": true,
+      "mechanical": 0.44054677904789685,
+      "expected_band_mass": 0.25462646270942396
+    },
+    "low_frequency": {
+      "n": 5000,
+      "macro_f1": 0.9870387458226878,
+      "faith": 0.7487961109727621,
+      "deletion_auc": 0.21199821308255198,
+      "insertion_auc": 0.7095904350280762,
+      "simplicity": 0.9220046544939587,
+      "operator_count": 41,
+      "parameter_count": 40409,
+      "eligible": true,
+      "mechanical": 0.6256306637917278,
+      "expected_band_mass": 0.5019470370110448
+    },
+    "high_mid": {
+      "n": 5000,
+      "macro_f1": 0.9870387458226878,
+      "faith": 0.7487961109727621,
+      "deletion_auc": 0.21199821308255198,
+      "insertion_auc": 0.7095904350280762,
+      "simplicity": 0.9220046544939587,
+      "operator_count": 41,
+      "parameter_count": 40409,
+      "eligible": true,
+      "mechanical": 0.3375033957132696,
+      "expected_band_mass": 0.11689102912288712
+    }
+  }
+}

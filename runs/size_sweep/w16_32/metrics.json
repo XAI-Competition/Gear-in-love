@@ -1,0 +1,18 @@
+{
+  "widths": [
+    16,
+    32
+  ],
+  "kernels": [
+    7,
+    5
+  ],
+  "torch_params": 4281,
+  "onnx_params": 4498,
+  "operator_count": 29,
+  "macro_f1": 0.8370499889072556,
+  "faith": 0.6847105883061886,
+  "simplicity": 0.9671898925680747,
+  "objective_local": 0.4673222138360904,
+  "onnx_path": "runs\\size_sweep\\w16_32\\model.onnx"
+}

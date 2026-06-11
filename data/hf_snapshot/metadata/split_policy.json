@@ -1,0 +1,2539 @@
+{
+  "public_splits": [
+    "train",
+    "validation"
+  ],
+  "hidden_split": "source test is retained by organizers and is not published",
+  "dev_fraction": 0.1,
+  "gap_windows": 99,
+  "policy": "Public train/validation are derived from source train. Source test remains hidden for official leaderboard scoring.",
+  "conditions": {
+    "PGB_20_0": {
+      "samples": {
+        "aligned_with_window_split": true,
+        "dev_fraction": 0.1,
+        "sequence_length": 100,
+        "classes": {
+          "HEA": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "MTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "RCF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "SWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "BWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "IRF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "ORF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          }
+        }
+      },
+      "windows": {
+        "dev_fraction": 0.1,
+        "gap_windows": 99,
+        "classes": {
+          "HEA": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "MTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "RCF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "SWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "BWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "IRF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "ORF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          }
+        },
+        "dropped_gap_windows": 891
+      }
+    },
+    "PGB_30_0": {
+      "samples": {
+        "aligned_with_window_split": true,
+        "dev_fraction": 0.1,
+        "sequence_length": 100,
+        "classes": {
+          "HEA": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "MTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "RCF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "SWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "BWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "IRF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "ORF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          }
+        }
+      },
+      "windows": {
+        "dev_fraction": 0.1,
+        "gap_windows": 99,
+        "classes": {
+          "HEA": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "MTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "RCF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "SWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "BWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "IRF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "ORF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          }
+        },
+        "dropped_gap_windows": 891
+      }
+    },
+    "PGB_30_1": {
+      "samples": {
+        "aligned_with_window_split": true,
+        "dev_fraction": 0.1,
+        "sequence_length": 100,
+        "classes": {
+          "HEA": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "MTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "RCF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "SWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "BWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "IRF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "ORF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          }
+        }
+      },
+      "windows": {
+        "dev_fraction": 0.1,
+        "gap_windows": 99,
+        "classes": {
+          "HEA": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "MTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "RCF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "SWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "BWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "IRF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "ORF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          }
+        },
+        "dropped_gap_windows": 891
+      }
+    },
+    "PGB_30_2": {
+      "samples": {
+        "aligned_with_window_split": true,
+        "dev_fraction": 0.1,
+        "sequence_length": 100,
+        "classes": {
+          "HEA": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "MTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "RCF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "SWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "BWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "IRF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "ORF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          }
+        }
+      },
+      "windows": {
+        "dev_fraction": 0.1,
+        "gap_windows": 99,
+        "classes": {
+          "HEA": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "MTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "RCF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "SWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "BWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "IRF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "ORF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          }
+        },
+        "dropped_gap_windows": 891
+      }
+    },
+    "PGB_30_3": {
+      "samples": {
+        "aligned_with_window_split": true,
+        "dev_fraction": 0.1,
+        "sequence_length": 100,
+        "classes": {
+          "HEA": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "MTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "RCF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "SWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "BWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "IRF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "ORF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          }
+        }
+      },
+      "windows": {
+        "dev_fraction": 0.1,
+        "gap_windows": 99,
+        "classes": {
+          "HEA": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "MTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "RCF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "SWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "BWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "IRF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "ORF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          }
+        },
+        "dropped_gap_windows": 891
+      }
+    },
+    "PGB_30_4": {
+      "samples": {
+        "aligned_with_window_split": true,
+        "dev_fraction": 0.1,
+        "sequence_length": 100,
+        "classes": {
+          "HEA": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "MTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "RCF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "SWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "BWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "IRF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "ORF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          }
+        }
+      },
+      "windows": {
+        "dev_fraction": 0.1,
+        "gap_windows": 99,
+        "classes": {
+          "HEA": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "MTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "RCF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "SWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "BWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "IRF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "ORF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          }
+        },
+        "dropped_gap_windows": 891
+      }
+    },
+    "PGB_30_5": {
+      "samples": {
+        "aligned_with_window_split": true,
+        "dev_fraction": 0.1,
+        "sequence_length": 100,
+        "classes": {
+          "HEA": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "MTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "RCF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "SWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "BWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "IRF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "ORF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          }
+        }
+      },
+      "windows": {
+        "dev_fraction": 0.1,
+        "gap_windows": 99,
+        "classes": {
+          "HEA": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "MTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "RCF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "SWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "BWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "IRF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "ORF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          }
+        },
+        "dropped_gap_windows": 891
+      }
+    },
+    "PGB_40_0": {
+      "samples": {
+        "aligned_with_window_split": true,
+        "dev_fraction": 0.1,
+        "sequence_length": 100,
+        "classes": {
+          "HEA": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "MTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "RCF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "SWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "BWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "IRF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "ORF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          }
+        }
+      },
+      "windows": {
+        "dev_fraction": 0.1,
+        "gap_windows": 99,
+        "classes": {
+          "HEA": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "MTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "RCF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "SWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "BWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "IRF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "ORF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          }
+        },
+        "dropped_gap_windows": 891
+      }
+    },
+    "PGB_50_0": {
+      "samples": {
+        "aligned_with_window_split": true,
+        "dev_fraction": 0.1,
+        "sequence_length": 100,
+        "classes": {
+          "HEA": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "MTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "RCF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "SWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "BWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "IRF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "ORF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          }
+        }
+      },
+      "windows": {
+        "dev_fraction": 0.1,
+        "gap_windows": 99,
+        "classes": {
+          "HEA": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "MTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "RCF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "SWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "BWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "IRF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "ORF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          }
+        },
+        "dropped_gap_windows": 891
+      }
+    },
+    "PGB_Variable_speed_Experiment1": {
+      "samples": {
+        "aligned_with_window_split": true,
+        "dev_fraction": 0.1,
+        "sequence_length": 100,
+        "classes": {
+          "HEA": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "MTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "RCF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "SWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "BWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "IRF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "ORF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          }
+        }
+      },
+      "windows": {
+        "dev_fraction": 0.1,
+        "gap_windows": 99,
+        "classes": {
+          "HEA": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "MTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "RCF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "SWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "BWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "IRF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "ORF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          }
+        },
+        "dropped_gap_windows": 891
+      }
+    },
+    "PGB_Variable_speed_Experiment10": {
+      "samples": {
+        "aligned_with_window_split": true,
+        "dev_fraction": 0.1,
+        "sequence_length": 100,
+        "classes": {
+          "HEA": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "MTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "RCF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "SWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "BWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "IRF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "ORF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          }
+        }
+      },
+      "windows": {
+        "dev_fraction": 0.1,
+        "gap_windows": 99,
+        "classes": {
+          "HEA": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "MTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "RCF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "SWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "BWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "IRF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "ORF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          }
+        },
+        "dropped_gap_windows": 891
+      }
+    },
+    "PGB_Variable_speed_Experiment2": {
+      "samples": {
+        "aligned_with_window_split": true,
+        "dev_fraction": 0.1,
+        "sequence_length": 100,
+        "classes": {
+          "HEA": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "MTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "RCF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "SWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "BWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "IRF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "ORF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          }
+        }
+      },
+      "windows": {
+        "dev_fraction": 0.1,
+        "gap_windows": 99,
+        "classes": {
+          "HEA": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "MTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "RCF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "SWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "BWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "IRF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "ORF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          }
+        },
+        "dropped_gap_windows": 891
+      }
+    },
+    "PGB_Variable_speed_Experiment3": {
+      "samples": {
+        "aligned_with_window_split": true,
+        "dev_fraction": 0.1,
+        "sequence_length": 100,
+        "classes": {
+          "HEA": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "MTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "RCF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "SWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "BWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "IRF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "ORF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          }
+        }
+      },
+      "windows": {
+        "dev_fraction": 0.1,
+        "gap_windows": 99,
+        "classes": {
+          "HEA": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "MTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "RCF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "SWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "BWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "IRF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "ORF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          }
+        },
+        "dropped_gap_windows": 891
+      }
+    },
+    "PGB_Variable_speed_Experiment4": {
+      "samples": {
+        "aligned_with_window_split": true,
+        "dev_fraction": 0.1,
+        "sequence_length": 100,
+        "classes": {
+          "HEA": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "MTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "RCF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "SWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "BWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "IRF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "ORF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          }
+        }
+      },
+      "windows": {
+        "dev_fraction": 0.1,
+        "gap_windows": 99,
+        "classes": {
+          "HEA": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "MTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "RCF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "SWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "BWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "IRF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "ORF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          }
+        },
+        "dropped_gap_windows": 891
+      }
+    },
+    "PGB_Variable_speed_Experiment5": {
+      "samples": {
+        "aligned_with_window_split": true,
+        "dev_fraction": 0.1,
+        "sequence_length": 100,
+        "classes": {
+          "HEA": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "MTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "RCF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "SWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "BWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "IRF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "ORF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          }
+        }
+      },
+      "windows": {
+        "dev_fraction": 0.1,
+        "gap_windows": 99,
+        "classes": {
+          "HEA": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "MTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "RCF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "SWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "BWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "IRF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "ORF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          }
+        },
+        "dropped_gap_windows": 891
+      }
+    },
+    "PGB_Variable_speed_Experiment6": {
+      "samples": {
+        "aligned_with_window_split": true,
+        "dev_fraction": 0.1,
+        "sequence_length": 100,
+        "classes": {
+          "HEA": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "MTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "RCF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "SWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "BWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "IRF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "ORF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          }
+        }
+      },
+      "windows": {
+        "dev_fraction": 0.1,
+        "gap_windows": 99,
+        "classes": {
+          "HEA": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "MTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "RCF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "SWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "BWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "IRF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "ORF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          }
+        },
+        "dropped_gap_windows": 891
+      }
+    },
+    "PGB_Variable_speed_Experiment7": {
+      "samples": {
+        "aligned_with_window_split": true,
+        "dev_fraction": 0.1,
+        "sequence_length": 100,
+        "classes": {
+          "HEA": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "MTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "RCF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "SWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "BWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "IRF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "ORF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          }
+        }
+      },
+      "windows": {
+        "dev_fraction": 0.1,
+        "gap_windows": 99,
+        "classes": {
+          "HEA": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "MTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "RCF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "SWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "BWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "IRF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "ORF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          }
+        },
+        "dropped_gap_windows": 891
+      }
+    },
+    "PGB_Variable_speed_Experiment8": {
+      "samples": {
+        "aligned_with_window_split": true,
+        "dev_fraction": 0.1,
+        "sequence_length": 100,
+        "classes": {
+          "HEA": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "MTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "RCF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "SWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "BWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "IRF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "ORF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          }
+        }
+      },
+      "windows": {
+        "dev_fraction": 0.1,
+        "gap_windows": 99,
+        "classes": {
+          "HEA": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "MTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "RCF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "SWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "BWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "IRF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "ORF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          }
+        },
+        "dropped_gap_windows": 891
+      }
+    },
+    "PGB_Variable_speed_Experiment9": {
+      "samples": {
+        "aligned_with_window_split": true,
+        "dev_fraction": 0.1,
+        "sequence_length": 100,
+        "classes": {
+          "HEA": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "MTF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "RCF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "SWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "BWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "CWF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "IRF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          },
+          "ORF": {
+            "source_train_samples": 5000,
+            "source_train_windows": 4901,
+            "train_samples": 4411,
+            "validation_samples": 589,
+            "validation_start_sample": 4411
+          }
+        }
+      },
+      "windows": {
+        "dev_fraction": 0.1,
+        "gap_windows": 99,
+        "classes": {
+          "HEA": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "MTF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "RCF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "SWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "BWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "CWF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "IRF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          },
+          "ORF": {
+            "source_train_windows": 4901,
+            "train_windows": 4312,
+            "validation_windows": 490,
+            "dropped_gap_windows": 99
+          }
+        },
+        "dropped_gap_windows": 891
+      }
+    }
+  }
+}

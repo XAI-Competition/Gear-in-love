@@ -1,0 +1,121 @@
+{
+  "conditions": {
+    "PGB_20_0": {
+      "train_rows": 38808,
+      "validation_rows": 4410
+    },
+    "PGB_30_0": {
+      "train_rows": 38808,
+      "validation_rows": 4410
+    },
+    "PGB_30_1": {
+      "train_rows": 38808,
+      "validation_rows": 4410
+    },
+    "PGB_30_2": {
+      "train_rows": 38808,
+      "validation_rows": 4410
+    },
+    "PGB_30_3": {
+      "train_rows": 38808,
+      "validation_rows": 4410
+    },
+    "PGB_30_4": {
+      "train_rows": 38808,
+      "validation_rows": 4410
+    },
+    "PGB_30_5": {
+      "train_rows": 38808,
+      "validation_rows": 4410
+    },
+    "PGB_40_0": {
+      "train_rows": 38808,
+      "validation_rows": 4410
+    },
+    "PGB_50_0": {
+      "train_rows": 38808,
+      "validation_rows": 4410
+    },
+    "PGB_Variable_speed_Experiment1": {
+      "train_rows": 38808,
+      "validation_rows": 4410
+    },
+    "PGB_Variable_speed_Experiment10": {
+      "train_rows": 38808,
+      "validation_rows": 4410
+    },
+    "PGB_Variable_speed_Experiment2": {
+      "train_rows": 38808,
+      "validation_rows": 4410
+    },
+    "PGB_Variable_speed_Experiment3": {
+      "train_rows": 38808,
+      "validation_rows": 4410
+    },
+    "PGB_Variable_speed_Experiment4": {
+      "train_rows": 38808,
+      "validation_rows": 4410
+    },
+    "PGB_Variable_speed_Experiment5": {
+      "train_rows": 38808,
+      "validation_rows": 4410
+    },
+    "PGB_Variable_speed_Experiment6": {
+      "train_rows": 38808,
+      "validation_rows": 4410
+    },
+    "PGB_Variable_speed_Experiment7": {
+      "train_rows": 38808,
+      "validation_rows": 4410
+    },
+    "PGB_Variable_speed_Experiment8": {
+      "train_rows": 38808,
+      "validation_rows": 4410
+    },
+    "PGB_Variable_speed_Experiment9": {
+      "train_rows": 38808,
+      "validation_rows": 4410
+    }
+  },
+  "counts": {
+    "train": 737352,
+    "validation": 83790
+  },
+  "exact_window_hash_intersections": {
+    "train_validation": 0
+  },
+  "format": "[N, 8, 100]",
+  "hash_algorithm": "blake2b-128 over float32 channels-first windows",
+  "hidden_leaderboard_split": "not included",
+  "label_counts": {
+    "train": {
+      "0": 81928,
+      "1": 81928,
+      "2": 81928,
+      "3": 81928,
+      "4": 81928,
+      "5": 81928,
+      "6": 81928,
+      "7": 81928,
+      "8": 81928
+    },
+    "validation": {
+      "0": 9310,
+      "1": 9310,
+      "2": 9310,
+      "3": 9310,
+      "4": 9310,
+      "5": 9310,
+      "6": 9310,
+      "7": 9310,
+      "8": 9310
+    }
+  },
+  "output_dir": "data\\prepared",
+  "public_splits": [
+    "train",
+    "validation"
+  ],
+  "split_integrity_verified": true,
+  "windows_dir": "data\\hf_snapshot\\data\\windows_100"
+}

@@ -1,0 +1,73 @@
+{
+  "mode": "out",
+  "temperature": 2.0,
+  "onnx_path": "runs\\temp_exp026\\out_T2\\model.onnx",
+  "self_check": {
+    "devkit_validation": {
+      "valid": true,
+      "samples": 8,
+      "input_name": "windows",
+      "probability_output": "probabilities",
+      "relevance_output": "relevance",
+      "load_seconds": 0.006741000004694797,
+      "inference_seconds": 0.0008305999945150688,
+      "probability_sum_min": 0.9999998807907104,
+      "probability_sum_max": 1.0,
+      "relevance_min": 0.00017949927132576704,
+      "relevance_max": 3.495450496673584
+    },
+    "prob_shape": [
+      8,
+      9
+    ],
+    "relevance_shape": [
+      8,
+      8,
+      100
+    ],
+    "prob_row_sum_range": [
+      0.9999998807907104,
+      1.0
+    ],
+    "relevance_min": 0.00017949927132576704,
+    "max_abs_prob_diff_vs_torch": 1.043081283569336e-06,
+    "max_abs_relevance_diff_vs_torch": 3.5762786865234375e-06
+  },
+  "metrics": {
+    "n": 5000,
+    "macro_f1": 0.9881642009979691,
+    "faith": 0.783031664788723,
+    "deletion_auc": 0.21888946890830996,
+    "insertion_auc": 0.7849527984857559,
+    "simplicity": 0.927986233049643,
+    "operator_count": 34,
+    "parameter_count": 40419,
+    "eligible": true,
+    "deletion_curve": [
+      0.9905485510826111,
+      0.4854283630847931,
+      0.2900354266166687,
+      0.18489809334278107,
+      0.13286776840686798,
+      0.11357923597097397,
+      0.1085374504327774,
+      0.10497132688760757,
+      0.10732745379209518,
+      0.10927285254001617,
+      0.11340485513210297
+    ],
+    "insertion_curve": [
+      0.11340485513210297,
+      0.38431668281555176,
+      0.5356265902519226,
+      0.7106320261955261,
+      0.8576683402061462,
+      0.9171687364578247,
+      0.9486209154129028,
+      0.9695989489555359,
+      0.9843360185623169,
+      0.9895831346511841,
+      0.9905485510826111
+    ]
+  }
+}

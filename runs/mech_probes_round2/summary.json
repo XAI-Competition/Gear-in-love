@@ -1,0 +1,169 @@
+{
+  "checkpoint": "runs\\exp029_final\\model.pt",
+  "eval_n": 3000,
+  "seed": 50050,
+  "variants": {
+    "occ_a1_eps0p2_T8": {
+      "variant": {
+        "name": "occ_a1_eps0p2_T8",
+        "alpha": 1.0,
+        "eps": 0.2,
+        "static_gate": false,
+        "temperature": 8.0
+      },
+      "onnx_path": "runs\\mech_probes_round2\\occ_a1_eps0p2_T8\\model.onnx",
+      "self_check": {
+        "devkit_validation": {
+          "valid": true,
+          "samples": 8,
+          "input_name": "windows",
+          "probability_output": "probabilities",
+          "relevance_output": "relevance",
+          "load_seconds": 0.03100240000640042,
+          "inference_seconds": 0.0029322999907890335,
+          "probability_sum_min": 1.0,
+          "probability_sum_max": 1.0,
+          "relevance_min": 7.32370381228975e-06,
+          "relevance_max": 13.37224006652832
+        },
+        "prob_shape": [
+          8,
+          9
+        ],
+        "relevance_shape": [
+          8,
+          8,
+          100
+        ],
+        "prob_row_sum_range": [
+          1.0,
+          1.0
+        ],
+        "relevance_min": 7.32370381228975e-06,
+        "max_abs_prob_diff_vs_torch": 4.163336342344337e-17,
+        "max_abs_relevance_diff_vs_torch": 2.384185791015625e-05
+      },
+      "public_metrics": {
+        "n": 3000,
+        "macro_f1": 0.9863983960863953,
+        "faith": 0.8729091085493564,
+        "deletion_auc": 0.17067222446203234,
+        "insertion_auc": 0.9164904415607452,
+        "simplicity": 0.9084745982680427,
+        "operator_count": 57,
+        "parameter_count": 40506,
+        "eligible": true,
+        "mechanical": null,
+        "expected_band_mass": null,
+        "deletion_curve": [
+          0.9984258413314819,
+          0.31489041447639465,
+          0.1601225733757019,
+          0.10165901482105255,
+          0.08161788433790207,
+          0.08199591189622879,
+          0.09436137974262238,
+          0.10750312358140945,
+          0.10999304056167603,
+          0.10059988498687744,
+          0.10953224450349808
+        ],
+        "insertion_curve": [
+          0.10953224450349808,
+          0.8092612028121948,
+          0.8982056379318237,
+          0.9548250436782837,
+          0.9805730581283569,
+          0.988744854927063,
+          0.993825376033783,
+          0.9932085871696472,
+          0.9948920011520386,
+          0.9973896741867065,
+          0.9984258413314819
+        ]
+      },
+      "proxy_metrics": {}
+    },
+    "occ_a0p5_eps0p05_exp023_T8": {
+      "variant": {
+        "name": "occ_a0p5_eps0p05_exp023_T8",
+        "alpha": 0.5,
+        "eps": 0.05,
+        "static_gate": true,
+        "temperature": 8.0
+      },
+      "onnx_path": "runs\\mech_probes_round2\\occ_a0p5_eps0p05_exp023_T8\\model.onnx",
+      "self_check": {
+        "devkit_validation": {
+          "valid": true,
+          "samples": 8,
+          "input_name": "windows",
+          "probability_output": "probabilities",
+          "relevance_output": "relevance",
+          "load_seconds": 0.011813699995400384,
+          "inference_seconds": 0.0032306000066455454,
+          "probability_sum_min": 1.0,
+          "probability_sum_max": 1.0,
+          "relevance_min": 9.199116902891546e-06,
+          "relevance_max": 11.681783676147461
+        },
+        "prob_shape": [
+          8,
+          9
+        ],
+        "relevance_shape": [
+          8,
+          8,
+          100
+        ],
+        "prob_row_sum_range": [
+          1.0,
+          1.0
+        ],
+        "relevance_min": 9.199116902891546e-06,
+        "max_abs_prob_diff_vs_torch": 4.163336342344337e-17,
+        "max_abs_relevance_diff_vs_torch": 1.9073486328125e-05
+      },
+      "public_metrics": {
+        "n": 3000,
+        "macro_f1": 0.9863983960863953,
+        "faith": 0.8657343491911889,
+        "deletion_auc": 0.17024633884429932,
+        "insertion_auc": 0.9017150372266769,
+        "simplicity": 0.9084745982680427,
+        "operator_count": 57,
+        "parameter_count": 40506,
+        "eligible": true,
+        "mechanical": null,
+        "expected_band_mass": null,
+        "deletion_curve": [
+          0.9984258413314819,
+          0.37565386295318604,
+          0.14273948967456818,
+          0.09102968126535416,
+          0.07975882291793823,
+          0.08215831965208054,
+          0.08726414293050766,
+          0.089386485517025,
+          0.10223747789859772,
+          0.09825607389211655,
+          0.10953224450349808
+        ],
+        "insertion_curve": [
+          0.10953224450349808,
+          0.6862935423851013,
+          0.8676956295967102,
+          0.9557425379753113,
+          0.9810102581977844,
+          0.9907093644142151,
+          0.9939789175987244,
+          0.9945651888847351,
+          0.9953780174255371,
+          0.9977978467941284,
+          0.9984258413314819
+        ]
+      },
+      "proxy_metrics": {}
+    }
+  }
+}

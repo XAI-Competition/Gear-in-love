@@ -1,0 +1,194 @@
+{
+  "description": "dynamic focused low-frequency gates: BWF 1.4, CWF 3, ORF 3.8, other channels 0.6",
+  "implementation": "direct",
+  "onnx_path": "runs\\mech_gate_exp022_focus_cont\\lowfreq_focus_b1p4_c3_o3p8_other0p6\\model.onnx",
+  "parameters": 39689,
+  "gates": [
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.399999976158142,
+      0.6000000238418579,
+      0.6000000238418579,
+      0.6000000238418579,
+      0.6000000238418579,
+      0.6000000238418579,
+      0.6000000238418579,
+      0.6000000238418579
+    ],
+    [
+      3.0,
+      0.6000000238418579,
+      0.6000000238418579,
+      0.6000000238418579,
+      0.6000000238418579,
+      0.6000000238418579,
+      0.6000000238418579,
+      0.6000000238418579
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      3.799999952316284,
+      0.6000000238418579,
+      0.6000000238418579,
+      0.6000000238418579,
+      0.6000000238418579,
+      0.6000000238418579,
+      0.6000000238418579,
+      0.6000000238418579
+    ]
+  ],
+  "self_check": {
+    "devkit_validation": {
+      "valid": true,
+      "samples": 8,
+      "input_name": "windows",
+      "probability_output": "probabilities",
+      "relevance_output": "relevance",
+      "load_seconds": 0.008452499998384155,
+      "inference_seconds": 0.002740399999311194,
+      "probability_sum_min": 0.9999998211860657,
+      "probability_sum_max": 1.0,
+      "relevance_min": 0.001318716793321073,
+      "relevance_max": 19.656713485717773
+    },
+    "prob_shape": [
+      8,
+      9
+    ],
+    "relevance_shape": [
+      8,
+      8,
+      100
+    ],
+    "prob_row_sum_range": [
+      0.9999998211860657,
+      1.0
+    ],
+    "relevance_min": 0.001318716793321073
+  },
+  "public_metrics": {
+    "n": 5000,
+    "macro_f1": 0.9891530016579669,
+    "faith": 0.7512702029198408,
+    "deletion_auc": 0.20606106296181678,
+    "insertion_auc": 0.7086014688014983,
+    "simplicity": 0.9220046544939587,
+    "operator_count": 41,
+    "parameter_count": 40409,
+    "eligible": true,
+    "mechanical": null,
+    "expected_band_mass": null
+  },
+  "proxy_metrics": {
+    "audit_peaks": {
+      "n": 5000,
+      "macro_f1": 0.9891530016579669,
+      "faith": 0.7512702029198408,
+      "deletion_auc": 0.20606106296181678,
+      "insertion_auc": 0.7086014688014983,
+      "simplicity": 0.9220046544939587,
+      "operator_count": 41,
+      "parameter_count": 40409,
+      "eligible": true,
+      "mechanical": 0.4406934301331007,
+      "expected_band_mass": 0.2550465551228902
+    },
+    "audit_peaks_broad": {
+      "n": 5000,
+      "macro_f1": 0.9891530016579669,
+      "faith": 0.7512702029198408,
+      "deletion_auc": 0.20606106296181678,
+      "insertion_auc": 0.7086014688014983,
+      "simplicity": 0.9220046544939587,
+      "operator_count": 41,
+      "parameter_count": 40409,
+      "eligible": true,
+      "mechanical": 0.4509789136116221,
+      "expected_band_mass": 0.26874902569031883
+    },
+    "low_frequency": {
+      "n": 5000,
+      "macro_f1": 0.9891530016579669,
+      "faith": 0.7512702029198408,
+      "deletion_auc": 0.20606106296181678,
+      "insertion_auc": 0.7086014688014983,
+      "simplicity": 0.9220046544939587,
+      "operator_count": 41,
+      "parameter_count": 40409,
+      "eligible": true,
+      "mechanical": 0.6288113740866326,
+      "expected_band_mass": 0.5063844505814691
+    },
+    "high_mid": {
+      "n": 5000,
+      "macro_f1": 0.9891530016579669,
+      "faith": 0.7512702029198408,
+      "deletion_auc": 0.20606106296181678,
+      "insertion_auc": 0.7086014688014983,
+      "simplicity": 0.9220046544939587,
+      "operator_count": 41,
+      "parameter_count": 40409,
+      "eligible": true,
+      "mechanical": 0.3410687048747735,
+      "expected_band_mass": 0.12171443960931155
+    }
+  }
+}

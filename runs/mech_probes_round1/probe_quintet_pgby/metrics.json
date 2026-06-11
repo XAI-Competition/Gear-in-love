@@ -1,0 +1,73 @@
+{
+  "classes": [
+    "CTF",
+    "MTF",
+    "RCF",
+    "SWF",
+    "IRF"
+  ],
+  "channel": "pgb_y",
+  "onnx_path": "runs\\mech_probes_round1\\probe_quintet_pgby\\model.onnx",
+  "self_check": {
+    "devkit_validation": {
+      "valid": true,
+      "samples": 8,
+      "input_name": "windows",
+      "probability_output": "probabilities",
+      "relevance_output": "relevance",
+      "load_seconds": 0.012297500012209639,
+      "inference_seconds": 0.0039806999993743375,
+      "probability_sum_min": 1.0,
+      "probability_sum_max": 1.0,
+      "relevance_min": 5.305009381117998e-06,
+      "relevance_max": 16.91767692565918
+    },
+    "prob_shape": [
+      8,
+      9
+    ],
+    "relevance_shape": [
+      8,
+      8,
+      100
+    ],
+    "prob_row_sum_range": [
+      1.0,
+      1.0
+    ],
+    "relevance_min": 5.305009381117998e-06,
+    "max_abs_prob_diff_vs_torch": 2.005085804828539e-21,
+    "max_abs_relevance_diff_vs_torch": 1.811981201171875e-05
+  },
+  "public_metrics": {
+    "n": 3000,
+    "macro_f1": 0.9881528979415022,
+    "faith": 0.8116969119757413,
+    "deletion_auc": 0.18518723025918005,
+    "insertion_auc": 0.8085810542106628,
+    "simplicity": 0.9084745982680427,
+    "operator_count": 57,
+    "parameter_count": 40506,
+    "eligible": true,
+    "mechanical": null,
+    "expected_band_mass": null
+  },
+  "proxy_metrics": {
+    "audit_peaks": {
+      "mechanical": 0.45017166528490477,
+      "expected_band_mass": 0.2677643540360918
+    },
+    "audit_peaks_broad": {
+      "mechanical": 0.46063631193449,
+      "expected_band_mass": 0.2817076570001911
+    },
+    "low_frequency": {
+      "mechanical": 0.6203062575368427,
+      "expected_band_mass": 0.4949286980270756
+    },
+    "high_mid": {
+      "mechanical": 0.34353180326047844,
+      "expected_band_mass": 0.12506870298068457
+    }
+  }
+}
