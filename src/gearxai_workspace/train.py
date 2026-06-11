@@ -53,6 +53,23 @@ class TrainConfig:
     # training (channel dropout). Tests whether forcing the classifier off any
     # single channel further improves faithfulness (orthogonal to time masking).
     channel_drop_prob: float = 0.0
+    # exp-029: insertion-curriculum augmentation. Replaces this fraction of each
+    # batch with "top-q relevance cells only" inputs (q ~ U[q_min, q_max], cells
+    # ranked by the model's own current relevance on the clean window) and trains
+    # cross-entropy on them. This is the insertion half of the faithfulness
+    # protocol turned into a training distribution: the classifier learns to
+    # recover the argmax from exactly the cells its relevance map ranks highest.
+    # 0 disables.
+    insertion_frac: float = 0.0
+    insertion_q_min: float = 0.05
+    insertion_q_max: float = 0.5
+    # exp-029: deletion anti-objective. On "top-d relevance cells deleted" inputs
+    # (d ~ U[d_min, d_max]) adds weight * negative-entropy of the prediction, i.e.
+    # maximizes uncertainty once the cells the relevance map flags are gone — the
+    # deletion half of the protocol. 0 disables.
+    deletion_entropy_weight: float = 0.0
+    deletion_d_min: float = 0.1
+    deletion_d_max: float = 0.4
     # Speed-robustness augmentation: resample each window with a slight random
     # time scale and interpolate back to length 100. This targets variable-speed
     # failures more directly than oversampling variable-speed rows.
@@ -191,6 +208,22 @@ def random_time_warp(windows: torch.Tensor, std: float) -> torch.Tensor:
 
 
 @torch.no_grad()
+def relevance_cell_ranks(model: GearXAINet, windows: torch.Tensor) -> torch.Tensor:
+    """Per-cell relevance ranks ``[N, 800]`` (0 = most relevant) from the model's
+    own current relevance map, computed in eval mode on the clean windows — the
+    same ranking family the deployed faithfulness protocol masks by."""
+
+    was_training = model.training
+    model.eval()
+    _, relevance = model(windows)
+    if was_training:
+        model.train()
+    flat = relevance.flatten(1)
+    # Double argsort: position of each cell in the descending-relevance order.
+    return flat.argsort(dim=1, descending=True).argsort(dim=1)
+
+
+@torch.no_grad()
 def evaluate(model: GearXAINet, x: torch.Tensor, y: np.ndarray, batch_size: int) -> float:
     """Evaluate macro-F1; ``x`` is expected to already live on the model's device."""
 
@@ -249,7 +282,8 @@ def train_baseline(config: TrainConfig) -> dict:
         start_time = time.perf_counter()
         for start in range(0, n, config.batch_size):
             idx = perm[start : start + config.batch_size]
-            xb, yb = x_train[idx], y_train[idx]
+            xb_clean, yb = x_train[idx], y_train[idx]
+            xb = xb_clean
             if config.time_warp_std > 0:
                 xb = random_time_warp(xb, config.time_warp_std)
             if config.noise_std > 0:
@@ -268,6 +302,20 @@ def train_baseline(config: TrainConfig) -> dict:
                     >= config.channel_drop_prob
                 ).float()
                 xb = xb * keep_ch
+
+            curriculum = config.insertion_frac > 0 or config.deletion_entropy_weight > 0
+            ranks = relevance_cell_ranks(model, xb_clean) if curriculum else None
+            if config.insertion_frac > 0:
+                b, num_ch, length = xb_clean.shape
+                q = config.insertion_q_min + (
+                    config.insertion_q_max - config.insertion_q_min
+                ) * torch.rand(b, 1, device=xb.device)
+                keep_top = (ranks < q * ranks.shape[1]).float().view(b, num_ch, length)
+                sel = (
+                    (torch.rand(b, device=xb.device) < config.insertion_frac).float().view(b, 1, 1)
+                )
+                # Insertion-protocol analog: clean cells on a zero baseline.
+                xb = sel * (xb_clean * keep_top) + (1.0 - sel) * xb
             optimizer.zero_grad(set_to_none=True)
             use_relevance = config.relevance_weight > 0 or config.occlusion_weight > 0
             if use_relevance:
@@ -287,6 +335,22 @@ def train_baseline(config: TrainConfig) -> dict:
                     )
             else:
                 loss = criterion(model.classify(xb), yb)
+            if config.deletion_entropy_weight > 0:
+                b, num_ch, length = xb_clean.shape
+                d = config.deletion_d_min + (
+                    config.deletion_d_max - config.deletion_d_min
+                ) * torch.rand(b, 1, device=xb.device)
+                keep_rest = (ranks >= d * ranks.shape[1]).float().view(b, num_ch, length)
+                # Deletion-protocol analog: top cells gone -> maximize entropy.
+                # Forward in eval mode: gradients still flow, but the heavily
+                # masked anti-objective inputs must not pollute the BatchNorm
+                # running statistics (exp-030 first round crashed val F1 to 0.83
+                # exactly through that pollution).
+                model.eval()
+                log_probs = torch.log_softmax(model.classify(xb_clean * keep_rest), dim=1)
+                model.train()
+                negative_entropy = (log_probs.exp() * log_probs).sum(dim=1).mean()
+                loss = loss + config.deletion_entropy_weight * negative_entropy
             loss.backward()
             optimizer.step()
             running += loss.item() * len(idx)

@@ -101,6 +101,28 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     parser.add_argument(
+        "--insertion-frac",
+        type=float,
+        default=0.0,
+        help=(
+            "exp-029: fraction of each batch replaced by top-q-relevance-cells-only "
+            "inputs (insertion-curriculum; 0 disables)"
+        ),
+    )
+    parser.add_argument("--insertion-q-min", type=float, default=0.05)
+    parser.add_argument("--insertion-q-max", type=float, default=0.5)
+    parser.add_argument(
+        "--deletion-entropy-weight",
+        type=float,
+        default=0.0,
+        help=(
+            "exp-029: weight of the negative-entropy loss on top-d-relevance-deleted "
+            "inputs (deletion anti-objective; 0 disables)"
+        ),
+    )
+    parser.add_argument("--deletion-d-min", type=float, default=0.1)
+    parser.add_argument("--deletion-d-max", type=float, default=0.4)
+    parser.add_argument(
         "--time-warp-std",
         type=float,
         default=0.0,
@@ -130,6 +152,12 @@ def main() -> int:
         occlusion_weight=args.occlusion_weight,
         noise_std=args.noise_std,
         time_mask_frac=args.time_mask_frac,
+        insertion_frac=args.insertion_frac,
+        insertion_q_min=args.insertion_q_min,
+        insertion_q_max=args.insertion_q_max,
+        deletion_entropy_weight=args.deletion_entropy_weight,
+        deletion_d_min=args.deletion_d_min,
+        deletion_d_max=args.deletion_d_max,
         time_warp_std=args.time_warp_std,
     )
 
@@ -169,6 +197,10 @@ def main() -> int:
             "occlusion_weight": config.occlusion_weight,
             "noise_std": config.noise_std,
             "time_mask_frac": config.time_mask_frac,
+            "insertion_frac": config.insertion_frac,
+            "insertion_q": [config.insertion_q_min, config.insertion_q_max],
+            "deletion_entropy_weight": config.deletion_entropy_weight,
+            "deletion_d": [config.deletion_d_min, config.deletion_d_max],
             "time_warp_std": config.time_warp_std,
             "channel_attention": config.model.channel_attention,
         },

@@ -24,7 +24,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--model-a", required=True, type=Path)
     parser.add_argument("--model-b", type=Path)
     parser.add_argument("--label-a", default="final2")
-    parser.add_argument("--label-b", default="mechanical_prior")
+    parser.add_argument("--label-b", default="candidate")
     parser.add_argument("--data-dir", default="data/prepared", type=Path)
     parser.add_argument("--out-dir", required=True, type=Path)
     parser.add_argument("--num-correct", type=int, default=3)
