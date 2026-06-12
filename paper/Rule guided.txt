@@ -1,0 +1,1803 @@
+Rule guided transformers for dynamic knowledge adaptation in rotating machinery fault diagnosis
+
+Eduard Hogea a c
+, 
+Darian M. Onchis a
+, 
+Ruqiang Yan b
+, 
+Zheng Zhou b
+
+Show more
+
+Download full issue
+
+Cite
+
+Add to Mendeley
+
+Share
+10.1016/j.aei.2026.104444
+Rule guided transformers for dynamic knowledge adaptation in rotating machinery fault diagnosis
+
+Download full issue
+Article
+Recommended articles
+Metrics
+Outline
+Highlights
+Abstract
+Graphical abstract
+Keywords
+1. Introduction
+2. Related work
+3. Methodology
+4. Experimental evaluation
+5. Explainability discussion
+6. Conclusion
+CRediT authorship contribution statement
+Declaration of competing interest
+Acknowledgements
+Appendix A. Ideal model size search
+Appendix B. Results on SpectraSimulator
+Data availability
+References
+
+Show full outline
+Figures (12)
+Unlabelled figure
+Fig. 1. End-to-end framework. Time-series windows are patched and embedded and a [CLS] token is prepended. A compact Transformer encodes the tokens and an MLP head is used to output class probabilities. Only ...
+Fig. 2. Choosing the number of sub-clusters k∈{2,3,4,5,9,10,20}. (A) Mean within-class silhouette across classes as a function of k (blue, left axis); the blue band in the background shows the interquartile r...
+Unlabelled figure
+(a). 20Hz, 0N m.
+(b). 30Hz, 1N m.
+
+Show 6 more figures
+Tables (15)
+Table 1. Ablation of number of clusters k: differences in macro F1 relative the k value for the clustering logic.
+Table 2. Study on similarity-merge threshold. Best value for k=3 was kept in this search.
+Table 3. Computational complexity and latency. Averaged from 1000 inferences.
+Table 4. DDS fault classes and abbreviations.
+Table 5. UoC fault classes and abbreviations.
+Table 6. Model and training hyperparameters.
+
+Show 9 more tables
+Highlights
+•
+Hybrid 1D Transformer + Logic Tensor Networks for gearbox fault diagnosis.
+•
+Dynamic rule induction (merge/prune) from embeddings for self-supervision.
+•
+DDS: 94.01% avg accuracy vs. 88.20% LogicLSTM; UoC macro-F1 = 0.939.
+•
+Explanations: rule-classifier consistency and rollout-rule alignment; ECE 0.0103.
+•
+No inference-time overhead vs. baseline Transformer; rule scores enable trust.
+Abstract
+Accurate fault classification in rotating machinery under changing speeds and loads is a critical challenge in industrial predictive maintenance, where vibration signatures shift across operating regimes and black-box decisions are difficult to trust. This paper presents a hybrid architecture that combines Transformers with Logic Tensor Networks (LTNs), used here as the neuro-symbolic learning framework because they ground first-order rules into differentiable satisfiability terms optimized directly in the training objective, for fault diagnosis on two public benchmarks: the Drivetrain Dynamics Simulator (DDS) (multiple speed/load regimes) and the University of Connecticut (UoC) gear-fault dataset. A compact 1-D Transformer encodes raw vibration windows, and an LTN layer imposes soft first-order constraints during training. We introduce a dynamic rule module that induces, merges, and prunes centroid-based similarity rules as the embedding geometry evolves, enabling the constraint set to adapt to within-class variability. Unlike prior LTN-based approaches such as LogicLSTM, which reweight a fixed rule set, our rules are induced and updated dynamically during training.
+Experiments show improvements over strong neural and neuro-symbolic baselines on DDS (average accuracy 94.01% vs 88.20%), and gains over a strong Transformer baseline on UoC (macro F1 0.939). Beyond accuracy, the induced rules provide compact, queryable explanations by identifying prototypical vibration-window patterns that support a prediction. Confidence calibration improves versus baselines under the same evaluation protocol. Because LTN supervision acts only during training, inference latency matches the base Transformer. The results support neuro-symbolic fusion as a practical path to accurate and explainable fault diagnosis under varying operating conditions.
+Graphical abstract
+Graphical abstract Image 1
+Download: Download high-res image (155KB)
+Download: Download full-size image
+Keywords
+Rotating machinery; Fault diagnosis; Neuro-symbolic learning; Logic tensor networks; Transformers; Dynamic rule induction; Explainable AI; Vibration signals
+Previous article in this issue
+Next article in this issue
+1. Introduction
+Rotating machinery is widespread in industrial systems, and effective fault diagnosis is crucial for safety, reliability, and cost reduction [1], [2]. Traditionally, fault detection relied on vibration-signal analysis and expert knowledge [3]. Techniques such as spectral analysis, envelope detection, and wavelet transforms have been used to identify characteristic fault frequencies in bearings and gears [4], [5]. Early systems employed rule-based reasoning or fuzzy logic to encode diagnostic expertise [6], but these approaches suffered from scalability issues typical of the expert-systems era. Classical supervised learning techniques such as support-vector machines and shallow neural networks, were later applied to vibration features, yet still required significant manual feature extraction and did not scale well to complex or high-dimensional data [7], [8]. In recent decades, motivated by the limitations of earlier methods and by increased computational power and data availability, research has shifted to data-driven deep learning approaches that have substantially improved rotating machinery fault diagnosis [9], [10].
+The rise of deep learning enabled end-to-end fault diagnosis directly from raw signals. Convolutional neural networks (CNNs) and autoencoders automatically learn discriminative features from vibration time series, outperforming models with manual feature engineering [11], [12], [13]. Researchers have applied deep CNNs [14], deep belief networks, and recurrent models to bearing and gearbox datasets with high accuracy [9]. These deep models capture complex patterns and have been extended to handle variable speeds and loads via data augmentation and domain adaptation [15], [16], [17]. Surveys affirm to the transformative impact of deep learning on fault diagnosis [18], [19], [20]. However, purely data-driven models act largely as black boxes and cannot easily incorporate prior engineering knowledge or reasoning about fault conditions [21]. This lack of interpretability and limited robustness under changing operating conditions motivates exploring hybrid intelligent systems [22], [23]. In safety–critical industrial applications, the inability to explain a model’s predictions undermines user trust and hinders adoption [24]. Moreover, models trained on data from a single machine or operating regime often fail to generalize when faced with new speeds, loads, or fault types without extensive retraining [25].
+One practical reason is that vibration patterns reflect how the fault excites the machine. The measured signal is typically a mix of characteristic frequency components (such as shaft and gear-mesh-related content and their sidebands) and short defect impacts that excite structural resonance. When speed and load change, these components shift in frequency and relative energy, so the same fault can appear in multiple, physically plausible ways across operating regimes.
+This highlights a concrete research gap. Many methods address operating-condition variability either by relying on model capacity and training protocol, or by injecting fixed priors (such as predefined rule sets or static constraints). Yet fixed knowledge cannot be updated when the data reveal new within-class regimes or when previously learned patterns become less relevant: it may regularize confidence, but it cannot revise the content of the constraints to track evolving fault signatures. These challenges have raised interest in combining data-driven learning with expert knowledge to enhance interpretability and adaptability [26].
+Neuro-symbolic learning offers a compelling approach by integrating statistical learning with symbolic reasoning [27]. In the context of fault diagnosis, a neuro-symbolic framework can learn from raw sensor data while enforcing logical constraints derived from domain expertise (e.g., known causal relations or failure rules), potentially improving accuracy under limited or noisy data and providing explanations for model decisions [28], [29], [30], [31]. However, many neuro-symbolic diagnosis systems still assume a rule base specified a priori and kept fixed during training, which limits their ability to reflect regime-driven variability within a fault class.
+The approach presented in this paper follows this paradigm. We propose a hybrid model that combines a Transformer-based neural network [32] with Logic Tensor Networks (LTNs) [22], [23] to perform fault classification in rotating machinery. The Transformer component handles low-level feature extraction from time-series signals, taking advantage of self-attention to capture long-range dependencies in vibration data [32]. On top of this, the LTN component injects high-level reasoning by encoding domain-specific logical rules (e.g., relationships between observed symptoms and fault modes) into the learning process. We do not treat the symbolic knowledge as static: we introduce a training-time dynamic rule module that induces, merges, and prunes prototype-grounded similarity rules as the embedding geometry evolves, so that the constraint set adapts to the regime structure discovered in the vibration data. This makes our model to learn a data-driven representation of machine condition and simultaneously reasons about faults in a human-understandable way.
+This work makes the following contributions:
+•
+Hybrid Transformer–LTN diagnosis model: a compact 1-D Transformer guided by LTN supervision during training, with no inference-time overhead compared to the base Transformer.
+•
+Dynamic knowledge adaptation: a rule-induction and maintenance mechanism (merge/prune) that maintains a low-cardinality set of prototype-grounded similarity implications, enabling the constraint set to adapt under operating-condition variability.
+•
+Mechanically grounded link: an interpretable connection between induced prototypes and recurring vibration regimes, consistent with classical fault mechanisms.
+•
+Comprehensive evaluation and diagnostics: experiments on DDS and UoC, including accuracy/macro-F1, confidence calibration (ECE), and rule-linked explanation diagnostics that quantify when predictions are supported by the learned rule base.
+The remainder of this paper reviews related work in data-driven fault diagnosis, neuro-symbolic AI, and information fusion methods, positioning our method within the state of the art and validating it on two benchmarks: the Drivetrain Dynamics Simulator (DDS) [33] and the University of Connecticut (UoC) gear fault datasets [34].
+2. Related work
+Recent hybrid methods in fault diagnosis have begun to explore this neuro-symbolic direction, but they typically rely on a fixed rule base that remains static during training. For example, LogicLSTM [33] augments an LSTM classifier with logical constraints, and convolutional neuro-fuzzy networks [35] embed expert fuzzy rules into a deep model. Similar designs include the Bayesian-Rule CNN [36] and the Self-Explainable TCN [37], both encode prior knowledge through immutable clauses whose truth values are merely reweighted. Empirical studies consistently report that such static knowledge bases generalize poorly when machines operate under unseen speeds, loads, or evolving fault signatures [24], [25], [38]. Deep Expert Network as well uses fixed signal-processing and logical-operator nodes to ensure interpretability [24]; however, its semantic structure is likewise frozen a priori.
+LogicLSTM provides a concrete example of the limitations of static knowledge infusion. It includes an attention-style mechanism that highlights important features, yet its rule base is limited to the per-sample label-consistency axiom
+(1)
+∀
+x
+∈
+D
+:
+P
+y
+(
+x
+)
+(
+x
+)
+∧
+⋀
+k
+≠
+y
+(
+x
+)
+¬
+P
+k
+(
+x
+)
+,
+where 
+x
+ denotes a vibration segment, 
+y
+(
+x
+)
+∈
+{
+1
+,
+…
+,
+K
+}
+ is its ground-truth fault class, and 
+P
+k
+(
+x
+)
+∈
+[
+0
+,
+1
+]
+ is the fuzzy predicate “
+x
+ belongs to class 
+k
+”. This clause simply enforces that each training sample satisfies its own label while negating all others. Although LogicLSTM can adjust the confidence of this constraint via a soft-logic framework, it cannot induce new rules: it fails to capture multi-modal structure within a class or to adapt when fault patterns drift over time [38].
+We address these limitations by introducing a dynamic, training-time rule-generation mechanism combined with a generalized similarity rule which serves as a form of self-supervised regularization. In our framework, the knowledge base is no longer static: new logical constraints are added, merged, or removed on-the-fly as the latent feature space evolves, echoing the evolving-rule philosophy of Shah and Wang [39]. For instance, if the Transformer uncovers a new cluster of abnormal vibration patterns, the system can automatically formulate a rule to represent that emergent fault signature. In contrast, if certain fault signatures converge or become obsolete under different operating conditions, the corresponding rules are pruned.
+Existing research on intelligent fault diagnosis in rotating machinery spans advanced deep learning architectures and neuro-symbolic techniques. Key strands include: (i) Transformer-based time-series models, (ii) hybrid CNN-and-Transformer architectures enriched with external knowledge, (iii) neuro-symbolic and other hybrid AI paradigms that inject symbolic structure into learning, (iv) transfer learning and domain/test-time adaptation methods for cross-condition diagnosis under distribution shift, and (v) graph and information-fusion frameworks that model multi-sensor or multi-view relationships in the data, often under label scarcity and varying operating conditions. A common practical driver across these strands is operating-condition variability: changes in speed and load shift characteristic harmonics, modulation sidebands, and impact patterns, so that a single fault class can manifest as multiple physically plausible regimes. Such regime variability is often seen in manufacturing assets due to changing duty cycles, production recipes, and maintenance states, so a proper diagnosis model has to remain reliable even when the same fault expresses differently across operating points.
+Transformer variants have become state of the art for vibration-signal analysis, capturing long-range temporal patterns that CNN/LSTM backbones miss. Time-Series Transformer (TST) outperforms CNN/LSTM on bearing benchmarks [32]; subsequent CNN–Transformer hybrids improve robustness to variable loads [40], [41]. Very compact self-attention designs such as Synthesizer [42], Diagnosisformer [41], Siamese Transformers for few-shot scenarios [43], and knowledge-enhanced variants that inject physical priors or graph relationships [44], [45] further demonstrate the architecture’s flexibility. These models, however, are predominantly data-driven. Robustness under regime changes is typically achieved through representation capacity and training protocol, rather than through explicit constraints whose content can be revised as vibration signatures evolve.
+Beyond raw attention, several works couple Transformers with explicit knowledge sources to boost interpretability and adaptability. Transparent Information Fusion Networks fuse multi-sensor features with self-organizing neuro-symbolic nodes [46], while large language model frameworks textualise vibration segments so reasoning can be carried out in natural language space [47]. These trends indicate a shift towards knowledge-guided Transformers for industrial diagnostics. This injected knowledge is often encoded as a fixed prior, graph, or auxiliary structure, rather than as a compact rule base that can be maintained and revised online as regimes and fault signatures shift.
+Outside the Transformer backbone, hybrid reasoning has broadened. Evolving neuro-fuzzy classifiers remain popular [39], but very recent relational Neuro-Symbolic Markov Models enforce first-order constraints along the whole time axis [48]. Hierarchical Decision Transformers that interface with symbolic planners achieve long-horizon control under explicit logical goals [49], and Logic-LM style systems combine large language models with external solvers for faithful rule satisfaction [50]. Pseudo-semantic losses further provide gradient-based proxies that impose logic consistency on autoregressive Transformers [51]. These developments strengthen the case for explicit constraints, but they do not directly resolve the rotating-machinery setting where the relevant constraint set itself should evolve with speed/load-induced changes in the signal.
+A closely related strand is transfer learning and domain/test-time adaptation for cross-condition diagnosis, which tackles distribution shift by aligning representations across operating regimes and updating the model as conditions evolve. Authors in [52] propose multi-source information transfer learning with subdomain adaptation to reduce cross-domain mismatch beyond global alignment. Moving to online settings, Tian et al. [53] introduce continual test-time domain adaptation under dynamic operating conditions, while Tian et al. [54] propose an evidential deep learning test-time adaptation strategy that stabilizes online updates via uncertainty-aware modelling.
+Graph and information-fusion methods construct graphs over multi-sensor or multi-view features and learn fault representations with graph neural networks. A universal graph neural network with multiple strategy constraints learns unsupervised fault features from full-dimensional signal descriptions and yields embeddings that transfer across several industrial datasets [55]. A sample-level multi-representation fusion scheme with semi-supervised graph learning is proposed for rotating machinery fault diagnosis when only a small number of labelled samples are available [56]. At a more general representation-learning level, uncertainty-aware embeddings of attributed networks combine several feature views while preserving multi-order proximity in the underlying graph [57]. Multi-sensor information fusion via several non-Euclidean graphs over sensors and time has been applied to extract equipment features for multiple operation and maintenance tasks under limited task labels [58].
+Further work uses graph structure and multi-sensor fusion for machinery health monitoring. Trusted multi-source information fusion with a modified graph convolution network has been reported for electromechanical systems [59]. Noise-robust multi-view graph neural networks have been proposed for rotating machinery fault diagnosis [60], and multi-view graph convolutional networks have been designed to fuse multi-source information for mechanical fault diagnosis [61]. Richly connected spatio-temporal graphs and attention-aware temporal–spatial graphs have been used to fuse multi-sensor signals for rotating machinery fault diagnosis [62], [63], while a dynamic graph attention network combined with time–frequency data fusion has been proposed for multi-sensor fault diagnosis [64]. Graph structures embedded with physical constraints have also been used in information-fusion networks for interpretable aero-engine fault diagnosis [65]. A recent survey reviews graph neural network-based fault-diagnosis methods across several industrial domains and synthesizes their main modelling patterns [66]. Together, these works highlight graph construction and multi-sensor fusion as powerful tools for robust diagnosis under label scarcity and varying operating conditions. However, the inductive bias is primarily expressed through topology and message passing, whereas our goal is a compact, explicit, first-order rule set whose content can be maintained and revised as the latent fault structure reorganizes under regime changes. Our approach is complementary: instead of encoding inductive bias through an explicit graph topology, we retain a compact 1D Transformer on raw vibration windows and impose structure via logical rules that are induced and updated during training, yielding explicit, queryable explanations.
+Existing Transformer-based models for fault diagnosis rarely embed dynamic symbolic constraints, while most neuro-symbolic systems assume a fixed rule base. In rotating machinery, this becomes especially limiting under speed/load variability: the same fault can produce different mixtures of impulses, resonance ring-down, and load-dependent modulation sidebands across operating points, creating intra-class regimes that drift in prevalence and separation. Static constraints, like the label-consistency axioms, can regularize confidence but cannot represent and maintain this evolving multi-modality. By contrast, our model couples a lightweight Transformer encoder with Logic Tensor Networks whose similarity rules are continuously induced, merged, and pruned as training progresses. This induces a low-cardinality set of prototype-grounded implications that tracks the evolving embedding geometry, providing an explicit knowledge-adaptation mechanism aligned with operating-condition drift while preserving baseline Transformer inference latency. Our work unifies these two research lines: a lightweight Transformer guided by Logic Tensor Networks whose rules are continuously induced and pruned, thereby addressing the open problem stated as our research gap, that of knowledge adaptation under changing scenarios.
+This neuro-symbolic diagnosis system is novel for rotating machinery: prior purely neural approaches have not incorporated formal logical reasoning, and traditional expert systems lack state-of-the-art deep feature extractors. By dynamically integrating learned signal representations with evolving symbolic rules, our contribution bridges this gap. The proposed model satisfies logical consistency constraints while learning rich features from data, thereby advancing both explainability and fault coverage. In summary, neuro-symbolic learning has the potential to enhance fault diagnosis by combining powerful feature learning [67] with domain knowledge and reasoning [26].
+3. Methodology
+Problem Statement. Let 
+D
+=
+{
+(
+x
+i
+,
+y
+i
+)
+}
+i
+=
+1
+N
+ be a dataset of vibration windows 
+x
+i
+∈
+R
+1
+×
+T
+, each of length 
+T
+=
+20
+ samples. The value for 
+T
+ was chosen as the best in terms of performance during our tests on a separate tuning subset (macro-F1 on a 15% validation split). The values tried were 
+T
+=
+{
+5
+,
+10
+,
+20
+,
+50
+,
+100
+}
+. Every label 
+y
+i
+ identifies a fault scenario drawn from the set 
+Y
+=
+{
+1
+,
+…
+,
+K
+}
+, where the number of classes 
+K
+ depends on the benchmark; 
+K
+=
+9
+ for UoC and DDS. Fig. 1 summarizes the proposed approach, with details for each component following afterwards.
+We aim to learn a parameterized predictor 
+f
+Θ
+:
+R
+1
+×
+T
+→
+Y
+ that returns
+y
+ˆ
+=
+f
+Θ
+(
+x
+)
+=
+arg
+max
+k
+∈
+Y
+P
+k
+(
+x
+)
+,
+with each fuzzy predicate 
+P
+k
+(
+x
+)
+∈
+[
+0
+,
+1
+]
+ grounded by the network’s softmax score in the sense of Real Logic [23]. During training the model must
+Fig. 1
+Download: Download high-res image (453KB)
+Download: Download full-size image
+Fig. 1. End-to-end framework. Time-series windows are patched and embedded and a [CLS] token is prepended. A compact Transformer encodes the tokens and an MLP head is used to output class probabilities. Only in the training (denoted by the purple dotted line) prototype-based similarity and label-consistency rules are optimized, with automatic merge/prune of redundant rules.
+
+1.
+maximize classification accuracy on 
+D
+,
+2.
+maximize the aggregate truth degree 
+SatAgg
+ of a first-order rule set 
+K
+t
+, and
+3.
+dynamically update 
+K
+t
+↦
+K
+t
++
+1
+ during training so the rules adapt to distribution drift.
+Thus learning solves
+Θ
+⋆
+=
+arg
+max
+Θ
+SatAgg
+(
+G
+Θ
+(
+K
+t
+)
+)
+,
+where 
+G
+Θ
+ is the LTN grounding operator and 
+SatAgg
+ is defined in Eq. (3).
+This section explains how first-order reasoning and deep time-series encoding are combined in a single trainable pipeline. Symbolic rules, expressed in the Logic Tensor Network (LTN) framework, provide explicit supervision that remains meaningful even in low-data regimes, whereas a lightweight one-dimensional Transformer supplies the raw feature extractor. Because both components are trained together, rule violations propagate gradients all the way to the first convolution, letting prior knowledge directly impact the learned embedding.
+3.1. LTN-based optimization
+Logic Tensor Networks (LTNs) [23] provide a fully differentiable bridge between first-order logic and gradient descent. The grounding operator 
+G
+θ
+ maps each syntactic object to a real-valued tensor so that formulas acquire truth degrees in 
+[
+0
+,
+1
+]
+. Let 
+K
+ be the current rule set, including the similarity rules of Section 3.2. Learning therefore maximizes the same objective introduced in the Problem Statement.
+Fuzzy operators.
+We adopt the following Real-Logic connectives: the product 
+t
+-norm 
+a
+⊗
+b
+=
+a
+b
+ (fuzzy “and”), the product 
+s
+-norm 
+a
+⊕
+b
+=
+a
++
+b
+−
+a
+b
+ (fuzzy “or”), standard negation 
+¬
+a
+=
+1
+−
+a
+, and the Goguen implication 
+a
+⇒
+b
+=
+min
+(
+1
+,
+b
+a
+)
+. Truth values are clipped to 10−6 to avoid division by zero; all functions remain continuously differentiable on 
+(
+0
+,
+1
+]
+.
+Satisfiability aggregator (
+Agg
+).
+Following [28], we adopt the aggregated 
+p
+-mean error (ApME) with 
+p
+=
+2
+ (so 
+Agg
+=
+A
+2
+ME
+) For a mini-batch with 
+n
+ truth values 
+x
+1
+,
+…
+,
+x
+n
+,
+(2)
+A
+2
+ME
+(
+x
+1
+,
+…
+,
+x
+n
+)
+=
+1
+−
+(
+1
+n
+∑
+i
+=
+1
+n
+(
+1
+−
+x
+i
+)
+2
+)
+1
+/
+2
+,
+and, applied to all rules, ApME gives
+(3)
+SatAgg
+=
+1
+−
+(
+1
+R
+∑
+r
+=
+1
+R
+(
+1
+−
+α
+r
+)
+2
+)
+1
+/
+2
+,
+where 
+R
+ is the batch-wise number of instantiated rules (recomputed each epoch) and 
+α
+r
+=
+G
+θ
+(
+φ
+r
+)
+∈
+[
+0
+,
+1
+]
+ is the truth degree of rule 
+φ
+r
+. SatAgg is the first term of the composite loss in Eq. (5).
+Predicates and label axioms.
+Each fault class 
+k
+∈
+Y
+ is represented by a predicate 
+P
+k
+ grounded as its softmax probability, 
+p
+ˆ
+k
+=
+softmax
+(
+z
+)
+k
+ with 
+z
+ the network logits. For every labelled segment 
+(
+x
+,
+y
+)
+ the knowledge base adds
+(4)
+∀
+x
+:
+P
+y
+(
+x
+)
+,
+∀
+x
+:
+¬
+P
+k
+(
+x
+)
+(
+k
+∈
+Y
+∖
+{
+y
+}
+)
+,
+where each 
+∀
+ is grounded by the batch mean. The positive clause enforces label consistency; the 
+K
+−
+1
+ negative clauses are each given weight 
+1
+/
+(
+K
+−
+1
+)
+, so their combined influence matches the positive term, thus avoiding class-imbalance bias. These label rules coexist with the similarity rules introduced in Section 3.2.
+3.2. Hybrid encoder meets LTN architecture
+Each vibration segment is a length 
+T
+=
+20
+ time series 
+x
+∈
+R
+1
+×
+T
+ with categorical label 
+y
+∈
+Y
+. The proposed model 
+M
+ couples a lightweight 1-D Transformer to the LTN layer of Section 3.1, so that symbolic constraints act directly on the learned representation.
+Transformer encoder.
+Each vibration window 
+x
+∈
+R
+1
+×
+T
+ is divided into overlapping patches of ten samples with stride five; for our default 
+T
+=
+20
+ this yields three patch tokens. A 
+1
+×
+10
+ convolution with stride five maps 
+x
+ to a sequence of 64-dimensional patch tokens, after which a learnable class token 
+z
+cls
+ is prepended and dropout is applied to the token sequence. The resulting tokens are processed by six pre-norm Transformer layers with eight attention heads. The final class-token output defines the embedding 
+f
+(
+x
+)
+∈
+R
+64
+, used for similarity-rule induction. For classification, we exclude the 
+[
+CLS
+]
+ token and pool the patch-token sequence with adaptive average and max pooling, concatenate the pooled features, and pass them through a two-layer MLP to obtain logits 
+z
+. Class probabilities then follow as 
+p
+ˆ
+(
+x
+)
+=
+softmax
+(
+z
+)
+.
+Configuration-specific choices (1) Depth 6 and width 64 replicate the “TST-Lite” profile of the Time-Series Transformer [32] and align with the “Synthesizer-Small” setting [42], which report state-of-the-art bearing-fault accuracy with 0.37 M and 3.1 M parameters, respectively. In our case, the model has 0.436 M trainable parameters (435 977).
+(2) At width 64, the depth/head sweep (Table A.14) shows that depth 8 yields at most ＋0.008 accuracy at ＋29.94% FLOPs, while depth 10 reduces accuracy by up to −0.070 despite ＋59.87% FLOPs; conversely, depth 4 improves accuracy by up to ＋0.022 at −29.94% FLOPs.
+(3) A width sweep at depth 6, heads 8 confirms the latency-accuracy trade-off: shrinking 64 to 32 lowers accuracy by 0.126 at −72.13% FLOPs, whereas increasing to 96 and 128 raises accuracy by ＋0.067 and ＋0.107 at ＋116.57% and ＋277.59% FLOPs, respectively. We therefore adopt width 64 as a balanced choice, enabling on-device inference in 3.746 ms per segment on a single-threaded CPU.
+(4) Head count has minor impact at fixed width: at depth 6, moving from 8 to 16 heads changes accuracy by at most ＋0.012 with minimal additional FLOPs; we thus keep eight heads as a default for long-range spectral–temporal dependencies [41].
+Similarity rules.
+After each epoch we run per–class 
+k
+–means in the embedding 
+f
+(
+⋅
+)
+, obtaining 
+k
+ sub–clusters for every ground–truth class. For each class we compute a within–class silhouette using only these sub–cluster labels and aggregate by the mean across classes; Fig. 2A reports this mean and its IQR band (see also Table 1 for the effect on macro–F1). For visualization only, a stratified subset (60 samples per class) is mapped to 2-D with t-SNE (perplexity 30, fixed seed); ellipses show each sub-cluster’s empirical 
+2
+σ
+ spread and centroids are placed on the map via a linear fit from the embedding (so t-SNE’s nonlinearity does not move them).
+The similarity rule encourages consistency with class prototypes. For class 
+k
+ and centroid 
+i
+,
+S
+k
+,
+i
+(
+x
+)
+=
+exp
+(
+−
+1
+2
+‖
+f
+(
+x
+)
+−
+μ
+k
+,
+i
+‖
+2
+2
+)
+⇒
+P
+k
+(
+x
+)
+,
+using Goguen implication. Because 
+S
+k
+,
+i
+∈
+[
+0
+,
+1
+]
+, these rules are soft and cannot contradict labels. Centroids with support 
+<
+s
+min
+ (default 10) are discarded to avoid spurious modes. We choose 
+k
+ by balancing separation and fragmentation, preferring the smallest value after the local minimum that also maintains strong task performance. On UoC, this yields 
+k
+=
+3
+ (Fig. 2A; Table 1).
+Mechanical interpretation of similarity prototypes.
+The 
+k
+-means step in Section 3.2 operates on the class-token embeddings 
+f
+(
+x
+)
+, which summarize short vibration windows in terms of their local temporal and spectral structure. For a fixed fault class 
+k
+, the resulting centroids 
+μ
+k
+,
+i
+ therefore group together windows that share a similar pattern of impulses, mesh lines and modulation sidebands, rather than arbitrary coordinates in latent space. When the signal is segmented into short windows, these mechanisms give rise to a small number of recurring regimes within the same fault mode (for example, impact-dominated windows, ring-down/resonance windows, and low-modulation background windows).
+Across both DDS and UoC we observed that the learned prototypes align with these regimes. Averaging the spectra of windows assigned to each centroid 
+μ
+k
+,
+i
+ yields distinct, repeatable shapes, with some prototypes concentrating energy around characteristic fault frequencies and their sidebands (gear-mesh and shaft harmonics for DDS gear faults, ball-pass frequencies for DDS bearing faults and UoC gear defects), and others emphasizing lower-frequency modulation or broadband resonance. This empirical behaviour explains why a small value of 
+k
+ is both sufficient and desirable. With 
+k
+=
+1
+, all regimes associated with a given fault are forced into a single prototype, weakening the ability of the similarity rule to capture the diversity of physically plausible realizations of that fault. Making 
+k
+ very large, in contrast, fragments these regimes into many centroids that differ mainly by small amplitude or noise variations and add little diagnostic information, which is reflected in the diminishing performance gains beyond 
+k
+=
+3
+ in Table 1. We therefore interpret our default 
+k
+=
+3
+ not only as the point where silhouette and macro-F1 stabilize (Fig. 2A; Table 1), but also as the smallest number of prototypes that still separates the principal vibration regimes within a fault class. In this sense, each logical rule 
+S
+k
+,
+i
+(
+x
+)
+⇒
+P
+k
+(
+x
+)
+ can be read as: “if 
+x
+ exhibits the 
+i
+th prototypical vibration pattern associated with fault 
+k
+, then the probability of class 
+k
+ should be high”, directly linking the symbolic predicates to the underlying physical failure mechanisms.
+Algorithm 1 maintains 
+K
+t
+ during training. Default similarity-merge threshold is 
+τ
+=
+0
+.
+80
+ (cosine similarity), but we have also experimented with 
+0
+.
+55
+,
+0
+.
+60
+,
+0
+.
+65
+ up to 1.00, see Table 2.
+Image 1001
+Download: Download high-res image (123KB)
+Download: Download full-size image
+Table 1. Ablation of number of clusters 
+k
+: differences in macro F1 relative the 
+k
+ value for the clustering logic.
+
+k
+1	2	3	4	5	9	10	20
+Δ
+–	＋0.027	＋0.030	＋0.010	＋0.022	−0.003	−0.002	−0.004
+Fig. 2
+Download: Download high-res image (372KB)
+Download: Download full-size image
+Fig. 2. Choosing the number of sub-clusters 
+k
+∈
+{
+2
+,
+3
+,
+4
+,
+5
+,
+9
+,
+10
+,
+20
+}
+. (A) Mean within-class silhouette across classes as a function of 
+k
+ (blue, left axis); the blue band in the background shows the interquartile range. (B–E) Two representative classes shown for 
+k
+=
+2
+ and 
+k
+=
+3
+ on a two-dimensional t-SNE map of the learned embedding (other classes greyed out). Silhouette values are very close for 
+k
+≥
+4
+ (a shallow rise after the local minimum at 
+k
+=
+3
+), while median support decreases as 
+k
+ grows. Together with Table 1, this supports choosing 
+k
+=
+3
+ for the main results and reporting 
+k
+=
+2
+ for sensitivity.
+
+Table 2. Study on similarity-merge threshold. Best value for 
+k
+=
+3
+ was kept in this search.
+
+τ
+0.55	0.60	0.65	0.70	0.75	0.80	0.85	0.90	0.95	1.00
+Δ
+(Macro F1)
+−0.020	−0.024	−0.033	−0.012	−0.025	–	−0.010	−0.026	−0.015	−0.021
+During training we also monitor, at every epoch, the number of active similarity rules and a few summary statistics (minimum, maximum and final rule count, and the mean and standard deviation over the last 20% of epochs). These quantities are logged alongside loss and accuracy and later used in Section 4.2.1 to characterize how the rule base behaves under different operating conditions.
+For the raining objective, our overall loss is
+(5)
+L
+=
+1
+−
+SatAgg
++
+β
+‖
+Θ
+‖
+2
+2
+,
+where 
+β
+=
+0
+.
+001
+. Optimization uses Adam (learning rate 10−4, batch 2048, fixed seed = 1) with early stopping.
+Model complexity. We evaluated the model on real vibration segments from the UoC dataset in Table 3. It comprises 43 5 977 learnable parameters and requires approximately 1 351 552 FLOPS. On an Intel Core I9 10900X CPU average inference time was 3.746 ms per segment and on an NVIDIA RTX A4000 GPU it was 4.373 ms per segment. The integration of Logic Tensor Networks only guides and constrains training and does not introduce any overhead at inference time, ensuring the same latency as the base 1-D Transformer.
+Table 3. Computational complexity and latency. Averaged from 1000 inferences.
+
+Platform	Params	FLOPs	ms/segment
+CPU (Intel Core I9-10900X)	435 977	1 351 552	3.746
+GPU (NVIDIA RTX A4000)	4.373
+4. Experimental evaluation
+We evaluate the proposed method on industrial vibration data. Experiments were run on Windows with 128 GiB RAM, an NVIDIA A4000 GPU, and an Intel(R) Core(TM) i9-10900X CPU.
+Datasets. We use two benchmarks: the Drivetrain Dynamics Simulator (DDS) and the University of Connecticut (UoC) gear-fault datasets. Both datasets contain nine classes, but their fault taxonomies differ (Table 4, Table 5). In both cases we cast diagnosis as a supervised nine-way classification problem: short time-domain vibration windows are used as inputs, and the corresponding physical condition of the gearbox/bearing (healthy or specific fault type) provides the class label. Abbreviations in figures default to DDS shorthands (Table 4); for UoC, SPL denotes spall and CTF-1…CTF-5 denote chipping severity levels.
+DDS. The DDS testbed provides multichannel vibration under fixed and variable operating conditions, sampled at 5120 Hz with eight synchronized channels: channel 1 is motor vibration; channels 2–4 are RGB 
+y
+/
+x
+/
+z
+; channel 5 is torque; channels 6–8 are PGB 
+y
+/
+x
+/
+z
+. Preprocessing and segmentation follow Section 3. Train/test splits use balanced splits of 5000 training and 1000 test samples per fault type and speed, standardization, one-hot encoding of the nine classes, and generation of subsequences with a sliding window. For each fixed speed–load regime and for each of the nine DDS fault classes in Table 4, we first form a long, continuous vibration record per operating condition. From that record we extract windows of length 
+T
+=
+20
+ using a unit-stride sliding window along the time axis. Each window inherits the fault label of the originating experiment. We then randomly subsample these windows without replacement to obtain balanced train and test sets with the same number of windows per class and regime, consistent with this configuration. This procedure is repeated independently for all speed–load regimes, so every domain in Table 9 is class-balanced at the window level. No synthetic signals are generated: all windows are cropped from the original DDS vibration recordings. The only source of noise is the measurement noise present in the test rig (mechanical and sensor noise); we do not add artificial white noise or other perturbations.
+Standardization on DDS is performed via feature-wise z-score scaling: all feature columns (vibration samples and, when present, auxiliary channels) are treated as inputs, while the column for the fault type is kept as the discrete target. The scaling parameters (mean and standard deviation per feature) are estimated on the training portion of the data and then reused to transform the corresponding test portion.
+UoC. Collected at the University of Connecticut [34], this dataset comprises nine gear conditions (Table 5) at 20 kHz. We use the benchmark’s preprocessed time-domain matrix, where each row is a univariate acceleration trace of length 936 samples (approximately 46.8 ms at 20 kHz). The matrix contains 3600 labelled traces, exactly 400 per fault condition, so that the class priors are perfectly balanced across the nine gear states. We do not relabel or re-sample the original runs and only discard a small number of corrupted records. Preprocessing (standardization and windowing) follows the common pipeline described below, and each resulting UoC window is a standardized univariate signal. Segmentation for UoC is performed at the trace level: each length-936 standardized trace is treated as a single 1D signal, and we slide a window of length 
+T
+=
+20
+ with stride 100 across it. The resulting windows inherit the gear condition label of their parent trace and form the input to the 1D Transformer. This sparse, low-overlap windowing strategy mimics a realistic industrial scenario in which only short snippets of vibration data are available, while still covering each trace with multiple diagnostic snippets. Measurement noise from the experimental setup is naturally present in the traces. As it was the case with DDS, we do not add synthetic noise or perform any further data augmentation on UoC.
+Data preprocessing. Across both datasets we follow a common preprocessing pipeline.
+Table 4. DDS fault classes and abbreviations.
+
+Class number	Abbreviation	Description
+1	HEA	Healthy condition
+2	CTF	Chipped tooth fault in Planetary Gearbox (PGB)
+3	MTF	Missing tooth fault in PGB
+4	RCF	Root crack fault in PGB
+5	SWF	Surface wear fault in PGB
+6	BWF	Ball wear fault in bearing
+7	CWF	Composite wear fault in outer and inner races of bearing
+8	IRF	Inner race fault in bearing
+9	ORF	Outer race fault in bearing
+PGB: Planetary Gearbox; RGB: Reduction Gearbox.
+Table 5. UoC fault classes and abbreviations.
+
+Class number	Abbreviation	Description
+1	HEA	Healthy condition
+2	CTF-1	Chipped tooth (tip chipping), severity level 1
+3	CTF-2	Chipped tooth (tip chipping), severity level 2
+4	CTF-3	Chipped tooth (tip chipping), severity level 3
+5	CTF-4	Chipped tooth (tip chipping), severity level 4
+6	CTF-5	Chipped tooth (tip chipping), severity level 5
+7	MTF	Missing tooth
+8	RCF	Root crack
+9	SPL	Tooth surface spall (pitting)
+UoC contains only gear faults; bearing-fault classes do not appear, contrary to DDS.
+1.
+We load the time series data and discard corrupted segments (NaNs or constant signals).
+2.
+Feature-wise z-score scaling is applied per dataset using statistics estimated on the training portion only, and the same transformation is reused for validation and test data.
+3.
+The standardized signals are segmented into fixed-length windows of 
+T
+=
+20
+ using the dataset-specific sliding-window schemes described above for DDS and UoC.
+4.
+Each window inherits the fault label of its source record and the nine fault types are encoded as one-hot vectors for the classifier head.
+Training setup. Batch size is 2048 and we set the training up to 1000 epochs with early stopping (patience 30). We use Adam (learning rate 10−4, weight decay 10−3). Logical constraints from the LTN are added as a regularizer with weight 
+β
+=
+0
+.
+001
+. Full hyperparameters are available in Table 6.
+Cross-validation. We report 2-fold stratified cross-validation for main results, and also explore 4, 8, and 16 folds for generalization.
+Table 6. Model and training hyperparameters.
+
+Parameter	Value
+Batch size	2048
+Epochs	1000
+Learning rate	0.0001
+Weight decay	0.001
+Transformer depth	6
+Attention heads	8
+Hidden embedding size	64
+Early stopping patience	30
+Calibration metric (ECE). We report Expected Calibration Error (ECE), a standard summary of reliability diagrams. For each test sample 
+x
+i
+ we take the predicted confidence as the maximum softmax probability 
+c
+i
+=
+max
+k
+P
+k
+(
+x
+i
+)
+ and the predicted label 
+y
+ˆ
+i
+=
+arg
+max
+k
+P
+k
+(
+x
+i
+)
+. We partition the confidence range 
+[
+0
+,
+1
+]
+ into 
+B
+=
+15
+ equal-width bins. For each bin 
+b
+, let 
+n
+b
+ be the number of samples in that bin, 
+acc
+b
+ the fraction of correct predictions in the bin, and 
+conf
+b
+ the average confidence in the bin. ECE is the weighted average gap between accuracy and confidence (Eq. (6)):
+(6)
+ECE
+=
+∑
+b
+=
+1
+B
+n
+b
+n
+|
+acc
+b
+−
+conf
+b
+|
+.
+Lower ECE indicates better calibration. We compute ECE on the held-out test split for each fold and report the mean across folds.
+4.1. Results on UoC
+Fig. 2A shows a local minimum in the mean within-class silhouette at 
+k
+=
+3
+ (0.1526), with only a modest rise thereafter (to 0.1661 at 
+k
+=
+10
+). Panels B–E provide the visual counterpart: at 
+k
+=
+3
+ an additional within-class mode is captured and sub-clusters remain compact with limited overlap. Consistently, the quantitative ablation in Table 1 reports the highest macro–F1 at 
+k
+=
+3
+. We therefore adopt 
+k
+=
+3
+ for training and include 
+k
+=
+2
+ as a sensitivity analysis. Table 7 summarize our model’s performance on the UoC gear-fault dataset, evaluated over nine fault classes. Overall macro-averaged F1 reached 0.939 (versus 0.905 for the vanilla Transformer), indicating strong generalization across fault modes.
+Table 8 provides a direct ECE comparison under the same protocol, enabling attribution of calibration gains to logic-guided training.
+Table 7. F1 score and improvements from vanilla Transformer to the inclusion of logical constraints.
+
+Class	Vanilla	LTN	
+Δ
+LTN
+−
+Van
+LTN+Sim	
+Δ
+Sim
+−
+LTN
+HEA	0.872	0.884	＋0.012	0.915	＋0.031
+CTF-1	0.853	0.880	＋0.027	0.916	＋0.036
+CTF-2	0.929	0.941	＋0.012	0.951	＋0.010
+CTF-3	0.990	0.989	−0.001	0.991	＋0.002
+CTF-4	0.882	0.894	＋0.012	0.913	＋0.019
+CTF-5	0.907	0.933	＋0.026	0.953	＋0.020
+MTF	0.916	0.931	＋0.015	0.946	＋0.015
+RCF	0.872	0.890	＋0.018	0.918	＋0.028
+SPL	0.928	0.948	＋0.020	0.951	＋0.003
+Average	0.905	0.921	＋0.016	0.939	＋0.018
+Table 8. UoC performance and calibration. ECE, from Eq. (6), uses 
+B
+=
+15
+ equal-width bins and maximum-softmax confidence (Section 4). Lower ECE is better.
+
+Model	Macro-F1	ECE
+Vanilla Transformer	0.905	0.0397
+LogicLSTM	0.877	0.0294
+LTN (static label rules)	0.921	0.0202
+LTN+Sim (ours)	0.939	0.0103
+The strongest per-class performance on UoC is observed for the medium chipping severity CTF-3 with an F1 of 0.991 in the final LTN+Sim model. Other gear conditions also score highly, including CTF-5 (0.953), CTF-2 (0.951), SPL (0.951) and MTF (0.946). The lowest per-class F1 is for CTF-4 at 0.913. These results suggest the main residual errors occur among adjacent chipping severities (CTF-1…CTF-5) and, to a lesser extent, between chipped and missing teeth, which can yield partially overlapping vibration signatures at certain operating points.
+Importantly, the strong macro averaged F1 together with the per class scores indicates that performance is not dominated by the more populous classes; rare or subtle fault types are classified with comparable fidelity. This balanced behaviour underscores the efficacy of our logic based regularization: symbolic constraints help steer the model to respect domain relationships even when data for certain classes are limited. Furthermore, the overall macro averaged F1 score of 0.939 surpasses the standalone Transformer baseline of 0.905, confirming that the neuro-symbolic fusion yields a substantial boost in fault classification robustness.
+4.2. Results on DDS dataset
+Table 9 reports accuracies for Synthesizer [42], RCNN [68], LSTM [69], LogicLSTM [33] and EWSNet [70], together with our model, across all DDS domains. Our model attains the highest average accuracy of 94.01%, improving over LogicLSTM at 88.20%. On the fixed speed and load domains it is best in eight of nine cases (LogicLSTM leads at 30 Hz, 0 N m). On the variable-speed tests it matches or exceeds the strongest baseline in five of ten cases (tests 2, 3, 4, 9, and 10), while LogicLSTM leads on the remaining tests. Baseline numbers are reproduced from the LogicLSTM study [33].
+While most DDS regimes in Table 9 achieve accuracies above 90%, a few settings remain clearly more challenging, notably 30 Hz at 1 N m (74.72%) and the mid-performing 30 Hz at 2 N m regime (PGB_30_2 in Table 12). To verify that these shortfalls are not simply artefacts of the similarity-rule thresholds, we performed a grid search over the support threshold 
+s
+min
+∈
+{
+5
+,
+10
+,
+15
+,
+20
+,
+25
+}
+ and the merge-cosine threshold 
+τ
+∈
+{
+0
+.
+55
+,
+0
+.
+60
+,
+…
+,
+0
+.
+95
+,
+1
+.
+00
+}
+ for three representative regimes: an easy case (PGB_20_0), the hard case (PGB_30_1) and a mid-performing case (PGB_30_2). Across this grid, accuracies vary by at most 
++
+2
+.
+36
+/
+−
+1
+.
+65
+ percentage points for the easy regime, 
++
+3
+.
+83
+/
+−
+0
+.
+55
+ for the mid-performing regime and 
++
+12
+.
+30
+/
+−
+4
+.
+28
+ for the hard regime, all relative to the default 
+(
+s
+min
+=
+10
+,
+τ
+=
+0
+.
+80
+)
+ configuration (see Table 10), indicating that the main conclusions are robust to reasonable threshold changes, although the hardest regime is naturally more sensitive to extreme settings.
+Table 9. Accuracy results for Synthesizer, RCNN, LSTM, LogicLSTM and our model. Best results in bold, second best underlined for the five baseline methods.
+
+PGB State	Synthesizer-Small	RCNN	LSTM	LogicLSTM	EWSNet	Our model
+Empty Cell	Accuracy (%)	Accuracy (%)	Accuracy (%)	Accuracy (%)	Accuracy (%)	Accuracy (%)
+20 Hz, 0 N m	85.68	82.46	77.55	86.22	54.73	90.84
+30 Hz, 0 N m	69.87	73.08	69.42	86.84	78.51	80.34
+30 Hz, 1 N m	45.33	41.32	24.75	54.61	26.35	74.72
+30 Hz, 2 N m	72.03	69.43	68.37	80.14	72.00	92.16
+30 Hz, 3 N m	66.80	63.89	57.58	79.94	69.66	92.02
+30 Hz, 4 N m	64.70	65.20	68.43	83.71	84.88	96.47
+30 Hz, 5 N m	66.33	75.14	51.22	71.56	52.56	95.92
+40 Hz, 0 N m	61.82	61.77	60.02	83.01	53.60	85.46
+50 Hz, 0 N m	46.23	52.23	23.41	52.59	49.31	83.49
+Var Speed Test 1	96.90	95.59	98.58	99.62	98.18	99.45
+Var Speed Test 2	99.31	99.10	99.91	99.98	82.64	99.98
+Var Speed Test 3	97.56	98.57	98.07	99.15	76.89	99.98
+Var Speed Test 4	99.20	99.54	99.87	99.88	85.74	99.97
+Var Speed Test 5	99.43	99.80	99.77	99.82	61.38	99.08
+Var Speed Test 6	96.61	99.74	97.66	99.99	99.11	99.94
+Var Speed Test 7	92.91	97.50	98.69	99.54	79.19	97.10
+Var Speed Test 8	96.30	95.94	98.68	99.70	81.02	99.41
+Var Speed Test 9	97.52	97.83	99.22	99.60	68.59	99.98
+Var Speed Test 10	98.15	99.73	99.97	99.97	93.94	99.97
+Average	81.72	82.52	78.48	88.20	72.01	94.01
+Table 10. Sensitivity of DDS accuracy to the support threshold 
+s
+min
+ and merge-cosine threshold 
+τ
+ for three representative regimes. For each regime we report the best and worst configurations in the 
+(
+s
+min
+,
+τ
+)
+ grid relative to the default 
+(
+10
+,
+0
+.
+80
+)
+; 
+Δ
+Acc is the accuracy change in percentage points with respect to that default.
+
+Regime	Best configuration	Worst configuration
+Empty Cell	
+s
+min
+τ
+Δ
+Acc	
+s
+min
+τ
+Δ
+Acc
+PGB_20_0 (easy)	5	0.60	＋2.36	10	0.90	−1.65
+PGB_30_2 (medium)	10	0.55	＋3.83	25	1.00	−0.55
+PGB_30_1 (hard)	5	0.60	＋12.30	20	0.90	−4.28
+4.2.1. Rule-base dynamics under fixed and variable regimes
+The DDS benchmark provides multiple operating regimes at different speeds and loads, which makes it a good testbed for inspecting how the induced rule base evolves during training. For each regime and cross-validation fold we therefore analyse the recorded number of similarity rules as a function of training epoch, together with the corresponding satisfiability and validation accuracy.
+Fig. 3a illustrates the dynamics for the 20 Hz, 0 N m case. At the beginning of training the model starts with one similarity prototype per class (9 rules). As the Transformer embedding improves, additional sub-clusters are discovered and the number of rules increases. In the second half of training, merge and prune operations balance one another and the rule count fluctuates only slightly around a stable value, while both satisfiability and validation accuracy rise and then level off. This scenario is relatively easy (Table 9 reports an accuracy of around 90%), and the rule base behaves as expected: early exploratory growth followed by a compact, stable configuration.
+A more demanding regime, 30 Hz at 1 N m, is shown in Fig. 3(b). Here the rule base again starts close to 9 rules but grows more rapidly. Subsequently, pruning removes weakly supported or redundant prototypes and the rule count contracts towards a plateau of around 10 rules. Validation accuracy is lower and more variable than in the previous case, and satisfiability displays modest oscillations, but the number of rules remains bounded and stabilizes in the later epochs. This scenario illustrates that, even when the classification problem is harder, the merge/prune mechanism prevents unbounded growth of the rule base and steers it towards a compact set of similarity rules.
+We then consider the reported variable-speed/load tests, which mix operating conditions. For each variable-speed experiment we repeat the same analysis and summarize the resulting statistics in Fig. 3(c). Across all ten regimes the final number of rules lies in a narrowband (between 9 and 10 rules, with a mean of 9.3), and the mean rule count over the last 20% of epochs remains close to this final value (between 9.0 and 10.18 rules) with a small standard deviation (on average 0.22, never exceeding 0.39). Based on these observations, we argue that the dynamic rule module adapts to different speed/load combinations while keeping the rule base compact and temporally stable once training has converged.
+(a)
+Download: Download high-res image (210KB)
+Download: Download full-size image
+(a). 20 Hz, 0 N m.
+
+(b)
+Download: Download high-res image (252KB)
+Download: Download full-size image
+(b). 30 Hz, 1 N m.
+
+(c)
+Download: Download high-res image (173KB)
+Download: Download full-size image
+(c). Variable speed/load.
+
+Fig. 3. Temporal behaviour of the dynamic rule base on DDS. (a) Easy fixed regime: the number of active similarity rules grows from the class count to a small plateau while satisfiability and validation accuracy stabilize. (b) Harder fixed regime: the rule count briefly overshoots and is then reduced by pruning, converging to a similar plateau despite more variable accuracy and satisfiability. (c) Summary across the ten variable-speed/load tests: all runs converge to a compact rule base with 9 to 10 active rules, the mean rule count over the last 20% of epochs remains close to the final value (9.0–10.18), and the late-epoch variability is small (average standard deviation 0.22, maximum 0.39), indicating a stable merge/prune process under changing operating conditions.
+
+4.2.2. Sequential operating-condition drift
+In a deployed setting, a diagnosis model is typically updated as new operating conditions become available, rather than being retrained from scratch for each regime. To emulate this scenario, we perform a sequential training experiment where the model is exposed to five DDS operating regimes in stages. We start from the 20 Hz, 0 N m regime and then progressively add four 30 Hz regimes with increasing load: 0, 1, 2, and 3 N m, in this order. At stage 
+s
+ the model has seen the set of regimes 
+R
+s
+=
+{
+r
+1
+,
+…
+,
+r
+s
+}
+: it is first trained on 
+r
+1
+, and at each subsequent stage we continue training the same network using only the training windows from the newly added regime 
+r
+s
+, while recomputing the similarity centroids and induced rules after every epoch on the union of training data from all regimes in 
+R
+s
+.
+Fig. 4a plots the evolution of the number of active similarity rules against the global training epoch, colour-coded by drift stage (with dotted vertical lines marking stage transitions). Across all stages the rule count remains bounded between 9 and 18 rules, and the final rule count for each stage lies between 10 and 18 rules. Table 11 summarizes these statistics per stage: over the last 20% of epochs in each stage, the standard deviation of the rule count never exceeds 2.09 rules (with an average of about 1.3), indicating that the merge/prune dynamics settle into a compact and temporally stable rule base despite changes in the operating regime.
+Fig. 4(b) shows the corresponding smoothed validation accuracy versus global epoch, again colour-coded by stage. At stage 
+s
+, validation accuracy is computed on the union of validation windows from all regimes in 
+R
+s
+=
+{
+r
+1
+,
+…
+,
+r
+s
+}
+, so each point reflects performance on the currently available operating-condition mixture. Within every stage the accuracy curve rises from its initial value and quickly stabilizes, with smoothed accuracies lying approximately between 0.61 and 1.0 across the entire run. Importantly, introducing a new regime 
+r
+s
+ causes only mild fluctuations on this global validation set: we do not observe any collapse of validation performance when the operating-condition mixture is updated.
+Beyond these global validation curves, we explicitly probe cross-regime generalization and forgetting on held-out test sets. After each stage 
+s
+, we freeze the model and evaluate it on the test windows of every regime 
+r
+j
+∈
+R
+s
+, obtaining a matrix of per-regime, per-stage accuracies 
+a
+j
+,
+s
+. Across all regimes and drift stages, these test accuracies remain in the range 0.52–0.93: newly added regimes rapidly reach high accuracy shortly after they enter 
+R
+s
+, whereas earlier regimes exhibit a moderate degradation as more operating conditions are incorporated. Together with the rule-count statistics in Fig. 4(a) and Table 11, this drift experiment shows that the proposed dynamic rule base maintains a narrow rule-count band and stable late-epoch behaviour under sequential operating-condition drift, while the classifier continues to generalize across operating regimes without catastrophic forgetting.
+In deployment, the runtime component is the base 1-D Transformer. LTN supervision and similarity-rule induction are applied only during offline training. This enables two complementary integration modes. Short-term. When a new operating point is introduced, the system can run a lightweight batch update: collect a small buffer of recent windows, recompute prototypes and refresh the similarity-rule set by rerunning Algorithm 1 on the batch (merge/prune included), and fine-tune the model for a small number of epochs before redeployment. During this cycle, the induced rules provide a compact diagnostic summary of what the model considers the new within-class regimes. Long-term. Under slowly evolving conditions, updates can be scheduled periodically using larger batches that span multiple regimes. In this setting, the rule base can be treated as an explicit, versioned diagnostic artefact. Rules and prototypes are stored alongside the model weights, reviewed for stability and coverage, and compared across update cycles to track emerging or disappearing regimes. This supports a strong documentation of regime changes, and targeted data acquisition for weakly supported modes.
+(a)
+Download: Download high-res image (148KB)
+Download: Download full-size image
+(a). Sequential operating-condition drift: number of active similarity rules versus global epoch. Colours distinguish drift stages (new regimes), and dotted vertical lines mark stage boundaries. The rule count quickly settles between 9 and 18 rules in each stage, indicating a compact and stable similarity-rule base.
+
+(b)
+Download: Download high-res image (89KB)
+Download: Download full-size image
+(b). Sequential operating-condition drift: smoothed validation accuracy versus global epoch. Curves are colour-coded by stage as in (a). Accuracy improves and stabilizes within each stage, remains between roughly 0.61 and 1.0.
+
+Fig. 4. Sequential operating-condition drift on DDS. (a) Dynamics of the similarity-rule base; (b) corresponding validation-accuracy trajectories.
+
+Table 11. Rule-base statistics per drift stage. For each stage we report the added regime, the number of training epochs, the maximum, minimum and final number of active similarity rules, and the mean and standard deviation of the rule count over the last 20% of epochs. All stages converge to a compact rule base with limited late-epoch variability.
+
+Stage	Added regime	Epochs	Max #rules	Min #rules	Final #rules	Mean (last 20%)	Std (last 20%)
+1	PGB_20_0	125	11	9	10	9.88	0.59
+2	PGB_30_0	71	18	15	18	17.43	0.62
+3	PGB_30_1	105	18	11	16	15.67	1.70
+4	PGB_30_2	128	18	9	18	17.28	2.09
+5	PGB_30_3	100	18	12	18	17.35	1.46
+4.2.3. Window size study
+We also assess sensitivity to the temporal window length by re-running the DDS protocol with a longer window (
+T
+=
+100
+ samples), keeping all other settings identical to Section 3. Table 12 reports per-domain accuracies for our model. These results complement the 
+T
+=
+20
+ configuration used in the rest of the experiments and isolate the effect of window length on fixed-speed/load and variable-speed regimes. The same choice of 
+T
+=
+20
+ as default window length is used consistently across DDS and UoC, matching the setting selected on the tuning split in Section 3.
+In absolute time, a window of 
+T
+=
+20
+ samples corresponds to approximately 3.9 ms on DDS (sampling rate 5120 Hz) and 1.0 ms on UoC (20 kHz), while 
+T
+=
+100
+ covers 19.5 ms and 5.0 ms, respectively. Although these intervals are shorter than a full mechanical revolution, windows are extracted densely along each record, so the encoder still sees many local fluctuations in the vibration signal per revolution and can learn stable features from short segments. The average accuracy difference between 
+T
+=
+20
+ and 
+T
+=
+100
+ on DDS is small (94.01% vs. 94.65%), indicating that the shorter window already retains most of the diagnostically relevant information.
+To understand what is contained in the short windows we use as input for our model, we performed a frequency-domain analysis of segments with high Transformer attention, using the CLS-to-patch attention scores introduced in Section 5. We selected the windows with highest patch attention and an equally sized set of random windows, so that the latter provide a baseline for the average spectral content, and computed average spectra on the DDS sampling rate (5120 Hz). Fig. 5 shows the result: average magnitude spectra of the high-attention windows versus random windows, with vertical lines at the shaft harmonics (30, 60, 90 Hz). For this class, the relative spectral energy of high-attention windows around the first three shaft harmonics (bands of 
+±
+40
+  Hz around each harmonic) is higher by a factor of 1.16 compared to random windows, and the low-frequency band 0–200 Hz shows a factor of 1.13.
+Table 12. DDS per-domain accuracy for our model at window sizes 
+T
+=
+20
+ and 
+T
+=
+100
+ samples. 
+T
+=
+20
+ values reproduce Table 9.
+
+PGB State	Our model (T = 20) Acc. (%)	Our model (T = 100) Acc. (%)
+20 Hz, 0 N m	90.84	91.72
+30 Hz, 0 N m	80.34	85.98
+30 Hz, 1 N m	74.72	81.33
+30 Hz, 2 N m	92.16	96.43
+30 Hz, 3 N m	92.02	92.34
+30 Hz, 4 N m	96.47	97.90
+30 Hz, 5 N m	95.92	98.81
+40 Hz, 0 N m	85.46	94.47
+50 Hz, 0 N m	83.49	81.16
+Var Speed Test 1	99.45	95.55
+Var Speed Test 2	99.98	100.00
+Var Speed Test 3	99.98	100.00
+Var Speed Test 4	99.97	100.00
+Var Speed Test 5	99.08	98.50
+Var Speed Test 6	99.94	100.00
+Var Speed Test 7	97.10	93.93
+Var Speed Test 8	99.41	94.19
+Var Speed Test 9	99.98	96.08
+Var Speed Test 10	99.97	99.98
+Average	94.01	94.65
+For the same set of windows we also inspected the corresponding similarity scores 
+S
+y
+ˆ
+(
+x
+)
+=
+max
+i
+S
+y
+ˆ
+,
+i
+(
+x
+)
+ for the predicted class 
+y
+ˆ
+. Windows that strongly activate at least one prototype 
+μ
+y
+ˆ
+,
+i
+ almost always belong to this high-attention subset and exhibit the same concentration of energy around shaft and fault-characteristic harmonics. In other words, the similarity predicates 
+S
+k
+,
+i
+ are not tied to arbitrary latent directions: they are grounded in vibration segments where the expected characteristic frequencies, modulation patterns and load-dependent harmonics are present, consistent with the mechanical interpretation in Section 3.2.
+Fig. 5
+Download: Download high-res image (321KB)
+Download: Download full-size image
+Fig. 5. Average magnitude spectra of high-attention windows (solid line) and random windows (dashed line) for an average regime (DDS, PGB 30 Hz, 2 N m, 
+T
+=
+20
+). Vertical dotted lines mark shaft-frequency harmonics at 30, 60, and 90 Hz.
+
+5. Explainability discussion
+The integration of symbolic rules into our hybrid Transformer-LTN improves both interpretability and reliability. By embedding domain knowledge as soft first-order constraints (Section 3.1), the model is trained not only to classify but also to respect known relations between fault modes and vibration signatures. All analyses below are computed on the test split of the UoC dataset (macro-F1, as reported in Table 7, is 0.939). On DDS, complementary physics-linked analyses of rule dynamics and attention in challenging regimes are reported in Section 4, in particular Sections 4.2.1 Rule-base dynamics under fixed and variable regimes, 4.2.2 Sequential operating-condition drift, 4.2.3 Window size study, where we relate the behaviour of the dynamic rule base and attention patterns to operating-condition changes and shaft-frequency harmonics.
+Explainable by design: we consider our model to be explainable by design, because the similarity predicates and their rule implications are optimized during training (Section 3.1), their truth degrees can be evaluated for any new sample and reported as intrinsic explanation scores (predicate activations, rule satisfactions, implication truth). The LTN grounding further enables simple logical queries and automatic consistency checks against the current rule set. Moreover, by optimizing a satisfiability objective (Eq. (3)) in addition to, and opposed to the classical cross entropy, the learner is explicitly encouraged to concentrate probability where the rules hold, yielding faithful, queryable explanations and supporting basic deductive reasoning over the learned predicates.
+Similarity rules as self-supervision.
+We reuse the similarity predicate 
+S
+k
+,
+i
+(
+x
+)
+ from Section 3.2 and summarize class-level activation by 
+S
+k
+(
+x
+)
+=
+max
+i
+S
+k
+,
+i
+(
+x
+)
+ (strongest prototype match).
+Post-hoc analysis. We present four concise, rule-linked summaries that highlight the effectiveness of an explainable Transformer trained under the LTN rule set 
+K
+t
+.
+1.
+Logic-aware class-to-class probabilities. The rule-conditioned matrix
+(7)
+M
+LTN
+[
+c
+,
+d
+]
+=
+E
+y
+=
+c
+[
+S
+c
+(
+x
+)
+P
+d
+(
+x
+)
+]
+E
+y
+=
+c
+[
+S
+c
+(
+x
+)
+]
+with 
+P
+d
+(
+x
+)
+ the softmax probability for class 
+d
+ (Section 3.1), the quantity 
+M
+LTN
+[
+c
+,
+d
+]
+ averages, over samples with 
+y
+=
+c
+, the probability the model assigns to class 
+d
+ when the class 
+c
+ rule is active. In Fig. 6, almost all probability remains on the class that triggered the rule. Averaged across classes, about 94% of the mass stays on the correct class; the weakest class still retains 85%, and the strongest is essentially 100%. Spillover to other classes is small, the largest secondary bar is about 4%, and most others are below 2.5%. This view is useful because it reveals consistent patterns in prediction behaviour and highlights underperforming cases where targeted changes, for example in data preprocessing or the model architecture, may be necessary. While softmax outputs in a standard DNN are straightforward to interpret, obtaining a class-conditioned distribution under rule activation is not.
+2.
+Rule–classifier consistency. Agreement between similarity rules and predictions is (8)
+Cons
+c
+=
+E
+S
+c
+(
+x
+)
+⇒
+P
+c
+(
+x
+)
+,
+Cons
+overall
+=
+1
+K
+∑
+c
+=
+1
+K
+Cons
+c
+,
+using the Goguen implication as in Section 3.1. Overall consistency is 0.55, indicating moderate alignment between the rules and the predictive head. Agreement is strongest for CTF-5 (0.71) and CTF-1 (0.67), and weakest for CTF-3 (0.38) and SPL (0.39) (Table 13). High values mean that when the class rule holds (high 
+S
+c
+), the model also assigns high probability to that class (high 
+P
+c
+). A possible fix for the lower values in CTF-3 and SPL is rule reweighting for these classes.
+3.
+Calibration and reliability. We assess calibration with Expected Calibration Error (ECE) using 
+B
+=
+15
+ equal-width confidence bins. For each sample we take the maximum softmax as confidence; in each bin we compare average confidence with empirical accuracy and average the absolute gaps, weighted by bin size. The ECE is 0.0103, and the reliability curve in Fig. 7 (left) lies close to the diagonal. A direct baseline comparison under the same protocol is reported in Table 8.
+4.
+Rule aligned attention over time. Final layer [CLS] to patch attention, averaged across heads and combined across layers by attention rollout, yields a per patch curve 
+A
+̄
+(
+t
+)
+. We link attention to rules via a leave one patch out rule sensitivity 
+Δ
+S
+y
+ˆ
+,
+t
+=
+S
+y
+ˆ
+(
+x
+)
+−
+S
+y
+ˆ
+(
+x
+∖
+t
+)
+ and define the Rollout Alignment (RA) coefficient
+(9)
+RA
+=
+corr
+t
+(
+A
+̄
+(
+t
+)
+,
+Δ
+S
+y
+ˆ
+,
+t
+)
+.
+computed per window and summarized across the test set. RA shows a positive median with wide variability (mean 0.04, std 0.69, median 0.14). 57% of windows have RA 
+>
+0
+, 35% have RA 
+≥
+0
+.
+5
+, and 31% have RA 
+≤
+−
+0
+.
+5
+. A positive median with many windows at RA 
+≥
+0
+.
+5
+ means that attention tends to concentrate on patches whose removal lowers the rule score for the predicted class, so attention highlights rule supporting segments rather than arbitrary locations. Windows with low or negative RA indicate a lack of alignment between attention and the rules. RA can also serve as a simple screening signal at inference time, for example accept when RA 
+>
+0
+ and flag RA 
+≤
+0
+ for review. Fig. 7 (right) provides an instance-level illustration for a single test window: we report the predicted label and confidence together with the predicted-class prototype match (rule support), and we verify faithfulness by showing that, in this window, removing the most-attended patch reduces this prototype match. In practical terms, this gives an engineer a short evidence trail by having additional information about which fault, how confident, and which time snippet in the vibration window actually carries the supporting signature.
+Summary. Taken together, these diagnostics show that the model is trustworthy and supports deductive queries over its rule base, while not being restricted to it. The rule–classifier consistency and the rule-conditioned matrix 
+M
+LTN
+ show that predictions concentrate where the class rules hold, while the small ECE indicates that the reported confidences are reliable.
+Fig. 6
+Download: Download high-res image (522KB)
+Download: Download full-size image
+Fig. 6. Rule-conditioned class-to-class probabilities on the UoC test set. Each row corresponds to a true class, bars show how the model distributes probability across predicted classes when the rule for that class is active. Rows are normalized to 100%.
+
+Table 13. Rule–classifier consistency (Eq. (8)) on the UoC test split. Class abbreviations per Table 5.
+
+Empty Cell	Class (UoC abbreviations)	Overall
+Empty Cell	HEA	CTF-1	CTF-2	CTF-3	CTF-4	CTF-5	MTF	RCF	SPL	Empty Cell
+Consistency	0.54	0.67	0.50	0.38	0.61	0.71	0.57	0.59	0.39	0.55
+Fig. 7
+Download: Download high-res image (221KB)
+Download: Download full-size image
+Fig. 7. Left: Reliability diagram on the UoC test split with 15 confidence bins. The curve shows empirical accuracy versus mean confidence and the diagonal indicates perfect calibration. Right: Attention rollout per patch plotted with rule sensitivity for the predicted class. Rule sensitivity is the drop in the class similarity score when that patch is removed. The rollout alignment linear correlation between the two curves for this window: positive RA means attention focuses on rule supporting patches.
+
+6. Conclusion
+We introduced a neuro-symbolic framework that couples a lightweight 1-D Transformer with Logic Tensor Networks to introduce domain rules into training while preserving the efficiency of a compact encoder at inference time. On two benchmarks, UoC and DDS, the hybrid model improves accuracy over strong baselines and provides rule-grounded diagnostics that make its decisions transparent.
+In UoC, the class-to-class rule-conditioned view shows that, when a class rule is active, about 94% of the probability mass remains in the same class, with a small “confidence” (
+≤
+4
+%
+) to others. Rule–classifier consistency averages 0.55, and calibration is strong (ECE 0.0103, with a baseline comparison in Table 8). Attention rollout aligns with rule sensitivity at the patch level with a positive median RA, indicating that attended segments generally support the active rule. These results suggest that the classifier concentrates probability where the rules hold and that its confidence estimates are reliable.
+On DDS, the model attains an average accuracy of 94.01%, improving over LogicLSTM (88.20%) and outperforming or matching other neural baselines across most operating regimes. Because LTN supervision acts only during training, the inference latency remains that of the base Transformer.
+Combining similarity and label based rules with attention based features yields a classifier that is accurate and explainable on UoC and DDS. The rule set clarifies when predictions are supported by the learned similarity structure and when they are not, surfacing cases for targeted refinement (for example prototype augmentation or rule reweighting). Future work will integrate explicit engineering knowledge into the rule set and assess robustness under broader operating shifts and sensor configurations. The non-optimal DDS regimes discussed indicate that remaining errors are concentrated in operating regions with overlapping fault spectra and only moderate rule–classifier agreement, motivating future extensions with multi-scale temporal context, multi-sensor similarity predicates and regime-aware rule weighting.
+CRediT authorship contribution statement
+Eduard Hogea: Writing – original draft, Software, Methodology, Data curation, Conceptualization. Darian M. Onchis: Writing – original draft, Validation, Supervision, Methodology, Conceptualization. Ruqiang Yan: Writing – review & editing, Validation, Supervision, Resources, Formal analysis, Data curation. Zheng Zhou: Writing – review & editing, Validation, Software, Methodology, Investigation, Data curation, Conceptualization.
+Declaration of competing interest
+The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+Acknowledgements
+This research is partially supported by the project “Romanian Hub for Artificial Intelligence - HRIA ”, Smart Growth, Digitization and Financial Instruments Program, 2021–2027, MySMIS no. 351416.
+Appendix A. Ideal model size search
+See Table A.14.
+Table A.14. Ablation over width (W), depth (D), and heads (H). Baseline: W = 64, D = 6, H = 8. 
+Δ
+Acc and 
+Δ
+FLOPs are computed relative to the baseline. All other training settings are held constant. Each run uses 50 epochs for computational reasons.
+
+W	D	H	Acc	
+Δ
+Acc	FLOPs	
+Δ
+FLOPs
+Baseline
+64	6	8	0.3543	＋0.0000	1,327,232	＋0.00%
+32	4	4	0.2807	−0.0736	269,504	−79.69%
+32	4	8	0.1973	−0.1570	269,504	−79.69%
+32	4	16	0.2611	−0.0932	269,504	−79.69%
+32	6	4	0.2303	−0.1240	369,856	−72.13%
+32	6	8	0.2282	−0.1261	369,856	−72.13%
+32	6	16	0.2368	−0.1175	369,856	−72.13%
+32	8	4	0.2398	−0.1145	470,208	−64.57%
+32	8	8	0.2240	−0.1303	470,208	−64.57%
+32	8	16	0.2332	−0.1211	470,208	−64.57%
+64	4	4	0.3763	＋0.0220	929,920	−29.94%
+64	4	8	0.3748	＋0.0205	929,920	−29.94%
+64	4	16	0.3582	＋0.0039	929,920	−29.94%
+64	6	4	0.3635	＋0.0092	1,327,232	＋0.00%
+64	6	8	0.3543	＋0.0000	1,327,232	＋0.00%
+64	6	16	0.3659	＋0.0116	1,327,232	＋0.00%
+64	8	4	0.3620	＋0.0077	1,724,544	＋29.94%
+64	8	8	0.3392	−0.0151	1,724,544	＋29.94%
+64	8	16	0.3282	−0.0261	1,724,544	＋29.94%
+96	4	4	0.4175	＋0.0632	1,983,552	＋49.45%
+96	4	8	0.4288	＋0.0745	1,983,552	＋49.45%
+96	4	16	0.4065	＋0.0522	1,983,552	＋49.45%
+96	6	4	0.4347	＋0.0804	2,874,432	＋116.57%
+96	6	8	0.4214	＋0.0671	2,874,432	＋116.57%
+96	6	16	0.4407	＋0.0864	2,874,432	＋116.57%
+96	8	4	0.4178	＋0.0635	3,765,312	＋183.70%
+96	8	8	0.4131	＋0.0588	3,765,312	＋183.70%
+96	8	16	0.4335	＋0.0792	3,765,312	＋183.70%
+128	4	4	0.4730	＋0.1187	3,430,400	＋158.46%
+128	4	8	0.4881	＋0.1338	3,430,400	＋158.46%
+128	4	16	0.4754	＋0.1211	3,430,400	＋158.46%
+128	6	4	0.4994	＋0.1451	5,011,456	＋277.59%
+128	6	8	0.4611	＋0.1068	5,011,456	＋277.59%
+128	6	16	0.5276	＋0.1733	5,011,456	＋277.59%
+128	8	4	0.4748	＋0.1205	6,592,512	＋396.71%
+128	8	8	0.4852	＋0.1309	6,592,512	＋396.71%
+128	8	16	0.4896	＋0.1353	6,592,512	＋396.71%
+Appendix B. Results on SpectraSimulator
+Table B.15 reports the performance of our hybrid Transformer–LTN model on the SpectraSimulator gearbox dataset, which comprises two classes: healthy operation and broken-tooth fault. Overall, the model achieves very high precision, recall, and F1-scores on both classes, with an average F1-score of 0.992. This demonstrates that the neuro-symbolic fusion generalizes effectively even to simulated vibration signals with only two operating conditions.
+Table B.15. Results of the hybrid Transformer-LTN model on the SpectraSimulator dataset.
+
+Class	Precision	Recall	F1-score
+HEALTHY	0.987	0.997	0.992
+BROKEN TOOTH	0.997	0.987	0.992
+AVERAGE	0.992	0.992	0.992
+Data availability
+Data will be made available on request.
