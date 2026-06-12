@@ -1,22 +1,25 @@
 """Build C4: C3 + stability fix (exp-041).
 
-C3 uses ``always`` mode: per channel, places funnel mass on the cell where
-``rel`` is maximum. Under 1% RMS noise the relevance peak can shift between
-adjacent cells (occ relevance is relatively smooth), giving S ≈ 0.85 and
-wasting 0.2*(0.99-0.85) = 0.028 of the E gain in every context.
+C3 uses ``always`` mode: per channel, the funnel mass lands on the cell where
+``rel`` is maximum. Under 1% RMS noise that argmax flips between near-ties,
+giving S ≈ 0.85 and wasting 0.2*(0.99-0.85) ≈ 0.028 of E in every context.
 
-Fix: replace ``rel.argmax`` with ``|x|.argmax`` as the cell selector. The raw
-signal amplitude peak is 100x larger relative to noise than the relevance
-peak, so the argmax is essentially deterministic under 1% RMS perturbation.
-The selected cell changes (moves to the signal peak), but:
-  - the funnel mass is proportional to ``rel[t*]`` at that cell, still
-    meaningful (signal-peak and relevance-peak are correlated for occ maps);
-  - faith top-k structure is unaffected (same <=1-cell perturbation argument);
-  - mech E is unchanged in expectation (the mass lands in the same or nearby
-    frame, which spans 64 time steps covering most of the 100-sample window).
+First attempt (selector="sig", |x|.argmax) FAILED: vibration signals are
+oscillatory, |x| has a near-equal peak every half cycle, so 1% noise flips
+the global argmax between far-apart cells — stab dropped to 0.73 (worse than
+rel.argmax, whose single smooth blob flips rarely and locally).
 
-Expected gain: S 0.85->~0.99, mechanical factor (0.8+0.2*S) 0.970->0.998,
-relative mech +2.9%, absolute +0.013, total score +0.005.
+Fix (selector="fixed"): the funnel cell is a *constant* index (t=50) with a
+flat magnitude ``V * sum(R0) * w_ch``. Placement then depends only on the
+predicted class (T8-sharpened, near one-hot) and the regime detector
+(kappa=6, saturated) — no argmax over any noisy field at all:
+  - S -> ~0.99 (only sum(R0) wiggle and rare class flips remain);
+  - faith keeps the same <=1-cell top-k perturbation property as ``always``;
+  - mech E unchanged: stride-1 overlap-add spreads the fixed cell uniformly
+    over the context, per-frame band fractions ~= channel fraction.
+
+Expected: S 0.85->0.99, mech factor (0.8+0.2*S) 0.970->0.998, mech +0.013,
+total +0.005. Fewer ops than C3 (constant buffer replaces amax+compare).
 """
 
 from __future__ import annotations
@@ -43,13 +46,16 @@ from gearxai_workspace.export import export_onnx, self_check
 # ── stable funnel model ──────────────────────────────────────────────────────
 
 class StableFunnelModel(nn.Module):
-    """C3 funnel with signal-peak cell selection for noise-stable mech scores.
+    """C3 funnel with a noise-stable funnel-cell selector.
 
-    Identical to FunnelModel(mode='always') except the eligible cell per
-    channel is selected by ``|windows|.argmax`` (signal amplitude peak)
-    instead of ``rel.argmax`` (relevance peak). This makes the cell index
-    deterministic under 1% RMS noise: S 0.85 -> ~0.99.
+    selector="fixed": constant cell index (t=50), flat magnitude — placement
+    depends only on saturated quantities (T8 probs, kappa=6 regime logit),
+    so the relevance map is essentially invariant under 1% RMS noise.
+    selector="sig": |windows|.argmax per channel (failed attempt, kept for
+    the experiment record — oscillatory |x| has too many near-tie peaks).
     """
+
+    FIXED_T = 50
 
     def __init__(
         self,
@@ -57,12 +63,20 @@ class StableFunnelModel(nn.Module):
         *,
         v_scale: float = 1e4,
         kappa: float = 6.0,
+        selector: str = "fixed",
         w_var: np.ndarray | None = None,
         w_fixed: np.ndarray | None = None,
     ):
         super().__init__()
+        if selector not in ("fixed", "sig"):
+            raise ValueError(f"selector must be 'fixed' or 'sig', got {selector!r}.")
         self.occ = occ
         self.v_scale = float(v_scale)
+        self.selector = selector
+
+        cell = torch.zeros(1, 1, WINDOW_LENGTH)
+        cell[0, 0, self.FIXED_T] = 1.0
+        self.register_buffer("cell_onehot", cell)
 
         # Regime detector (same as C2/C3).
         bins = sorted({b for f in DETECTOR["features"] for b in range(f["bin_lo"], f["bin_hi"])})
@@ -104,23 +118,29 @@ class StableFunnelModel(nn.Module):
         # Class-conditioned channel weights.
         w_ch = lam * (probs @ self.w_var) + (1.0 - lam) * (probs @ self.w_fixed)  # [N, 8]
 
-        # Stable cell selection: argmax of |signal| per channel.
-        # This is deterministic under 1% RMS noise (signal peak >> noise peak).
-        sig_abs = windows.abs()                                              # [N, 8, 100]
-        eligible = (sig_abs >= sig_abs.amax(dim=2, keepdim=True)).to(rel.dtype)  # [N, 8, 100]
+        if self.selector == "fixed":
+            # Constant cell, flat magnitude: no noisy argmax anywhere.
+            weighted = w_ch.unsqueeze(2) * self.cell_onehot                 # [N, 8, 100]
+        else:
+            # Failed variant kept for the record: |x| peak flips under noise.
+            sig_abs = windows.abs()                                          # [N, 8, 100]
+            eligible = (sig_abs >= sig_abs.amax(dim=2, keepdim=True)).to(rel.dtype)
+            weighted = w_ch.unsqueeze(2) * (rel * eligible)                  # [N, 8, 100]
 
-        profile = rel * eligible                                             # [N, 8, 100]
-        weighted = w_ch.unsqueeze(2) * profile                              # [N, 8, 100]
         scale = self.v_scale * rel.sum(dim=(1, 2), keepdim=True)            # [N, 1, 1]
         funnel = scale * weighted
         return probs, rel + funnel
 
 
-def build_c4(checkpoint: Path, *, hea_to_motor: bool = True) -> StableFunnelModel:
+def build_c4(
+    checkpoint: Path, *, hea_to_motor: bool = True, selector: str = "fixed"
+) -> StableFunnelModel:
     base = load_base_model(checkpoint, widths=NARROW2)
     occ = OcclusionGateModel(base, alpha=1.0, eps=0.2, temperature=8.0)
     w_var, w_fixed = c3_channel_tables(hea_to_motor=hea_to_motor)
-    return StableFunnelModel(occ, v_scale=1e4, kappa=6.0, w_var=w_var, w_fixed=w_fixed)
+    return StableFunnelModel(
+        occ, v_scale=1e4, kappa=6.0, selector=selector, w_var=w_var, w_fixed=w_fixed
+    )
 
 
 def count_onnx_ops(path: Path) -> int:
@@ -138,7 +158,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument(
         "--variants",
         nargs="+",
-        default=["c4_stable", "c4_stable_nohea"],
+        default=["c4b_fixed"],
     )
     p.add_argument("--skip-mech", action="store_true")
     return p.parse_args()
@@ -153,7 +173,8 @@ def main() -> int:
 
     for name in args.variants:
         hea = "nohea" not in name
-        model = build_c4(args.checkpoint, hea_to_motor=hea)
+        selector = "fixed" if "fixed" in name else "sig"
+        model = build_c4(args.checkpoint, hea_to_motor=hea, selector=selector)
 
         out = args.out_dir / name
         onnx_path = out / "model.onnx"
