@@ -73,7 +73,7 @@ class StableFunnelModel(nn.Module):
             raise ValueError(f"selector must be 'fixed' or 'sig', got {selector!r}.")
         self.occ = occ
         self.v_scale = float(v_scale)
-        self.selector = selector
+        self.cell_selector = selector
 
         cell = torch.zeros(1, 1, WINDOW_LENGTH)
         cell[0, 0, self.FIXED_T] = 1.0
@@ -119,7 +119,7 @@ class StableFunnelModel(nn.Module):
         # Class-conditioned channel weights.
         w_ch = lam * (probs @ self.w_var) + (1.0 - lam) * (probs @ self.w_fixed)  # [N, 8]
 
-        if self.selector == "fixed":
+        if self.cell_selector == "fixed":
             # Constant cell, flat magnitude: no noisy argmax anywhere.
             weighted = w_ch.unsqueeze(2) * self.cell_onehot  # [N, 8, 100]
         else:
