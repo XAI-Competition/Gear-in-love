@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import sys
 from pathlib import Path
 from typing import Any
@@ -37,13 +38,13 @@ from build_c3_motor_funnel import channel_tables as c3_channel_tables
 from export_occlusion_gate_variants import OcclusionGateModel
 from export_temperature_variants import load_base_model
 from torch import nn
-import math
 
-from gearxai_workspace.data import NUM_CHANNELS, NUM_CLASSES, WINDOW_LENGTH
+from gearxai_workspace.data import NUM_CHANNELS, WINDOW_LENGTH
 from gearxai_workspace.evaluate import evaluate_onnx, summary_line
 from gearxai_workspace.export import export_onnx, self_check
 
 # ── stable funnel model ──────────────────────────────────────────────────────
+
 
 class StableFunnelModel(nn.Module):
     """C3 funnel with a noise-stable funnel-cell selector.
@@ -110,7 +111,7 @@ class StableFunnelModel(nn.Module):
         probs, rel = self.occ(windows)
 
         # Regime detector -> lam (1 = variable speed).
-        proj = torch.matmul(windows, self.basis)          # [N, 8, 2B]
+        proj = torch.matmul(windows, self.basis)  # [N, 8, 2B]
         band = torch.matmul((proj * proj).flatten(1), self.selector)  # [N, F]
         z = torch.matmul(torch.log(band + 1e-9), self.det_w) + self.det_b  # [N, 1]
         lam = torch.sigmoid(z)
@@ -120,14 +121,14 @@ class StableFunnelModel(nn.Module):
 
         if self.selector == "fixed":
             # Constant cell, flat magnitude: no noisy argmax anywhere.
-            weighted = w_ch.unsqueeze(2) * self.cell_onehot                 # [N, 8, 100]
+            weighted = w_ch.unsqueeze(2) * self.cell_onehot  # [N, 8, 100]
         else:
             # Failed variant kept for the record: |x| peak flips under noise.
-            sig_abs = windows.abs()                                          # [N, 8, 100]
+            sig_abs = windows.abs()  # [N, 8, 100]
             eligible = (sig_abs >= sig_abs.amax(dim=2, keepdim=True)).to(rel.dtype)
-            weighted = w_ch.unsqueeze(2) * (rel * eligible)                  # [N, 8, 100]
+            weighted = w_ch.unsqueeze(2) * (rel * eligible)  # [N, 8, 100]
 
-        scale = self.v_scale * rel.sum(dim=(1, 2), keepdim=True)            # [N, 1, 1]
+        scale = self.v_scale * rel.sum(dim=(1, 2), keepdim=True)  # [N, 1, 1]
         funnel = scale * weighted
         return probs, rel + funnel
 
@@ -145,6 +146,7 @@ def build_c4(
 
 def count_onnx_ops(path: Path) -> int:
     import onnx
+
     m = onnx.load(str(path))
     return len(m.graph.node)
 
@@ -209,7 +211,9 @@ def main() -> int:
         line += f" | ops={ops}"
         if "mech_gear" in entry:
             eg = entry["mech_gear"]
-            line += f" | gear E={eg['enrichment']:.4f} stab={eg['stability']:.4f} mech={eg['mech']:.4f}"
+            line += (
+                f" | gear E={eg['enrichment']:.4f} stab={eg['stability']:.4f} mech={eg['mech']:.4f}"
+            )
         print(line)
 
     args.out_dir.mkdir(parents=True, exist_ok=True)
